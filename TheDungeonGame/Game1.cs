@@ -10,6 +10,7 @@ namespace TheDungeonGame
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private Player _player;
 
         public Game1()
         {
@@ -30,6 +31,7 @@ namespace TheDungeonGame
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
+            _player = new Player(Content.Load<Texture2D>("PointedCircle"), Vector2.Zero, 0.0f);
         }
 
         protected override void Update(GameTime gameTime)
@@ -39,7 +41,7 @@ namespace TheDungeonGame
 
             // TODO: Add your update logic here
             InputManager.Update();
-            Debug.WriteLine($"Moving Left: {InputManager.IsHeld(Input.MoveLeft)}");
+            _player.Move();
 
             base.Update(gameTime);
         }
@@ -49,6 +51,11 @@ namespace TheDungeonGame
             GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
+            _spriteBatch.Begin();
+
+            _player.Draw(_spriteBatch);
+
+            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
