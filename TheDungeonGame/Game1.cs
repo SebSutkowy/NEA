@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
+using System.Diagnostics;
 
 namespace TheDungeonGame
 {
@@ -36,6 +38,8 @@ namespace TheDungeonGame
                 Exit();
 
             // TODO: Add your update logic here
+            InputManager.Update();
+            Debug.WriteLine($"Moving Left: {InputManager.IsHeld(Input.MoveLeft)}");
 
             base.Update(gameTime);
         }

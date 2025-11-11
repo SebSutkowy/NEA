@@ -30,17 +30,22 @@ namespace TheDungeonGame
     }
 
 
-    class InputManager
+    static class InputManager
     {
-        private Dictionary<Input, KeyBind> Binds; // hard coded for now --> read from json file on launch
+        private static Dictionary<Input, KeyBind> Binds = new Dictionary<Input, KeyBind>() // hard coded for now --> read from json file on launch
+        {
+            {Input.MoveLeft, new KeyBind(){ Method = InputMethod.Keyboard, Key = Keys.A} },
+            {Input.MoveRight, new KeyBind(){ Method = InputMethod.Keyboard, Key = Keys.D} },
+            {Input.MoveUp, new KeyBind(){ Method = InputMethod.Keyboard, Key = Keys.W } },
+            {Input.MoveDown, new KeyBind(){ Method = InputMethod.Keyboard, Key = Keys.S} },
+        };
+        private static KeyboardState currentKeyboardState = new KeyboardState();
+        private static KeyboardState prevKeyboardState;
 
-        private KeyboardState currentKeyboardState = new KeyboardState();
-        private KeyboardState prevKeyboardState;
+        private static MouseState currentMouseState = new MouseState();
+        private static MouseState prevMouseState;
 
-        private MouseState currentMouseState = new MouseState();
-        private MouseState prevMouseState;
-
-        public void Update()
+        public static void Update()
         {
             prevKeyboardState = currentKeyboardState;
             currentKeyboardState = Keyboard.GetState();
@@ -49,9 +54,9 @@ namespace TheDungeonGame
             currentMouseState = Mouse.GetState();
         }
 
-        public Point GetMousePos() => currentMouseState.Position;
+        public static Point GetMousePos() => currentMouseState.Position;
 
-        public bool IsPressed(Input input)
+        public static bool IsPressed(Input input)
         {
             if (Binds[input].Method == InputMethod.Keyboard)
                 return currentKeyboardState.IsKeyDown(Binds[input].Key) && !prevKeyboardState.IsKeyDown(Binds[input].Key);
@@ -63,7 +68,7 @@ namespace TheDungeonGame
                 return currentMouseState.RightButton == ButtonState.Pressed && prevMouseState.RightButton != ButtonState.Pressed;
             return false;
         }
-        public bool IsHeld(Input input)
+        public static bool IsHeld(Input input)
         {
             if (Binds[input].Method == InputMethod.Keyboard)
                 return currentKeyboardState.IsKeyDown(Binds[input].Key);
