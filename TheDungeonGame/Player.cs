@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace TheDungeonGame
 {
@@ -21,6 +22,10 @@ namespace TheDungeonGame
             vels.Y += InputManager.IsHeld(Input.MoveDown) ? Speed : 0;
 
             Position += new Vector2(vels.X, vels.Y);
+
+            Point mpos = InputManager.GetMousePos();
+            Rotation = (float)Math.Atan2(mpos.Y - Position.Y, mpos.X - Position.X);
+            Rotation = (Rotation + MathHelper.Pi / 2) % (MathHelper.Pi * 2);
         }
     }
 }
