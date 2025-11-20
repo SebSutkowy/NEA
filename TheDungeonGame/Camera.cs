@@ -15,6 +15,7 @@ namespace TheDungeonGame
 
         public static void Initialize(SpriteBatch spriteBatch, SpriteFont font)
         {
+            Position = Vector2.Zero;
             SpriteBatch = spriteBatch;
             Font = font;
         }
@@ -72,6 +73,10 @@ namespace TheDungeonGame
 
         #endregion
 
+        public static void ResetCamera()
+        {
+            Position = Vector2.Zero;
+        }
 
 
         public static void MoveCamera(Vector2 newPosition, float LerpConstant = 0.3f)

@@ -41,6 +41,7 @@ namespace TheDungeonGame
             InputManager.LoadBinds(@"Keybinds\Keybinds.json");
             _cameraFont = Content.Load<SpriteFont>("CameraFont");
             Camera.Initialize(_spriteBatch, _cameraFont);
+            SceneManager.InstantiateScenes();
         }
 
         protected override void Update(GameTime gameTime)
@@ -50,8 +51,6 @@ namespace TheDungeonGame
 
             // TODO: Add your update logic here
             InputManager.Update();
-            Camera.MoveCamera(_player.Position);
-            _player.Update();
 
             base.Update(gameTime);
         }
