@@ -17,7 +17,7 @@ namespace TheDungeonGame
 
             if (InputManager.IsPressed(Input.SaveBinds))
             {
-                InputManager.SaveBinds(@"Data\Keybinds");
+                InputManager.SaveBinds();
             }
 
         }

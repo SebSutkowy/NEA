@@ -32,6 +32,7 @@ namespace TheDungeonGame
 
             // TODO: use this.Content to load your game content here
             _player = new Player(Content.Load<Texture2D>("PointedCircle"), Vector2.Zero, 0.0f);
+            InputManager.LoadBinds(@"Keybinds\Keybinds.json");
         }
 
         protected override void Update(GameTime gameTime)

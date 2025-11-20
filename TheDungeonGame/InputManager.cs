@@ -7,29 +7,29 @@ using System.Text.Json;
 
 namespace TheDungeonGame
 {
-    enum Input
+    public enum Input
     {
         MoveRight, MoveLeft, MoveUp, MoveDown, // Orthogonal movement binds
         SaveBinds, // misc
     }
 
-    enum InputMethod
+    public enum InputMethod
     {
         Mouse,
         Keyboard
     }
-    enum MouseButtons
+    public enum MouseButtons
     {
         LeftButton,
         MiddleButton,
         RightButton
     }
 
-    struct KeyBind
+    public struct KeyBind
     {
-        public InputMethod Method;
-        public Keys Key;
-        public MouseButtons Button;
+        public InputMethod Method { get; set; }
+        public Keys Key { get; set; }
+        public MouseButtons Button { get; set; }
     }
 
 
@@ -58,20 +58,23 @@ namespace TheDungeonGame
             currentMouseState = Mouse.GetState();
         }
 
-        public static void SaveBinds(string path)
+        public static void SaveBinds()
         {
             JsonSerializerOptions options = new JsonSerializerOptions();
             options.WriteIndented = true;
             string jsonText = JsonSerializer.Serialize(Binds, options);
             Debug.WriteLine(jsonText);
             Debug.WriteLine("^^^^^^ JSON ^^^^");
-            FileManager.SaveData(path, "Keybinds.json", jsonText);
+            FileManager.SaveData("Keybinds", "Keybinds.json", jsonText);
         }
         
         public static void LoadBinds(string path)
         {
-            //JsonSerializerOptions options = new JsonSerializerOptions();
-            Binds = JsonSerializer.Deserialize<Dictionary<Input, KeyBind>>(path);
+            if (!FileManager.FileExists(path))
+                return;
+            string dir = FileManager.GetDirectory(path);
+            string text = File.ReadAllText(dir);
+            Binds = JsonSerializer.Deserialize<Dictionary<Input, KeyBind>>(text);
         }
 
 

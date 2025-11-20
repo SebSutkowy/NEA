@@ -6,7 +6,15 @@ namespace TheDungeonGame
 {
     internal static class FileManager
     {
-        private static string BasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DungeonGame");
+        private static string BasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DungeonGame", "Data");
+
+        public static bool FileExists(string path)
+        {
+            string dir = Path.Combine(BasePath, path);
+            if (File.Exists(dir))
+                return true;
+            return false;
+        }
 
         public static string GetDirectory(string path)
         {
@@ -24,9 +32,7 @@ namespace TheDungeonGame
             Debug.WriteLine($"Saving to: {Path.Combine(BasePath, path, fileName)}");
             string dir = Path.Combine(BasePath, path);
             Directory.CreateDirectory(dir);
-            Debug.WriteLine("Writing");
             File.WriteAllText(Path.Combine(dir, fileName), data);
-            Debug.WriteLine("Writed");
         }
 
     }
