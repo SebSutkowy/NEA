@@ -1,13 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Text.Json;
 
 namespace TheDungeonGame
 {
     enum Input
     {
         MoveRight, MoveLeft, MoveUp, MoveDown, // Orthogonal movement binds
-        
+        SaveBinds, // misc
     }
 
     enum InputMethod
@@ -38,6 +41,7 @@ namespace TheDungeonGame
             {Input.MoveRight, new KeyBind(){ Method = InputMethod.Keyboard, Key = Keys.D} },
             {Input.MoveUp, new KeyBind(){ Method = InputMethod.Keyboard, Key = Keys.W } },
             {Input.MoveDown, new KeyBind(){ Method = InputMethod.Keyboard, Key = Keys.S} },
+            {Input.SaveBinds, new KeyBind(){ Method = InputMethod.Keyboard, Key = Keys.P } },
         };
         private static KeyboardState currentKeyboardState = new KeyboardState();
         private static KeyboardState prevKeyboardState;
@@ -53,6 +57,23 @@ namespace TheDungeonGame
             prevMouseState = currentMouseState;
             currentMouseState = Mouse.GetState();
         }
+
+        public static void SaveBinds(string path)
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions();
+            options.WriteIndented = true;
+            string jsonText = JsonSerializer.Serialize(Binds, options);
+            Debug.WriteLine(jsonText);
+            Debug.WriteLine("^^^^^^ JSON ^^^^");
+            FileManager.SaveData(path, "Keybinds.json", jsonText);
+        }
+        
+        public static void LoadBinds(string path)
+        {
+            //JsonSerializerOptions options = new JsonSerializerOptions();
+            Binds = JsonSerializer.Deserialize<Dictionary<Input, KeyBind>>(path);
+        }
+
 
         public static Point GetMousePos() => currentMouseState.Position;
 

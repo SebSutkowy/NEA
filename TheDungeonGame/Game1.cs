@@ -41,7 +41,7 @@ namespace TheDungeonGame
 
             // TODO: Add your update logic here
             InputManager.Update();
-            _player.Move();
+            _player.Update();
 
             base.Update(gameTime);
         }

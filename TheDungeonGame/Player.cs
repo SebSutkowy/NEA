@@ -11,6 +11,18 @@ namespace TheDungeonGame
         public Player(Texture2D texture, Vector2 position, float rotation): base(texture, position, rotation)
         { }
 
+        public void Update()
+        {
+            Move();
+
+            if (InputManager.IsPressed(Input.SaveBinds))
+            {
+                InputManager.SaveBinds(@"Data\Keybinds");
+            }
+
+        }
+
+
         public void Move()
         {
             Vector2 vels = new Vector2();
