@@ -7,15 +7,16 @@ namespace TheDungeonGame
     public static class Camera
     {
         private static Vector2 Position;
-
         private static SpriteBatch SpriteBatch;
+        private static SpriteFont Font;
         public const int ScreenWidth = 1000;
         public const int ScreenHeight = 1000;
         public static Vector2 ScreenDimensions => new Vector2(ScreenWidth, ScreenHeight);
 
-        public static void Initialize(SpriteBatch spriteBatch)
+        public static void Initialize(SpriteBatch spriteBatch, SpriteFont font)
         {
             SpriteBatch = spriteBatch;
+            Font = font;
         }
 
         public static Rectangle OffsetRect(Rectangle rect) => new Rectangle(rect.X - (int)Position.X, rect.Y - (int)Position.Y, rect.Width, rect.Height);
@@ -64,7 +65,14 @@ namespace TheDungeonGame
             SpriteBatch.Draw(texture, OffsetPos(position), sourceRect, color, rotation, origin, scale, spriteEffects, layerDepth);
         }
 
+        public static void DrawString(string text, Vector2 position, Color color)
+        {
+            SpriteBatch.DrawString(Font, text, position, color);
+        }
+
         #endregion
+
+
 
         public static void MoveCamera(Vector2 newPosition, float LerpConstant = 0.3f)
         {

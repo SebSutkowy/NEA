@@ -11,6 +11,7 @@ namespace TheDungeonGame
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private Player _player;
+        private SpriteFont _cameraFont;
 
         public Game1()
         {
@@ -38,7 +39,8 @@ namespace TheDungeonGame
             // TODO: use this.Content to load your game content here
             _player = new Player(Content.Load<Texture2D>("PointedCircle"), Vector2.Zero, 0.0f);
             InputManager.LoadBinds(@"Keybinds\Keybinds.json");
-            Camera.Initialize(_spriteBatch);
+            _cameraFont = Content.Load<SpriteFont>("CameraFont");
+            Camera.Initialize(_spriteBatch, _cameraFont);
         }
 
         protected override void Update(GameTime gameTime)

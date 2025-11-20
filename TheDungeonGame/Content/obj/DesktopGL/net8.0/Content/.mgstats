@@ -1,2 +1,3 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/CameraFont.spritefont","C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/bin/DesktopGL/Content/CameraFont.xnb","FontDescriptionProcessor","SpriteFontContent",2068,21529,0.2470683
 "C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/PointedCircle.png","C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/bin/DesktopGL/Content/PointedCircle.xnb","TextureProcessor","Texture2DContent",1453,40085,0.2326197

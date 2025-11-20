@@ -4,9 +4,11 @@
   <Platform>DesktopGL</Platform>
   <Config />
   <SourceFiles>
+    <File>C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/CameraFont.spritefont</File>
     <File>C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/PointedCircle.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>
