@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
+using System.Diagnostics;
 
 namespace TheDungeonGame
 {
@@ -36,6 +37,8 @@ namespace TheDungeonGame
             Position += new Vector2(vels.X, vels.Y);
 
             Point mpos = InputManager.GetMousePos();
+            mpos = Camera.OffsetPoint(new Point(-1*mpos.X, -1*mpos.Y));
+            mpos = new Point(-1 * mpos.X, -1 * mpos.Y);
             Rotation = (float)Math.Atan2(mpos.Y - Position.Y, mpos.X - Position.X);
             Rotation = (Rotation + MathHelper.Pi / 2) % (MathHelper.Pi * 2);
         }

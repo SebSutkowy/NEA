@@ -1,0 +1,78 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
+
+namespace TheDungeonGame
+{
+    public static class Camera
+    {
+        private static Vector2 Position;
+
+        private static SpriteBatch SpriteBatch;
+        public const int ScreenWidth = 1000;
+        public const int ScreenHeight = 1000;
+        public static Vector2 ScreenDimensions => new Vector2(ScreenWidth, ScreenHeight);
+
+        public static void Initialize(SpriteBatch spriteBatch)
+        {
+            SpriteBatch = spriteBatch;
+        }
+
+        public static Rectangle OffsetRect(Rectangle rect) => new Rectangle(rect.X - (int)Position.X, rect.Y - (int)Position.Y, rect.Width, rect.Height);
+        public static Vector2 OffsetPos(Vector2 pos) => pos - Position;
+        public static Point OffsetPoint(Point pos) => pos - new Point((int)Position.X, (int)Position.Y);
+
+        #region Draw overloads
+
+        public static void Draw(Texture2D texture, Rectangle rect, Color color)
+        {
+            SpriteBatch.Draw(texture, OffsetRect(rect), color);
+        }
+        public static void Draw(Texture2D texture, Rectangle rect, Rectangle? sourceRect, Color color)
+        {
+            SpriteBatch.Draw(texture, OffsetRect(rect), sourceRect, color);
+        }
+        public static void Draw(Texture2D texture, Rectangle rect,
+            Rectangle? sourceRect, Color color,
+            float rotation, Vector2 Origin,
+            SpriteEffects spriteEffects, float layerDepth)
+        {
+            SpriteBatch.Draw(texture, OffsetRect(rect), sourceRect, color, rotation, Origin, spriteEffects, layerDepth);
+        }
+
+        public static void Draw(Texture2D texture, Vector2 position, Color color)
+        {
+            SpriteBatch.Draw(texture, OffsetPos(position), color);
+        }
+
+        public static void Draw(Texture2D texture, Vector2 position, Rectangle? sourceRect, Color color)
+        {
+            SpriteBatch.Draw(texture, OffsetPos(position), sourceRect, color);
+        }
+
+        public static void Draw(Texture2D texture, Vector2 position,
+            Rectangle? sourceRect, Color color, float rotation,
+            Vector2 origin, Vector2 scale, SpriteEffects spriteEffects, float layerDepth)
+        {
+            SpriteBatch.Draw(texture, OffsetPos(position), sourceRect, color, rotation, origin, scale, spriteEffects, layerDepth);
+        }
+
+        public static void Draw(Texture2D texture, Vector2 position,
+            Rectangle? sourceRect, Color color, float rotation,
+            Vector2 origin, float scale, SpriteEffects spriteEffects, float layerDepth)
+        {
+            SpriteBatch.Draw(texture, OffsetPos(position), sourceRect, color, rotation, origin, scale, spriteEffects, layerDepth);
+        }
+
+        #endregion
+
+        public static void MoveCamera(Vector2 newPosition, float LerpConstant = 0.3f)
+        {
+            Position += ScreenDimensions/2;
+            Position = Vector2.Lerp(Position, newPosition, LerpConstant);
+            Position -= ScreenDimensions / 2;
+            Debug.WriteLine($"{Position.X}, {Position.Y}");
+        }
+
+    }
+}
