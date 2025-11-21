@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using System;
 using System.Collections.Generic;
 
@@ -18,10 +19,12 @@ namespace TheDungeonGame
         public static Scene CurrentScene => Scenes[CurrentSceneName];
 
         private static Dictionary<SceneName, Scene> Scenes = new Dictionary<SceneName, Scene>();
-        
-        public static void InstantiateScenes()
+
+        public static void LoadScenes(ContentManager Content)
         {
-            Scenes.Add(SceneName.MainMenu, new MainMenuScene());
+            CurrentSceneName = SceneName.Game;
+            Scenes.Add(SceneName.MainMenu, new MainMenuScene(Content));
+            Scenes.Add(SceneName.Game, new GameScene(Content));
         }
 
         public static void Update()

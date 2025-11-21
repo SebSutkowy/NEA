@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 
 namespace TheDungeonGame
 {
@@ -6,7 +7,7 @@ namespace TheDungeonGame
     {
         public const SceneName Name = SceneName.MainMenu;
 
-        public MainMenuScene()
+        public MainMenuScene(ContentManager content)
         { }
 
         public override void Update()
