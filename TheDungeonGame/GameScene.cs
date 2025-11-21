@@ -16,6 +16,8 @@ namespace TheDungeonGame
 
         public override void Update()
         {
+            if (InputManager.IsPressed(Input.Escape))
+                SceneManager.BackScene();
             Camera.MoveCamera(player.Position);
             player.Update();
         }

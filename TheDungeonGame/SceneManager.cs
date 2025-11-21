@@ -22,7 +22,7 @@ namespace TheDungeonGame
 
         public static void LoadScenes(ContentManager Content)
         {
-            CurrentSceneName = SceneName.Game;
+            CurrentSceneName = SceneName.MainMenu;
             Scenes.Add(SceneName.MainMenu, new MainMenuScene(Content));
             Scenes.Add(SceneName.Game, new GameScene(Content));
         }
@@ -36,6 +36,22 @@ namespace TheDungeonGame
         public static void Draw()
         {
             CurrentScene.Draw();
+        }
+
+        public static void SwitchScene(SceneName newScene)
+        {
+            if (!Scenes.ContainsKey(newScene))
+                throw new NotImplementedException();
+            PreviousSceneName = CurrentSceneName;
+            CurrentSceneName = newScene;
+        }
+
+        public static void BackScene()
+        {
+            if (PreviousSceneName == null) return;
+            SceneName temp = CurrentSceneName;
+            CurrentSceneName = (SceneName)PreviousSceneName;
+            PreviousSceneName = CurrentSceneName;
         }
     }
 

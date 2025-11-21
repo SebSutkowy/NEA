@@ -11,7 +11,10 @@ namespace TheDungeonGame
         { }
 
         public override void Update()
-        { }
+        {
+            if (InputManager.IsPressed(Input.LMB))
+                SceneManager.SwitchScene(SceneName.Game);
+        }
 
         public override void Draw()
         {

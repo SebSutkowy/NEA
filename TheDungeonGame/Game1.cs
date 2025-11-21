@@ -33,7 +33,7 @@ namespace TheDungeonGame
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            InputManager.LoadBinds(@"Keybinds\Keybinds.json");
+            //InputManager.LoadBinds(@"Keybinds\Keybinds.json");
             _cameraFont = Content.Load<SpriteFont>("CameraFont");
             Camera.Initialize(_spriteBatch, _cameraFont);
             SceneManager.LoadScenes(Content);
