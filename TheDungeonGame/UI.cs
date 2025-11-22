@@ -26,12 +26,14 @@ namespace TheDungeonGame
     public class UIRect
     {
         public Rectangle Rectangle { get; private set; }
+        public string Text { get; private set; }
         public Color Color { get; private set; }
 
-        public UIRect(Rectangle rect, Color color)
+        public UIRect(Rectangle rect, Color color, string text="")
         {
             Rectangle = rect;
             Color = color;
+            Text = text;
         }
 
         public bool Contains(Point pos) => Rectangle.Contains(pos);
@@ -45,6 +47,11 @@ namespace TheDungeonGame
             Rectangle = new Rectangle(Rectangle.X, Rectangle.Y, (int)size.X, (int)size.Y);
         }
 
+        public void ChangeText(string text)
+        {
+            Text = text;
+        }
+
         public void ChangeColor(Color newColor)
         {
             Color = newColor;
@@ -53,6 +60,9 @@ namespace TheDungeonGame
         public void Draw()
         {
             UI.DrawRect(Rectangle, Color);
+            Vector2 textSize = Camera.MeasureString(Text);
+            Vector2 Position = new Vector2(Rectangle.Center.X - textSize.X / 2, Rectangle.Center.Y - textSize.Y / 2);
+            Camera.DrawString(Text, Position, Color.White);
         }
     }
 }

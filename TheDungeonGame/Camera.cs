@@ -73,6 +73,8 @@ namespace TheDungeonGame
 
         #endregion
 
+        public static Vector2 MeasureString(string text) => Font.MeasureString(text);
+
         public static void ResetCamera()
         {
             Position = Vector2.Zero;
