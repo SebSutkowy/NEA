@@ -44,19 +44,19 @@ namespace TheDungeonGame
                 throw new NotImplementedException();
             PreviousSceneName = CurrentSceneName;
             CurrentSceneName = newScene;
+            CurrentScene.OnSwitch();
         }
 
         public static void BackScene()
         {
             if (PreviousSceneName == null) return;
-            SceneName temp = CurrentSceneName;
-            CurrentSceneName = (SceneName)PreviousSceneName;
-            PreviousSceneName = CurrentSceneName;
+            SwitchScene((SceneName)PreviousSceneName);
         }
     }
 
     public abstract class Scene
     {
+        public abstract void OnSwitch();
         public abstract void Update();
         public abstract void Draw();
     }

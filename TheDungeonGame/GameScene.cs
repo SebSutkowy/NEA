@@ -14,12 +14,15 @@ namespace TheDungeonGame
             player = new Player(Content.Load<Texture2D>("PointedCircle"), Vector2.Zero, 0f);
         }
 
+        public override void OnSwitch()
+        { }
+
         public override void Update()
         {
-            if (InputManager.IsPressed(Input.Escape))
-                SceneManager.BackScene();
             Camera.MoveCamera(player.Position);
             player.Update();
+            if (InputManager.IsPressed(Input.Escape))
+                SceneManager.BackScene();
         }
 
         public override void Draw()

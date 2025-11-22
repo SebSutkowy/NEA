@@ -14,12 +14,30 @@ namespace TheDungeonGame
         public MainMenuScene(ContentManager content)
         { }
 
+        public override void OnSwitch()
+        {
+            Camera.ResetCamera();
+        }
+
         public override void Update()
         {
             if (switchSceneRect.Contains(InputManager.GetMousePos()))
-                switchSceneRect.ChangeColor(Color.Green);
+                switchSceneRect.ChangeColor(Color.LimeGreen);
             else
-                switchSceneRect.ChangeColor(Color.Red);
+                switchSceneRect.ChangeColor(Color.MediumVioletRed);
+
+            if (InputManager.IsPressed(Input.LMB) && switchSceneRect.Color == Color.LimeGreen)
+                SceneManager.SwitchScene(SceneName.Game);
+
+            if (quitGameRect.Contains(InputManager.GetMousePos()))
+                quitGameRect.ChangeColor(Color.LimeGreen);
+            else
+                quitGameRect.ChangeColor(Color.MediumVioletRed);
+
+            if (InputManager.IsPressed(Input.LMB) && quitGameRect.Color == Color.LimeGreen)
+                System.Environment.Exit(0);
+                
+
         }
 
         public override void Draw()
