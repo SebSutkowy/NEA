@@ -36,6 +36,7 @@ namespace TheDungeonGame
             //InputManager.LoadBinds(@"Keybinds\Keybinds.json");
             _cameraFont = Content.Load<SpriteFont>("CameraFont");
             Camera.Initialize(_spriteBatch, _cameraFont);
+            UI.LoadUI(GraphicsDevice);
             SceneManager.LoadScenes(Content);
         }
 
