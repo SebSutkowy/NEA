@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 
 namespace TheDungeonGame
 {
-    internal class Sprite
+    public class Sprite
     {
         public Texture2D Texture { get; set; }
         public Vector2 Origin => new Vector2(Texture.Width / 2, Texture.Height / 2);

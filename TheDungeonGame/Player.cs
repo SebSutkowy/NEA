@@ -5,11 +5,10 @@ using System.Diagnostics;
 
 namespace TheDungeonGame
 {
-    internal class Player : Sprite
+    public class Player : Entity 
     {
-        const float Speed = 5.0f;
 
-        public Player(Texture2D texture, Vector2 position, float rotation): base(texture, position, rotation)
+        public Player(Texture2D texture, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed): base(texture, position, rotation, maxHealth, health, damage, speed)
         { }
 
         public void Update()
@@ -41,6 +40,11 @@ namespace TheDungeonGame
             mpos = new Point(-1 * mpos.X, -1 * mpos.Y); // -(-mpos-offset) = mpos + offset
             Rotation = (float)Math.Atan2(mpos.Y - Position.Y, mpos.X - Position.X);
             Rotation = (Rotation + MathHelper.Pi / 2) % (MathHelper.Pi * 2);
+        }
+
+        public void Attack()
+        {
+            
         }
     }
 }
