@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Diagnostics;
 
 namespace TheDungeonGame
@@ -81,12 +82,17 @@ namespace TheDungeonGame
         }
 
 
-        public static void MoveCamera(Vector2 newPosition, float LerpConstant = 0.3f)
+        public static void MoveCamera(Vector2 newPosition, float LerpConstant = 0.3f, Rectangle? CameraBounds=null)
         {
             Position += ScreenDimensions/2;
             Position = Vector2.Lerp(Position, newPosition, LerpConstant);
             Position -= ScreenDimensions / 2;
             Debug.WriteLine($"{Position.X}, {Position.Y}");
+            if (CameraBounds != null)
+            {
+                Position.X = Math.Clamp(Position.X, (float)CameraBounds?.X, (float)CameraBounds?.X + (float)CameraBounds?.Width - (float)ScreenWidth);
+                Position.Y = Math.Clamp(Position.Y, (float)CameraBounds?.Y, (float)CameraBounds?.Y + (float)CameraBounds?.Height- (float)ScreenHeight);
+            }
         }
 
     }

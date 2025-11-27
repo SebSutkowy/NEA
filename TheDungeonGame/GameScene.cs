@@ -8,10 +8,12 @@ namespace TheDungeonGame
     {
         public const SceneName Name = SceneName.Game;
         Player player;
+        Texture2D _attackTexture;
 
         public GameScene(ContentManager Content)
         {
-            player = new Player(Content.Load<Texture2D>("PointedCircle"), Vector2.Zero, 0f);
+            _attackTexture = Content.Load<Texture2D>("sword");
+            player = new Player(Content.Load<Texture2D>("PointedCircle"), Vector2.Zero, 0f, 1, 1, 5f, 5f, _attackTexture);
         }
 
         public override void OnSwitch()
@@ -19,7 +21,7 @@ namespace TheDungeonGame
 
         public override void Update()
         {
-            Camera.MoveCamera(player.Position);
+            Camera.MoveCamera(player.Position, 0.3f, new Rectangle(-500, -500, 2000, 2000));
             player.Update();
             if (InputManager.IsPressed(Input.Escape))
                 SceneManager.BackScene();

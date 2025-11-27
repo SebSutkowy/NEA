@@ -38,6 +38,7 @@ namespace TheDungeonGame
             Camera.Initialize(_spriteBatch, _cameraFont);
             UI.LoadUI(GraphicsDevice);
             SceneManager.LoadScenes(Content);
+            
         }
 
         protected override void Update(GameTime gameTime)

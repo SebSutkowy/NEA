@@ -1,3 +1,6 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/beam.png","C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/bin/DesktopGL/beam.xnb","TextureProcessor","Texture2DContent",981,40085,0.1067847
 "C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/CameraFont.spritefont","C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/bin/DesktopGL/CameraFont.xnb","FontDescriptionProcessor","SpriteFontContent",2068,21529,0.2446281
 "C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/PointedCircle.png","C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/bin/DesktopGL/PointedCircle.xnb","TextureProcessor","Texture2DContent",1453,40085,0.2735153
+"C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/projectile.png","C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/bin/DesktopGL/projectile.xnb","TextureProcessor","Texture2DContent",1722,40085,0.0048452
+"C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/sword.png","C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/bin/DesktopGL/sword.xnb","TextureProcessor","Texture2DContent",1812,40085,0.0046603

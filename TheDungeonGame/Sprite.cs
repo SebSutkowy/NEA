@@ -10,6 +10,7 @@ namespace TheDungeonGame
         public Vector2 Origin => new Vector2(Texture.Width / 2, Texture.Height / 2);
         public Vector2 Position { get; set; }
         public float Rotation { get; set; }
+        public Rectangle Hitbox => new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height);
 
         public Sprite(Texture2D texture, Vector2 position, float rotation)
         {
