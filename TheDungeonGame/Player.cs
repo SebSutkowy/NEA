@@ -9,12 +9,13 @@ namespace TheDungeonGame
         private MeleeAttack PlayerAttack { get; set; }
         private int AttackFrame = 0; // place holder for the animation of the attacks
         private int AttackTimer = 0; // so that you can't spam attacks
-        private bool IsAttacking = false; 
+        private bool IsAttacking = false;
+        private ItemNames Weapon = ItemNames.BasicSword; // place holder for the weapon, will be initially set to none, but for the purpose of testing is a sword 
 
-        public Player(Texture2D texture, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed,
-                      Texture2D attackTexture): base(texture, position, rotation, maxHealth, health, damage, speed)
+        public Player(Texture2D texture, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed) 
+            : base(texture, position, rotation, maxHealth, health, damage, speed)
         {
-            PlayerAttack = new MeleeAttack(attackTexture, Vector2.Zero, 0f);
+            PlayerAttack = new MeleeAttack(AssetManager.GetItemTexture(Weapon), Vector2.Zero, 0f);
 
         }
 
@@ -77,7 +78,7 @@ namespace TheDungeonGame
 
         public void Attack()
         {
-            PlayerAttack.Position = GetPolarPos(75, Rotation);
+            PlayerAttack.Position = GetPolarPos(75, Rotation-MathHelper.Pi/2);
             EnemyManager.Attack(PlayerAttack.Hitbox, PlayerAttack.Damage * Damage); 
         }
 

@@ -35,6 +35,8 @@ namespace TheDungeonGame
             // TODO: use this.Content to load your game content here
             //InputManager.LoadBinds(@"Keybinds\Keybinds.json");
             _cameraFont = Content.Load<SpriteFont>("CameraFont");
+            AssetManager.LoadUnimplementedTexture(Content, "ErrorTexture");
+            AssetManager.LoadItemTexture(Content, ItemNames.BasicSword, "Sword");
             Camera.Initialize(_spriteBatch, _cameraFont);
             UI.LoadUI(GraphicsDevice);
             SceneManager.LoadScenes(Content);

@@ -13,6 +13,11 @@ namespace TheDungeonGame
     public class Attack : Sprite
     {
         public Attack(Texture2D texture, Vector2 position, float rotation) : base(texture, position, rotation) { }
+
+        public void ChangeWeapon(Texture2D newTexture)
+        {
+            Texture = newTexture;
+        }
     }
 
     public class MeleeAttack : Attack

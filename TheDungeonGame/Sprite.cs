@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using System;
 
 namespace TheDungeonGame
 {
@@ -14,6 +15,8 @@ namespace TheDungeonGame
 
         public Sprite(Texture2D texture, Vector2 position, float rotation)
         {
+            if (texture == null)
+                throw new Exception("Texture is not implemented");
             Texture = texture;
             Position = position;
             Rotation = rotation;

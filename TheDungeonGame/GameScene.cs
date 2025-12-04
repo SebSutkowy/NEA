@@ -13,7 +13,7 @@ namespace TheDungeonGame
         public GameScene(ContentManager Content)
         {
             _attackTexture = Content.Load<Texture2D>("sword");
-            player = new Player(Content.Load<Texture2D>("PointedCircle"), Vector2.Zero, 0f, 1, 1, 5f, 5f, _attackTexture);
+            player = new Player(Content.Load<Texture2D>("PointedCircle"), Vector2.Zero, 0f, 1, 1, 5f, 5f);
         }
 
         public override void OnSwitch()
