@@ -12,7 +12,7 @@ namespace TheDungeonGame
 
         public static void LoadUnimplementedTexture(ContentManager Content, string path)
         {
-            Content.Load<Texture2D>(path);
+            UnimplementedTexture = Content.Load<Texture2D>(path);
         }
 
         public static void LoadItemTexture(ContentManager Content, ItemNames itemName, string fileName)

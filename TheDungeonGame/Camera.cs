@@ -27,9 +27,12 @@ namespace TheDungeonGame
 
         #region Draw overloads
 
-        public static void Draw(Texture2D texture, Rectangle rect, Color color)
+        public static void Draw(Texture2D texture, Rectangle rect, Color color, bool AbsolutePos=false)
         {
-            SpriteBatch.Draw(texture, OffsetRect(rect), color);
+            if (AbsolutePos)
+                SpriteBatch.Draw(texture, rect, color);
+            else
+                SpriteBatch.Draw(texture, OffsetRect(rect), color);
         }
         public static void Draw(Texture2D texture, Rectangle rect, Rectangle? sourceRect, Color color)
         {

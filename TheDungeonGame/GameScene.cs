@@ -8,12 +8,16 @@ namespace TheDungeonGame
     {
         public const SceneName Name = SceneName.Game;
         Player player;
-        Texture2D _attackTexture;
+        UIRect healthBar;
+        int healthBarMaxLength = Camera.ScreenWidth - 10 * 2;
 
         public GameScene(ContentManager Content)
         {
-            _attackTexture = Content.Load<Texture2D>("sword");
             player = new Player(Content.Load<Texture2D>("PointedCircle"), Vector2.Zero, 0f, 1, 1, 5f, 5f);
+            healthBar = new UIRect(
+                new Rectangle(10, 10, healthBarMaxLength, 25),
+                Color.Red
+                );
         }
 
         public override void OnSwitch()
@@ -25,12 +29,15 @@ namespace TheDungeonGame
             player.Update();
             if (InputManager.IsPressed(Input.Escape))
                 SceneManager.BackScene();
+            healthBar.ChangeSize(new Vector2((player.Health / player.MaxHealth) * healthBarMaxLength, healthBar.Rectangle.Height));
         }
 
         public override void Draw()
         {
             Camera.DrawString("Hello, this is the Game Scene", Vector2.Zero, Color.White);
             player.Draw();
+            healthBar.Draw();
+            
         }
     }
 }

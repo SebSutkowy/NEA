@@ -14,7 +14,7 @@ namespace TheDungeonGame
         }
         public static void DrawRect(Rectangle rect, Color color)
         {
-            Camera.Draw(pixelRect, rect, color);
+            Camera.Draw(pixelRect, rect, color, true);
         }
 
         public static void DrawText(string text, Vector2 position, Color color)
