@@ -22,7 +22,7 @@ namespace TheDungeonGame
 
     public class MeleeAttack : Attack
     {
-        public readonly float Damage = 10f;
+        public readonly float Damage = 5f;
         public readonly float ManaCost = 0f;
         public readonly AttackType Type = AttackType.Melee;
 

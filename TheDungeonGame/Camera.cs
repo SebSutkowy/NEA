@@ -90,7 +90,6 @@ namespace TheDungeonGame
             Position += ScreenDimensions/2;
             Position = Vector2.Lerp(Position, newPosition, LerpConstant);
             Position -= ScreenDimensions / 2;
-            Debug.WriteLine($"{Position.X}, {Position.Y}");
             if (CameraBounds != null)
             {
                 Position.X = Math.Clamp(Position.X, (float)CameraBounds?.X, (float)CameraBounds?.X + (float)CameraBounds?.Width - (float)ScreenWidth);

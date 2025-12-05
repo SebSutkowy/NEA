@@ -88,5 +88,5 @@ namespace TheDungeonGame
             if (IsAttacking)
                 PlayerAttack.Draw();
         }
-    }
+   }
 }

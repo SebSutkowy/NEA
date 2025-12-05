@@ -12,9 +12,9 @@ namespace TheDungeonGame
             pixelRect = new Texture2D(graphicsDevice, 1, 1);
             pixelRect.SetData(new[] { Color.White });
         }
-        public static void DrawRect(Rectangle rect, Color color)
+        public static void DrawRect(Rectangle rect, Color color, bool drawAbsolute=true)
         {
-            Camera.Draw(pixelRect, rect, color, true);
+            Camera.Draw(pixelRect, rect, color, drawAbsolute);
         }
 
         public static void DrawText(string text, Vector2 position, Color color)
@@ -57,9 +57,9 @@ namespace TheDungeonGame
             Color = newColor;
         }
 
-        public void Draw()
+        public void Draw(bool DrawAbsolute=true)
         {
-            UI.DrawRect(Rectangle, Color);
+            UI.DrawRect(Rectangle, Color, DrawAbsolute);
             Vector2 textSize = Camera.MeasureString(Text);
             Vector2 Position = new Vector2(Rectangle.Center.X - textSize.X / 2, Rectangle.Center.Y - textSize.Y / 2);
             Camera.DrawString(Text, Position, Color.White);

@@ -22,9 +22,11 @@ namespace TheDungeonGame
             Rotation = rotation;
         }
 
-        public void Draw()
+        public void Draw(Color color)
         {
-            Camera.Draw(Texture, Position, null, Color.White, Rotation, Origin, 1.0f, SpriteEffects.None, 0.0f); // will add animations source rectangle will no longer be null
+            Camera.Draw(Texture, Position, null, color, Rotation, Origin, 1.0f, SpriteEffects.None, 0.0f); // will add animations source rectangle will no longer be null
         }
+
+        public void Draw() => Draw(Color.White);
     }
 }
