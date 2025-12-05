@@ -18,7 +18,6 @@ namespace TheDungeonGame
             Enemy enemy;
             for (int i = Enemies.Count - 1; i >= 0; i--)
             {
-                Debug.WriteLine("HERE");
                 enemy = Enemies[i];
                 if (enemy.Health <= 0)
                 {
@@ -33,7 +32,7 @@ namespace TheDungeonGame
 
         public static void Attack(Rectangle hitbox, float damage)
         {
-            foreach (Entity enemy in Enemies)
+            foreach (Enemy enemy in Enemies)
             {
                 if (enemy.Hitbox.Intersects(hitbox))
                 {
@@ -44,7 +43,7 @@ namespace TheDungeonGame
 
         public static void Draw()
         {
-            foreach (Entity enemy in Enemies)
+            foreach (Enemy enemy in Enemies)
             {
                 enemy.Draw();
             }
