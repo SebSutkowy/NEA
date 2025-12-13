@@ -11,10 +11,12 @@ namespace TheDungeonGame
         UIRect healthBar;
         int healthBarMaxLength = Camera.ScreenWidth - 10 * 2;
         Enemy enemy;
+        Tilemap tilemap;
 
         public GameScene(ContentManager Content)
         {
             Texture2D entityTexture = Content.Load<Texture2D>("PointedCircle");
+
             int playerMaxHealth = 100;
             int playerHealth = 100;
             float playerDamage = 5f;
@@ -24,8 +26,20 @@ namespace TheDungeonGame
                 new Rectangle(10, 10, healthBarMaxLength, 25),
                 Color.Red
                 );
+
             enemy = new Enemy(entityTexture, Vector2.Zero, 0f, 100, 100, 1f, 1f);
             EnemyManager.AddEnemy(enemy);
+
+            tilemap = new Tilemap();
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    tilemap.Add(new Point(i, j), TileType.Floor);
+                }
+            }
+            tilemap.Save();
+
         }
 
         public override void OnSwitch()
@@ -43,6 +57,7 @@ namespace TheDungeonGame
 
         public override void Draw()
         {
+            tilemap.Draw();
             player.Draw();
             EnemyManager.Draw();
 

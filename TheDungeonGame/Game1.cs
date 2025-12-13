@@ -37,6 +37,8 @@ namespace TheDungeonGame
             _cameraFont = Content.Load<SpriteFont>("CameraFont");
             AssetManager.LoadUnimplementedTexture(Content, "ErrorTexture");
             AssetManager.LoadItemTexture(Content, ItemNames.BasicSword, "Sword");
+            AssetManager.LoadTileTexture(Content, TileType.Floor, "BrickFloor");
+            AssetManager.LoadTileTexture(Content, TileType.Wall, "TempWall");
             Camera.Initialize(_spriteBatch, _cameraFont);
             UI.LoadUI(GraphicsDevice);
             SceneManager.LoadScenes(Content);

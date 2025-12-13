@@ -9,6 +9,7 @@ namespace TheDungeonGame
     {
         private static Texture2D UnimplementedTexture;
         private static Dictionary<ItemNames, Texture2D> ItemTextures = new Dictionary<ItemNames, Texture2D>();
+        private static Dictionary<TileType, Texture2D> TileTextures = new Dictionary<TileType, Texture2D>();
 
         public static void LoadUnimplementedTexture(ContentManager Content, string path)
         {
@@ -20,9 +21,20 @@ namespace TheDungeonGame
             ItemTextures.Add(itemName, Content.Load<Texture2D>(fileName));
         }
 
+        public static void LoadTileTexture(ContentManager Content, TileType type, string fileName)
+        {
+            TileTextures.Add(type, Content.Load<Texture2D>(fileName));
+        }
+
         public static Texture2D GetItemTexture(ItemNames itemName)
         {
             if(ItemTextures.ContainsKey(itemName)) return ItemTextures[itemName];
+            return UnimplementedTexture;
+        }
+
+        public static Texture2D GetTileTexture(TileType type)
+        {
+            if (TileTextures.ContainsKey(type)) return TileTextures[type];
             return UnimplementedTexture;
         }
     }
