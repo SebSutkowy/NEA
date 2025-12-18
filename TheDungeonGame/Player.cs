@@ -19,9 +19,9 @@ namespace TheDungeonGame
 
         }
 
-        public void Update()
+        public void Update(Tilemap tilemap)
         {
-            Move();
+            Move(tilemap);
 
             if (InputManager.IsPressed(Input.SaveBinds))
             {
@@ -57,17 +57,20 @@ namespace TheDungeonGame
             return result;
         }
 
-        public void Move()
+        public void Move(Tilemap tilemap)
         {
-            Vector2 vels = new Vector2();
+            Vector2 vels = Vector2.Zero;
 
             vels.X = InputManager.IsHeld(Input.MoveLeft) ? -Speed : 0;
-            vels.X += InputManager.IsHeld(Input.MoveRight) ? Speed : 0;
+            vels.X += InputManager.IsHeld(Input.MoveRight) ? Speed : 0; 
 
             vels.Y = InputManager.IsHeld(Input.MoveUp) ? -Speed : 0;
             vels.Y += InputManager.IsHeld(Input.MoveDown) ? Speed : 0;
 
-            Position += new Vector2(vels.X, vels.Y);
+            Rectangle collisionBox = new Rectangle((int)(Hitbox.X + vels.X), Hitbox.Y, Hitbox.Width, Hitbox.Height);
+            if (tilemap.IsValid(collisionBox)) Position = new Vector2(Position.X + vels.X, Position.Y);
+            collisionBox = new Rectangle(Hitbox.X, (int)(Hitbox.Y + vels.Y), Hitbox.Width, Hitbox.Height);
+            if (tilemap.IsValid(collisionBox)) Position = new Vector2(Position.X, Position.Y + vels.Y);
 
             Point mpos = InputManager.GetMousePos();
             mpos = Camera.OffsetPoint(new Point(-1 * mpos.X, -1 * mpos.Y)); // the offset method subtracts the offset from the point when addition is needed here
@@ -84,6 +87,7 @@ namespace TheDungeonGame
 
         public new void Draw()
         {
+            UI.DrawRect(Hitbox, Color.Red, false);
             base.Draw();
             if (IsAttacking)
                 PlayerAttack.Draw();

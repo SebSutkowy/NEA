@@ -41,7 +41,7 @@ namespace TheDungeonGame
         public override void Update()
         {
             Camera.MoveCamera(player.Position, 0.3f, tilemap.CameraBounds);
-            player.Update();
+            player.Update(tilemap);
             healthBar.ChangeSize(new Vector2((player.Health / player.MaxHealth) * healthBarMaxLength, healthBar.Rectangle.Height));
             EnemyManager.Update();
             if (InputManager.IsPressed(Input.Escape))

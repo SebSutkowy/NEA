@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Text.Json.Serialization;
 using System.IO;
 using TheDungeonGame;
+using System;
 
 namespace TheDungeonGame 
 {
@@ -41,12 +42,18 @@ namespace TheDungeonGame
 
     public enum TileType 
     {
+        None,
         Wall,
-        Floor
+        Floor,
     }
 
     public class Tilemap
     {
+        public readonly HashSet<TileType> TraversableTiles = new HashSet<TileType>()
+        {
+            TileType.Floor
+        };
+
         [JsonInclude]
         private Dictionary<string, TileType> Map { get; set; }
         public Rectangle? CameraBounds { get; private set; }
@@ -107,11 +114,35 @@ namespace TheDungeonGame
 
         public TileType this[string loc]
         {
-            get => Map[loc];
+            get => Map.ContainsKey(loc) ? Map[loc] : TileType.None;
         }
         public TileType this[Point point]
         {
-            get => Map[GetLoc(point)];
+            get => Map.ContainsKey(GetLoc(point)) ? Map[GetLoc(point)] : TileType.None;
+        }
+
+        public bool IsValid(Rectangle bounds)
+        {
+            // works only for tileSize x tileSize entities
+            int left = bounds.Left,
+                right = bounds.Right - 1,
+                top = bounds.Top,
+                bottom = bounds.Bottom - 1;
+
+            int tileLeft = (int)Math.Floor(left / 100f),
+                tileRight = (int)Math.Floor(right / 100f),
+                tileTop = (int)Math.Floor(top / 100f),
+                tileBottom = (int)Math.Floor(bottom / 100f);
+
+            // top left
+            if (!TraversableTiles.Contains(this[new Point(tileLeft, tileTop)])) return false;
+            // top right
+            if (!TraversableTiles.Contains(this[new Point(tileRight, tileTop)])) return false;
+            // bottom left
+            if (!TraversableTiles.Contains(this[new Point(tileLeft, tileBottom)])) return false;
+            // bottom right
+            if (!TraversableTiles.Contains(this[new Point(tileRight, tileBottom)])) return false;
+            return true;
         }
 
         public void Draw()
