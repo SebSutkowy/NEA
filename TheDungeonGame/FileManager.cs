@@ -35,5 +35,12 @@ namespace TheDungeonGame
             File.WriteAllText(Path.Combine(dir, fileName), data);
         }
 
+        public static string ReadData(string path)
+        {
+            string dir = Path.Combine(BasePath, path);
+            Debug.WriteLine($"Reading from {dir}");
+            return File.ReadAllText(dir);
+        }
+
     }
 }

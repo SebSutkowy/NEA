@@ -1,12 +1,44 @@
 ﻿using System.Collections.Generic;
-using System.Security.Cryptography;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Text.Json;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
+using System.IO;
+using TheDungeonGame;
 
-namespace TheDungeonGame
+namespace TheDungeonGame 
 {
+    public class RectangleData
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
+        public RectangleData()
+        {
+
+        }
+
+        public RectangleData(int x, int y, int width, int height)
+        {
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
+        }
+
+        public RectangleData(Rectangle rect)
+        {
+            X = rect.X;
+            Y = rect.Y;
+            Width = rect.Width;
+            Height = rect.Height;
+        }
+
+        public Rectangle getRect() => new Rectangle(X, Y, Width, Height);
+    }
+
     public enum TileType 
     {
         Wall,
@@ -15,9 +47,12 @@ namespace TheDungeonGame
 
     public class Tilemap
     {
+        [JsonInclude]
         private Dictionary<string, TileType> Map { get; set; }
         public Rectangle? CameraBounds { get; private set; }
         public int TileSize { get; private set; }
+        [JsonInclude]
+        private RectangleData savedBounds { get; set; }
 
         public Tilemap()
         {
@@ -26,10 +61,28 @@ namespace TheDungeonGame
             TileSize = 100;
         }
 
+        public Tilemap(string path)
+        {
+            Load(path);
+        }
+
+        public void Load(string path)
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
+            string text = FileManager.ReadData(path);
+            Tilemap newTilemap = (Tilemap)JsonSerializer.Deserialize<Tilemap>(text, options);
+            Debug.WriteLine(newTilemap.savedBounds);
+            Map = newTilemap.Map;
+            TileSize = newTilemap.TileSize;
+            CameraBounds = newTilemap.savedBounds.getRect();
+        }
+
         public void Save(string path = "")
         {
-            JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
-            string text = JsonSerializer.Serialize(Map, options);
+            JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true, Converters = { new JsonStringEnumConverter() } };
+            string text = JsonSerializer.Serialize(this, options);
+            if(path != "")
+                File.WriteAllText(path, text);
             Debug.WriteLine(text);
         }
 
@@ -38,11 +91,19 @@ namespace TheDungeonGame
         public Point GetPos(Point point) => new Point(point.X * TileSize, point.Y * TileSize);
         public Point GetPos(string loc) => GetPos(GetPoint(loc)); 
 
-        public void Add(string loc, TileType tileType) => Map.Add(loc, tileType);
-        public void Add(Point point, TileType tileType) => Map.Add(GetLoc(point), tileType);
+        public void Add(string loc, TileType tileType) => Map[loc] = tileType;
+        public void Add(Point point, TileType tileType) => Map[GetLoc(point)] = tileType;
 
         public void Remove(string loc) => Map.Remove(loc);
         public void Remove(Point point) => Map.Remove(GetLoc(point));
+
+        public bool Contains(string loc) => Map.ContainsKey(loc);
+        public bool Contains(Point pos) => Map.ContainsKey(GetLoc(pos));
+
+        public void SetBounds(Rectangle? bounds)
+        {
+            CameraBounds = bounds;
+        }
 
         public TileType this[string loc]
         {

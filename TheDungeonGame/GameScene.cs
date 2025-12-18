@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace TheDungeonGame
 {
@@ -30,15 +31,7 @@ namespace TheDungeonGame
             enemy = new Enemy(entityTexture, Vector2.Zero, 0f, 100, 100, 1f, 1f);
             EnemyManager.AddEnemy(enemy);
 
-            tilemap = new Tilemap();
-            for (int i = 0; i < 10; i++)
-            {
-                for (int j = 0; j < 10; j++)
-                {
-                    tilemap.Add(new Point(i, j), TileType.Floor);
-                }
-            }
-            tilemap.Save();
+            tilemap = new Tilemap(@"Maps/Lobby.json");
 
         }
 
@@ -47,7 +40,7 @@ namespace TheDungeonGame
 
         public override void Update()
         {
-            Camera.MoveCamera(player.Position, 0.3f, new Rectangle(-500, -500, 2000, 2000));
+            Camera.MoveCamera(player.Position, 0.3f, tilemap.CameraBounds);
             player.Update();
             healthBar.ChangeSize(new Vector2((player.Health / player.MaxHealth) * healthBarMaxLength, healthBar.Rectangle.Height));
             EnemyManager.Update();
