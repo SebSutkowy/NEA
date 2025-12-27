@@ -1,52 +1,97 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 
 namespace TheDungeonGame
 {
+    public enum Classes
+    {
+        Berserker,
+        Archer,
+        Mage
+    }
+
     public enum AttackType
     {
-        Melee,
-        Projectile,
+        NormalAttack,
+        SpecialAttack
+    }
+
+    public enum NormalAttacks
+    {
+        Swing,
+        BowShot,
+        Orb
+    }
+
+    public enum SpecialAttacks
+    {
+        Sweep,
+        PowerShot,
         Beam
     }
 
-    public class Attack : Sprite
+    public enum Utilities
     {
-        public Attack(Texture2D texture, Vector2 position, float rotation) : base(texture, position, rotation) { }
+        Rage,
+        Stealth,
+        Drain
+    }
 
-        public void ChangeWeapon(Texture2D newTexture)
+    public class Skillset 
+    {
+        public NormalAttacks NormalAttack;
+        public SpecialAttacks SpecialAttack;
+        public Utilities Utility;
+
+        public int NormalAttackLevel;
+        public int SpecialAttack1Level;
+        public int SpecialAttack2Level;
+
+        public Skillset()
         {
-            Texture = newTexture;
+            NormalAttackLevel = 1;
+            SpecialAttack1Level = 1;
+            SpecialAttack2Level = 1;
         }
-    }
 
-    public class MeleeAttack : Attack
-    {
-        public readonly float Damage = 5f;
-        public readonly float ManaCost = 0f;
-        public readonly AttackType Type = AttackType.Melee;
+        public Skillset(Classes playerClass)
+        {
+            switch (playerClass)
+            {
+                case Classes.Berserker:
+                    NormalAttack = NormalAttacks.Swing;
+                    SpecialAttack = SpecialAttacks.Sweep;
+                    Utility = Utilities.Rage;
+                    break;
+                case Classes.Archer:
+                    NormalAttack = NormalAttacks.BowShot;
+                    SpecialAttack = SpecialAttacks.PowerShot;
+                    Utility = Utilities.Stealth;
+                    break;
+                case Classes.Mage:
+                    NormalAttack = NormalAttacks.Orb;
+                    SpecialAttack = SpecialAttacks.Beam;
+                    Utility = Utilities.Drain;
+                    break;
+            }
+        }
 
-        public MeleeAttack(Texture2D texture, Vector2 position, float rotation) : base(texture, position, rotation)
-        { }
-    }
+        public Rectangle GetHitbox(Vector2 position, float rotation, AttackType attackType)
+        {
+            // create a table for all the functions of the new attack position given these parameters f(x, y, θ) = rect
 
-    public class ProjectileAttack : Attack 
-    {
-        public readonly float Damage = 5f;
-        public readonly float ManaCost = 0f;
-        public readonly AttackType Type = AttackType.Projectile;
+            return new Rectangle((int)(position.X + Math.Sin(rotation)), (int)(position.Y + Math.Cos(rotation)), 50, 50);
+        }
 
-        public ProjectileAttack(Texture2D texture, Vector2 position, float rotation) : base(texture, position, rotation)
-        { }
-    }
+        public float GetDamage(AttackType attackType)
+        {
+            /* in notepad, create a table / data set for damage of all attacks and level scaling e.g. swing = 5 (+2 per level) */
 
-    public class BeamAttack : Attack
-    {
-        public readonly float Damage = 3f;
-        public readonly float ManaCost = 5f;
-        public readonly AttackType Type = AttackType.Beam;
+            return 0f;
+        }
 
-        public BeamAttack(Texture2D texture, Vector2 position, float rotation) : base(texture, position, rotation)
-        { }
+
+
     }
 }

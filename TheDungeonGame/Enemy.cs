@@ -2,19 +2,21 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System.Diagnostics;
+using System;
 
 namespace TheDungeonGame
 {
+
     public class Enemy : Entity
     {
         private UIRect HealthBar;
         private int HealthBarMaxLength;
         private int FrameDamageTime;
-        public Enemy(Texture2D texture, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed) : base(texture, position, rotation, maxHealth, health, damage, speed)
+        public Enemy(AnimationManager animationManager, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed) : base(animationManager, position, rotation, maxHealth, health, damage, speed)
         {
-            HealthBarMaxLength = Texture.Width;
+            HealthBarMaxLength = AnimationManager.CurrentFrameRect.Width;
             HealthBar = new UIRect(
-                    new Rectangle((int)(Position.X - Texture.Width / 2), (int)(Position.Y - Texture.Height / 2 - 12), (Health / MaxHealth) * HealthBarMaxLength, 10),
+                    new Rectangle((int)(Position.X - AnimationManager.CurrentFrameRect.Width / 2), (int)(Position.Y - AnimationManager.CurrentFrameRect.Height / 2 - 12), (Health / MaxHealth) * HealthBarMaxLength, 10),
                     Color.Red
                     );
             FrameDamageTime = 15;

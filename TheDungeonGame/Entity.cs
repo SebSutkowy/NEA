@@ -12,9 +12,11 @@ namespace TheDungeonGame
         public float Speed { get; private set; } = 5.0f;
         protected int FramesSinceDamage { get; set; }
 
+        public Entity() : base() { }
 
-        public Entity(Texture2D texture, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed) : base(texture, position, rotation)
+        public Entity(AnimationManager animationManager, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed) : base(animationManager, position, rotation)
         {
+            AnimationManager = animationManager;
             MaxHealth = maxHealth;
             Health = health;
             Damage = damage;

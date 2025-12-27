@@ -1,21 +1,26 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
+using System.Runtime.Serialization;
 
 namespace TheDungeonGame
 {
-    public class Player : Entity 
+    public class Player : Entity
     {
-        private MeleeAttack PlayerAttack { get; set; }
         private int AttackFrame = 0; // place holder for the animation of the attacks
         private int AttackTimer = 0; // so that you can't spam attacks
         private bool IsAttacking = false;
-        private ItemNames Weapon = ItemNames.BasicSword; // place holder for the weapon, will be initially set to none, but for the purpose of testing is a sword 
+        private Skillset Skills;
+        private Classes Class;
 
-        public Player(Texture2D texture, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed) 
-            : base(texture, position, rotation, maxHealth, health, damage, speed)
+        public Player() : base()
+        { }
+
+        public Player(AnimationManager animationManager, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed, Classes @class) 
+            : base(animationManager, position, rotation, maxHealth, health, damage, speed)
         {
-            PlayerAttack = new MeleeAttack(AssetManager.GetItemTexture(Weapon), Vector2.Zero, 0f);
+            Class = @class;
+            Skills = new Skillset(@class);
 
         }
 
@@ -29,7 +34,7 @@ namespace TheDungeonGame
             }
             if (InputManager.IsPressed(Input.LMB)) // for attacking
             {
-                Attack();
+                Attack(AttackType.NormalAttack);
                 IsAttacking = true;
             }
             if (IsAttacking && AttackFrame < 10)
@@ -61,17 +66,21 @@ namespace TheDungeonGame
         {
             Vector2 vels = Vector2.Zero;
 
+            // horizontal velocities
             vels.X = InputManager.IsHeld(Input.MoveLeft) ? -Speed : 0;
             vels.X += InputManager.IsHeld(Input.MoveRight) ? Speed : 0; 
 
+            // vertical velocities
             vels.Y = InputManager.IsHeld(Input.MoveUp) ? -Speed : 0;
             vels.Y += InputManager.IsHeld(Input.MoveDown) ? Speed : 0;
 
+            // checking for collisions with the tilemap
             Rectangle collisionBox = new Rectangle((int)(Hitbox.X + vels.X), Hitbox.Y, Hitbox.Width, Hitbox.Height);
             if (tilemap.IsValid(collisionBox)) Position = new Vector2(Position.X + vels.X, Position.Y);
             collisionBox = new Rectangle(Hitbox.X, (int)(Hitbox.Y + vels.Y), Hitbox.Width, Hitbox.Height);
             if (tilemap.IsValid(collisionBox)) Position = new Vector2(Position.X, Position.Y + vels.Y);
 
+            // calculating player rotation based on mouse pos
             Point mpos = InputManager.GetMousePos();
             mpos = Camera.OffsetPoint(new Point(-1 * mpos.X, -1 * mpos.Y)); // the offset method subtracts the offset from the point when addition is needed here
             mpos = new Point(-1 * mpos.X, -1 * mpos.Y); // -(-mpos-offset) = mpos + offset
@@ -79,18 +88,19 @@ namespace TheDungeonGame
             Rotation = (Rotation + MathHelper.Pi / 2) % (MathHelper.Pi * 2);
         }
 
-        public void Attack()
+        public void Attack(AttackType attackType)
         {
-            PlayerAttack.Position = GetPolarPos(75, Rotation-MathHelper.Pi/2);
-            EnemyManager.Attack(PlayerAttack.Hitbox, PlayerAttack.Damage * Damage); 
+            Rectangle hitbox = Skills.GetHitbox(Position, Rotation, attackType);
+            EnemyManager.Attack(hitbox, Skills.GetDamage(attackType));
+
         }
 
         public new void Draw()
         {
             UI.DrawRect(Hitbox, Color.Red, false);
             base.Draw();
-            if (IsAttacking)
-                PlayerAttack.Draw();
+            if (IsAttacking) return;
+                //PlayerAttack.Draw();
         }
    }
 }
