@@ -63,15 +63,20 @@ namespace TheDungeonGame
             Paused = false;
         }
 
-        public void Update()
+        public bool Update()
         {
-            if (Paused) return;
+            if (Paused) return false;
             if (FrameTimer++ < AnimationFrameInterval)
-                return;
+                return false;
             FrameTimer = 0;
             CurrentFrame = ++CurrentFrame % FrameCount;
             if (!Looping && CurrentFrame == 0)
+            {
                 Paused = true;
+                return true;
+            }
+            return false;
+
         }
 
         public Rectangle GetSourceRect() => new Rectangle((int)FrameSize.X * CurrentFrame, (int)FrameSize.Y * SpriteSheetRow, (int)FrameSize.X, (int)FrameSize.Y);

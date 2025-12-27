@@ -2,13 +2,14 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Runtime.Serialization;
+using System.Diagnostics;
 
 namespace TheDungeonGame
 {
     public class Player : Entity
     {
         private int AttackFrame = 0; // place holder for the animation of the attacks
-        private int AttackTimer = 0; // so that you can't spam attacks
+        private int AttackCooldown = 0; // so that you can't spam attacks
         private bool IsAttacking = false;
         private Skillset Skills;
         private Classes Class;
@@ -37,20 +38,22 @@ namespace TheDungeonGame
                 Attack(AttackType.NormalAttack);
                 IsAttacking = true;
             }
-            if (IsAttacking && AttackFrame < 10)
-                AttackFrame++;
-            else if (IsAttacking && AttackFrame >= 10)
+            if (IsAttacking && Skills.AnimationManager.CurrentAnimation != AnimationNames.None)
             {
-                AttackFrame = 0;
+                Debug.WriteLine("updating");
+                Skills.Update(); // just updates the animation
+            }
+            else if (IsAttacking && Skills.AnimationManager.CurrentAnimation == AnimationNames.None)
+            {
+                Debug.WriteLine("Stop attacking");
                 IsAttacking = false;
             }
             else
             {
-                AttackTimer = Math.Min(AttackTimer++, 30);
+                Debug.WriteLine("increase cooldown");
+                AttackCooldown = Math.Min(AttackCooldown++, 30);
             }
-
-
-
+            Debug.WriteLine(Skills.AnimationManager.CurrentAnimation);
         }
 
         public Vector2 GetPolarPos(float radius, float angle)
@@ -99,8 +102,8 @@ namespace TheDungeonGame
         {
             UI.DrawRect(Hitbox, Color.Red, false);
             base.Draw();
-            if (IsAttacking) return;
-                //PlayerAttack.Draw();
+            if (IsAttacking && Skills.AnimationManager.CurrentAnimation != AnimationNames.None)
+                Skills.Draw(); 
         }
    }
 }

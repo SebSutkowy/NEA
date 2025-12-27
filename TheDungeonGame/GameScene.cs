@@ -25,8 +25,8 @@ namespace TheDungeonGame
             AnimationManager playerAnimationManager = new AnimationManager(entityTexture);
             Animation playerIdle = new Animation(new Vector2(100f), 0, 1, 1);
             playerIdle.Pause();
-            playerAnimationManager.AddAnimation(Animations.Idle, playerIdle);
-            playerAnimationManager.ChangeAnimation(Animations.Idle);
+            playerAnimationManager.AddAnimation(AnimationNames.Idle, playerIdle);
+            playerAnimationManager.ChangeAnimation(AnimationNames.Idle);
             player = new Player(playerAnimationManager, Vector2.Zero, 0f, playerMaxHealth, playerHealth, playerDamage, playerSpeed, Classes.Berserker);
             healthBar = new UIRect(
                 new Rectangle(10, 10, healthBarMaxLength, 25),
@@ -36,8 +36,8 @@ namespace TheDungeonGame
             AnimationManager enemyAnimationManager = new AnimationManager(entityTexture);
             Animation enemyIdle = new Animation(new Vector2(100f), 0, 1, 1);
             enemyIdle.Pause();
-            enemyAnimationManager.AddAnimation(Animations.Idle, enemyIdle);
-            enemyAnimationManager.ChangeAnimation(Animations.Idle);
+            enemyAnimationManager.AddAnimation(AnimationNames.Idle, enemyIdle);
+            enemyAnimationManager.ChangeAnimation(AnimationNames.Idle);
             enemy = new Enemy(enemyAnimationManager, Vector2.Zero, 0f, 100, 100, 1f, 1f);
             EnemyManager.AddEnemy(enemy);
 

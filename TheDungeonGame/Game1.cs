@@ -39,6 +39,7 @@ namespace TheDungeonGame
             AssetManager.LoadItemTexture(Content, ItemNames.BasicSword, "Sword");
             AssetManager.LoadTileTexture(Content, TileType.Floor, "FloorTile");
             AssetManager.LoadTileTexture(Content, TileType.Wall, "WallTile");
+            AssetManager.LoadSpriteSheet(Content, SpriteSheets.Weapons, "WeaponSpriteSheet");
             Camera.Initialize(_spriteBatch, _cameraFont);
             UI.LoadUI(GraphicsDevice);
             SceneManager.LoadScenes(Content);
