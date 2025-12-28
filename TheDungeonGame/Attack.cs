@@ -90,17 +90,15 @@ namespace TheDungeonGame
             UtilityLevel = 1;
         }
 
-        public void Update()
+        public void Update(Vector2 position, float rotation)
         {
+            Position = new Vector2(position.X + 75 * (float)Math.Sin(rotation), position.Y - 75 * (float)Math.Cos(rotation));
+            Rotation = rotation;
             AnimationManager.Update();
         }
 
-        public Rectangle GetHitbox(Vector2 position, float rotation, AttackType attackType)
+        public void Attack(AttackType attackType)
         {
-            // create a table for all the functions of the new attack position given these parameters f(x, y, θ) = rect maybe
-
-            Position = new Vector2(position.X + 75 * (float)Math.Sin(rotation), position.Y + 75 * (float)Math.Cos(rotation));
-            Rotation = rotation;
             AnimationNames name;
             switch (attackType)
             {
@@ -115,9 +113,6 @@ namespace TheDungeonGame
                     break;
             }
             AnimationManager.Play(name);
-
-            return Hitbox;
-
         }
 
         public float GetDamage(AttackType attackType)

@@ -8,8 +8,8 @@ namespace TheDungeonGame
 {
     public class Player : Entity
     {
-        private int AttackFrame = 0; // place holder for the animation of the attacks
         private int AttackCooldown = 0; // so that you can't spam attacks
+        private const int MaxAttackCooldown = 30;
         private bool IsAttacking = false;
         private Skillset Skills;
         private Classes Class;
@@ -33,27 +33,25 @@ namespace TheDungeonGame
             {
                 InputManager.SaveBinds();
             }
-            if (InputManager.IsPressed(Input.LMB)) // for attacking
+            if (InputManager.IsPressed(Input.LMB) && AttackCooldown >= MaxAttackCooldown) // for attacking
             {
                 Attack(AttackType.NormalAttack);
                 IsAttacking = true;
+                AttackCooldown = 0;
             }
             if (IsAttacking && Skills.AnimationManager.CurrentAnimation != AnimationNames.None)
             {
-                Debug.WriteLine("updating");
-                Skills.Update(); // just updates the animation
+                Skills.Update(Position, Rotation); // just updates the animation
             }
             else if (IsAttacking && Skills.AnimationManager.CurrentAnimation == AnimationNames.None)
             {
-                Debug.WriteLine("Stop attacking");
                 IsAttacking = false;
             }
             else
             {
-                Debug.WriteLine("increase cooldown");
-                AttackCooldown = Math.Min(AttackCooldown++, 30);
+                AttackCooldown = Math.Min(++AttackCooldown, MaxAttackCooldown);
             }
-            Debug.WriteLine(Skills.AnimationManager.CurrentAnimation);
+            Debug.WriteLine(AttackCooldown);
         }
 
         public Vector2 GetPolarPos(float radius, float angle)
@@ -93,8 +91,8 @@ namespace TheDungeonGame
 
         public void Attack(AttackType attackType)
         {
-            Rectangle hitbox = Skills.GetHitbox(Position, Rotation, attackType);
-            EnemyManager.Attack(hitbox, Skills.GetDamage(attackType));
+            Skills.Attack(attackType);
+            EnemyManager.Attack(Skills.Hitbox, Skills.GetDamage(attackType));
 
         }
 
