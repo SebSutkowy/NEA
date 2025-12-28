@@ -12,7 +12,6 @@ namespace TheDungeonGame
         UIRect healthBar;
         int healthBarMaxLength = Camera.ScreenWidth - 10 * 2;
         Enemy enemy;
-        Tilemap tilemap;
 
         public GameScene(ContentManager Content)
         {
@@ -41,17 +40,20 @@ namespace TheDungeonGame
             enemy = new Enemy(enemyAnimationManager, Vector2.Zero, 0f, 100, 100, 1f, 1f);
             EnemyManager.AddEnemy(enemy);
 
-            tilemap = new Tilemap(@"Maps/Lobby.json");
 
         }
 
         public override void OnSwitch()
-        { }
+        {
+            Dungeon.Clear();
+            Dungeon.AddTilemap(Tilemaps.Lobby);
+            Dungeon.ChangeTilemap(Tilemaps.Lobby);
+        }
 
         public override void Update()
         {
-            Camera.MoveCamera(player.Position, 0.3f, tilemap.CameraBounds);
-            player.Update(tilemap);
+            Camera.MoveCamera(player.Position, 0.3f, Dungeon.CameraBounds);
+            player.Update();
             healthBar.ChangeSize(new Vector2((player.Health / player.MaxHealth) * healthBarMaxLength, healthBar.Rectangle.Height));
             EnemyManager.Update();
             if (InputManager.IsPressed(Input.Escape))
@@ -60,7 +62,7 @@ namespace TheDungeonGame
 
         public override void Draw()
         {
-            tilemap.Draw();
+            Dungeon.Draw();
             player.Draw();
             EnemyManager.Draw();
 

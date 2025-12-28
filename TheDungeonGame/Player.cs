@@ -25,9 +25,9 @@ namespace TheDungeonGame
 
         }
 
-        public void Update(Tilemap tilemap)
+        public void Update()
         {
-            Move(tilemap);
+            Move();
 
             if (InputManager.IsPressed(Input.SaveBinds))
             {
@@ -63,7 +63,7 @@ namespace TheDungeonGame
             return result;
         }
 
-        public void Move(Tilemap tilemap)
+        public void Move()
         {
             Vector2 vels = Vector2.Zero;
 
@@ -77,9 +77,9 @@ namespace TheDungeonGame
 
             // checking for collisions with the tilemap
             Rectangle collisionBox = new Rectangle((int)(Hitbox.X + vels.X), Hitbox.Y, Hitbox.Width, Hitbox.Height);
-            if (tilemap.IsValid(collisionBox)) Position = new Vector2(Position.X + vels.X, Position.Y);
+            if (Dungeon.IsValid(collisionBox)) Position = new Vector2(Position.X + vels.X, Position.Y);
             collisionBox = new Rectangle(Hitbox.X, (int)(Hitbox.Y + vels.Y), Hitbox.Width, Hitbox.Height);
-            if (tilemap.IsValid(collisionBox)) Position = new Vector2(Position.X, Position.Y + vels.Y);
+            if (Dungeon.IsValid(collisionBox)) Position = new Vector2(Position.X, Position.Y + vels.Y);
 
             // calculating player rotation based on mouse pos
             Point mpos = InputManager.GetMousePos();
@@ -93,7 +93,6 @@ namespace TheDungeonGame
         {
             Skills.Attack(attackType);
             EnemyManager.Attack(Skills.Hitbox, Skills.GetDamage(attackType));
-
         }
 
         public new void Draw()

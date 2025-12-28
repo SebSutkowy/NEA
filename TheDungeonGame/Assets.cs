@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 
 namespace TheDungeonGame
 {
@@ -18,6 +19,13 @@ namespace TheDungeonGame
         private static Dictionary<ItemNames, Texture2D> ItemTextures = new Dictionary<ItemNames, Texture2D>();
         private static Dictionary<TileType, Texture2D> TileTextures = new Dictionary<TileType, Texture2D>();
         private static Dictionary<SpriteSheets, Texture2D> SpriteSheets = new Dictionary<SpriteSheets, Texture2D>();
+
+        private static Dictionary<Tilemaps, string> TilemapFileLocations = new Dictionary<Tilemaps, string>()
+        {
+            {Tilemaps.None, @"" },
+            {Tilemaps.Lobby, @"Maps/Lobby.json" },
+            {Tilemaps.Hallway1, @"Maps/" }  // add later
+        };
 
         public static void LoadUnimplementedTexture(ContentManager Content, string path)
         {
@@ -55,6 +63,12 @@ namespace TheDungeonGame
         {
             if (SpriteSheets.ContainsKey(spriteSheet)) return SpriteSheets[spriteSheet];
             return UnimplementedTexture;
+        }
+
+        public static string GetTilemapFileLocation(Tilemaps tilemap)
+        {
+            if (TilemapFileLocations.ContainsKey(tilemap)) return TilemapFileLocations[tilemap];
+            return "";
         }
 
     }

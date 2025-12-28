@@ -47,6 +47,13 @@ namespace TheDungeonGame
         Floor,
     }
 
+    public enum Tilemaps
+    {
+        None,
+        Lobby,
+        Hallway1
+    }
+
     public class Tilemap
     {
         public readonly HashSet<TileType> TraversableTiles = new HashSet<TileType>()
@@ -60,12 +67,16 @@ namespace TheDungeonGame
         public int TileSize { get; private set; }
         [JsonInclude]
         private RectangleData savedBounds { get; set; }
+        private int DoorsCount { get; set; }
+        private Dictionary<string, int[]> Doors { get; set; } // second stores the offset on entry
 
         public Tilemap()
         {
             Map = new Dictionary<string, TileType>();
             CameraBounds = null;
             TileSize = 100;
+            DoorsCount = 0;
+            Doors = new Dictionary<string, int[]>();
         }
 
         public Tilemap(string path)
@@ -82,6 +93,8 @@ namespace TheDungeonGame
             Map = newTilemap.Map;
             TileSize = newTilemap.TileSize;
             CameraBounds = newTilemap.savedBounds.getRect();
+            DoorsCount = newTilemap.DoorsCount;
+            Doors = newTilemap.Doors;
         }
 
         public void Save(string path = "")
