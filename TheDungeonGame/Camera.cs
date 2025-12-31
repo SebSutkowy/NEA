@@ -92,8 +92,12 @@ namespace TheDungeonGame
             Position -= ScreenDimensions / 2;
             if (CameraBounds != null)
             {
-                Position.X = Math.Clamp(Position.X, (float)CameraBounds?.X, (float)CameraBounds?.X + (float)CameraBounds?.Width - (float)ScreenWidth);
-                Position.Y = Math.Clamp(Position.Y, (float)CameraBounds?.Y, (float)CameraBounds?.Y + (float)CameraBounds?.Height- (float)ScreenHeight);
+                float horizontalSide1 = (float)CameraBounds?.X;
+                float horizontalSide2 = (float)CameraBounds?.X + (float)CameraBounds?.Width - ScreenWidth;
+                float verticalSide1 = (float)CameraBounds?.Y;
+                float verticalSide2 = (float)CameraBounds?.Y + (float)CameraBounds?.Height - ScreenHeight;
+                Position.X = Math.Clamp(Position.X, Math.Min(horizontalSide1, horizontalSide2), Math.Max(horizontalSide1, horizontalSide2));
+                Position.Y = Math.Clamp(Position.Y, Math.Min(verticalSide1, verticalSide2), Math.Max(verticalSide1, verticalSide2));
             }
         }
 

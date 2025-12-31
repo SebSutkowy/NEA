@@ -8,6 +8,7 @@ namespace TheDungeonGame
 {
     public enum SpriteSheets
     {
+        Entity,
         Player,
         Enemy,
         Weapons
@@ -24,7 +25,7 @@ namespace TheDungeonGame
         {
             {Tilemaps.None, @"" },
             {Tilemaps.Lobby, @"Maps/Lobby.json" },
-            {Tilemaps.Hallway1, @"Maps/" }  // add later
+            {Tilemaps.Hallway1, @"Maps/Hallway1.json" }  
         };
 
         public static void LoadUnimplementedTexture(ContentManager Content, string path)

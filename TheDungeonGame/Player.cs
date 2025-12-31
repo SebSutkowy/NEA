@@ -51,7 +51,11 @@ namespace TheDungeonGame
             {
                 AttackCooldown = Math.Min(++AttackCooldown, MaxAttackCooldown);
             }
-            Debug.WriteLine(AttackCooldown);
+        }
+
+        public void SetPos(Vector2 pos)
+        {
+            Position = pos;
         }
 
         public Vector2 GetPolarPos(float radius, float angle)
@@ -92,7 +96,7 @@ namespace TheDungeonGame
         public void Attack(AttackType attackType)
         {
             Skills.Attack(attackType);
-            EnemyManager.Attack(Skills.Hitbox, Skills.GetDamage(attackType));
+            Dungeon.Attack(Skills.Hitbox, Skills.GetDamage(attackType));
         }
 
         public new void Draw()

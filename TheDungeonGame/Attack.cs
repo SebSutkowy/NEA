@@ -64,7 +64,7 @@ namespace TheDungeonGame
         public Skillset(Classes playerClass)
         {
             AnimationManager = new AnimationManager(AssetManager.GetSpriteSheet(SpriteSheets.Weapons));
-            Animation swingAnimation = new Animation(frameSize: new Vector2(100f), spriteSheetRow: 0, frameCount: 5, frameInterval: 6, looping: false);
+            Animation swingAnimation = new Animation(frameSize: new Vector2(100f), spriteSheetRow: 0, frameCount: 5, frameInterval: 3, looping: false);
             AnimationManager.AddAnimation(AnimationNames.SwingAttack, swingAnimation);
 
             switch (playerClass)

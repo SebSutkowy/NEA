@@ -45,6 +45,7 @@ namespace TheDungeonGame
         None,
         Wall,
         Floor,
+        Door,
     }
 
     public enum Tilemaps
@@ -62,12 +63,15 @@ namespace TheDungeonGame
         };
 
         [JsonInclude]
+        public Tilemaps Name { get; private set; }
+        [JsonInclude]
         private Dictionary<string, TileType> Map { get; set; }
         public Rectangle? CameraBounds { get; private set; }
         public int TileSize { get; private set; }
         [JsonInclude]
         private RectangleData savedBounds { get; set; }
-        private int DoorsCount { get; set; }
+        public int DoorsCount { get; set; }
+        [JsonInclude]
         private Dictionary<string, int[]> Doors { get; set; } // second stores the offset on entry
 
         public Tilemap()
@@ -89,7 +93,8 @@ namespace TheDungeonGame
             JsonSerializerOptions options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
             string text = FileManager.ReadData(path);
             Tilemap newTilemap = (Tilemap)JsonSerializer.Deserialize<Tilemap>(text, options);
-            Debug.WriteLine(newTilemap.savedBounds);
+            Debug.WriteLine(newTilemap.Name);
+            Name = newTilemap.Name;
             Map = newTilemap.Map;
             TileSize = newTilemap.TileSize;
             CameraBounds = newTilemap.savedBounds.getRect();
@@ -106,10 +111,10 @@ namespace TheDungeonGame
             Debug.WriteLine(text);
         }
 
-        public string GetLoc(Point point) => $"{point.X};{point.Y}";
-        public Point GetPoint(string loc) => new Point(int.Parse(loc.Split(';')[0]), int.Parse(loc.Split(';')[1]));
+        public static string GetLoc(Point point) => $"{point.X};{point.Y}";
+        public static Point GetPoint(string loc) => new Point(int.Parse(loc.Split(';')[0]), int.Parse(loc.Split(';')[1]));
         public Point GetPos(Point point) => new Point(point.X * TileSize, point.Y * TileSize);
-        public Point GetPos(string loc) => GetPos(GetPoint(loc)); 
+        public Point GetPos(string loc) => GetPos(GetPoint(loc));
 
         public void Add(string loc, TileType tileType) => Map[loc] = tileType;
         public void Add(Point point, TileType tileType) => Map[GetLoc(point)] = tileType;
@@ -134,6 +139,14 @@ namespace TheDungeonGame
             get => Map.ContainsKey(GetLoc(point)) ? Map[GetLoc(point)] : TileType.None;
         }
 
+        public string GetDoorLoc(string loc)
+        {
+            if (!Doors.ContainsKey(loc)) return "";
+            Point newPos = GetPoint(loc);
+            newPos = new Point(newPos.X + Doors[loc][0], newPos.Y + Doors[loc][1]);
+            return GetLoc(newPos);
+        }
+
         public bool IsValid(Rectangle bounds)
         {
             // works only for tileSize x tileSize entities
@@ -147,14 +160,23 @@ namespace TheDungeonGame
                 tileTop = (int)Math.Floor(top / 100f),
                 tileBottom = (int)Math.Floor(bottom / 100f);
 
+            Point topLeft = new Point(tileLeft, tileTop),
+                  topRight = new Point(tileRight, tileTop),
+                  bottomLeft = new Point(tileLeft, tileBottom),
+                  bottomRight = new Point(tileRight, tileBottom);
+
             // top left
-            if (!TraversableTiles.Contains(this[new Point(tileLeft, tileTop)])) return false;
+            if (!TraversableTiles.Contains(this[topLeft])) return false;
+            if (Doors.ContainsKey(GetLoc(topLeft))) Dungeon.UseDoor(Name, GetLoc(topLeft));
             // top right
-            if (!TraversableTiles.Contains(this[new Point(tileRight, tileTop)])) return false;
+            if (!TraversableTiles.Contains(this[topRight])) return false;
+            if (Doors.ContainsKey(GetLoc(topRight))) Dungeon.UseDoor(Name, GetLoc(topRight));
             // bottom left
-            if (!TraversableTiles.Contains(this[new Point(tileLeft, tileBottom)])) return false;
+            if (!TraversableTiles.Contains(this[bottomLeft])) return false;
+            if (Doors.ContainsKey(GetLoc(bottomLeft))) Dungeon.UseDoor(Name, GetLoc(bottomLeft));
             // bottom right
-            if (!TraversableTiles.Contains(this[new Point(tileRight, tileBottom)])) return false;
+            if (!TraversableTiles.Contains(this[bottomRight])) return false;
+            if (Doors.ContainsKey(GetLoc(bottomRight))) Dungeon.UseDoor(Name, GetLoc(bottomRight));
             return true;
         }
 
@@ -164,7 +186,14 @@ namespace TheDungeonGame
             {
                 Texture2D texture = AssetManager.GetTileTexture(tileType);
                 Rectangle rect = new Rectangle(GetPos(loc), texture.Bounds.Size);
-                Camera.Draw(AssetManager.GetTileTexture(tileType), rect, Color.White);
+                Camera.Draw(texture, rect, Color.White);
+            }
+
+            foreach (string loc in Doors.Keys)
+            {
+                Texture2D texture = AssetManager.GetTileTexture(TileType.Door);
+                Rectangle rect = new Rectangle(GetPos(loc), texture.Bounds.Size);
+                Camera.Draw(texture, rect, Color.White);
             }
         }
 

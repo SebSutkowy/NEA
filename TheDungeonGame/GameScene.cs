@@ -32,13 +32,6 @@ namespace TheDungeonGame
                 Color.Red
                 );
 
-            AnimationManager enemyAnimationManager = new AnimationManager(entityTexture);
-            Animation enemyIdle = new Animation(new Vector2(100f), 0, 1, 1);
-            enemyIdle.Pause();
-            enemyAnimationManager.AddAnimation(AnimationNames.Idle, enemyIdle);
-            enemyAnimationManager.ChangeAnimation(AnimationNames.Idle);
-            enemy = new Enemy(enemyAnimationManager, Vector2.Zero, 0f, 100, 100, 1f, 1f);
-            EnemyManager.AddEnemy(enemy);
 
 
         }
@@ -47,24 +40,34 @@ namespace TheDungeonGame
         {
             Dungeon.Clear();
             Dungeon.AddTilemap(Tilemaps.Lobby);
+            Dungeon.AddTilemap(Tilemaps.Hallway1);
+            Dungeon.ConnectDoors(Tilemaps.Lobby, "0;-6", Tilemaps.Hallway1, "0;6");
             Dungeon.ChangeTilemap(Tilemaps.Lobby);
+
+            AnimationManager enemyAnimationManager = new AnimationManager(AssetManager.GetSpriteSheet(SpriteSheets.Entity));
+            Animation enemyIdle = new Animation(new Vector2(100f), 0, 1, 1);
+            enemyIdle.Pause();
+            enemyAnimationManager.AddAnimation(AnimationNames.Idle, enemyIdle);
+            enemyAnimationManager.ChangeAnimation(AnimationNames.Idle);
+            enemy = new Enemy(enemyAnimationManager, Vector2.Zero, 0f, 100, 100, 1f, 1f);
+            Dungeon.AddEnemy(Tilemaps.Lobby, enemy);
         }
 
         public override void Update()
         {
             Camera.MoveCamera(player.Position, 0.3f, Dungeon.CameraBounds);
             player.Update();
+            Dungeon.Update();
             healthBar.ChangeSize(new Vector2((player.Health / player.MaxHealth) * healthBarMaxLength, healthBar.Rectangle.Height));
-            EnemyManager.Update();
             if (InputManager.IsPressed(Input.Escape))
                 SceneManager.BackScene();
+            Dungeon.CheckIfChangingTilemap(player);
         }
 
         public override void Draw()
         {
             Dungeon.Draw();
             player.Draw();
-            EnemyManager.Draw();
 
             healthBar.Draw(); 
         }
