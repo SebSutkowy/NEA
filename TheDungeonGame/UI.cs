@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Globalization;
 
 namespace TheDungeonGame
 {
@@ -25,15 +26,22 @@ namespace TheDungeonGame
 
     public class UIRect
     {
-        public Rectangle Rectangle { get; private set; }
-        public string Text { get; private set; }
-        public Color Color { get; private set; }
+        public Rectangle Rectangle { get; protected set; }
+        public string Text { get; protected set; }
+        public Color Color { get; protected set; }
+        public Color TextColor { get; protected set; }
 
-        public UIRect(Rectangle rect, Color color, string text="")
+        public UIRect() { }
+
+        public UIRect(Rectangle rect, Color color, string text = "") : this(rect, color, Color.White, text)
+        { }
+
+        public UIRect(Rectangle rect, Color color, Color textColor, string text = "")
         {
             Rectangle = rect;
             Color = color;
             Text = text;
+            TextColor = textColor;
         }
 
         public bool Contains(Point pos) => Rectangle.Contains(pos);
@@ -64,5 +72,66 @@ namespace TheDungeonGame
             Vector2 Position = new Vector2(Rectangle.Center.X - textSize.X / 2, Rectangle.Center.Y - textSize.Y / 2);
             Camera.DrawString(Text, Position, Color.White);
         }
+    }
+
+    public class DialogueBox : UIRect
+    {
+
+        private string FinalText { get; set; }
+
+        public bool IsFinished => FinalText.Length <= Text.Length;
+
+        public bool IsPaused { get; protected set; }
+        public bool IsVisible { get; set; }
+
+        public DialogueBox() : base()
+        {
+            FinalText = string.Empty;
+        }
+
+        public DialogueBox(Rectangle rect, Color color, string finalText) : base(rect, color, "")
+        {
+            FinalText = finalText;
+        }
+
+        public DialogueBox(Rectangle rect, Color color, string finalText, Color textColor) : base(rect, color, textColor, "")
+        {
+            FinalText = finalText;
+        }
+
+        public void Update()
+        {
+            if(!IsFinished && !IsPaused)
+                Text += FinalText[Text.Length];
+                
+        }
+
+        public void SkipDialogue()
+        {
+            if(!IsFinished)
+                Text = FinalText;
+            else
+            {
+                IsVisible = false;
+                IsPaused = true;
+            }
+        }
+
+        public void Pause()
+        {
+            IsPaused = true;
+        }
+
+        public void UnPause()
+        {
+            IsPaused = false;
+        }
+
+        public void Draw()
+        {
+            if (IsVisible)
+                base.Draw();
+        }
+
     }
 }
