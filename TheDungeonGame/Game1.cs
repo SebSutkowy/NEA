@@ -42,6 +42,9 @@ namespace TheDungeonGame
             AssetManager.LoadTileTexture(Content, TileType.Door, "DoorTile");
             AssetManager.LoadSpriteSheet(Content, SpriteSheets.Weapons, "WeaponSpriteSheet");
             AssetManager.LoadSpriteSheet(Content, SpriteSheets.Entity, "PointedCircle");
+
+            AssetManager.LoadNPC(NPCId.Shopkeep, new NPC(0f, NPCId.Shopkeep));
+
             Camera.Initialize(_spriteBatch, _cameraFont);
             UI.LoadUI(GraphicsDevice);
             SceneManager.LoadScenes(Content);

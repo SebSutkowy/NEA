@@ -73,6 +73,8 @@ namespace TheDungeonGame
         public int DoorsCount { get; set; }
         [JsonInclude]
         private Dictionary<string, int[]> Doors { get; set; } // second stores the offset on entry
+        [JsonInclude]
+        public Dictionary<string, NPCId> NPCs { get; set; }
 
         public Tilemap()
         {
@@ -81,6 +83,7 @@ namespace TheDungeonGame
             TileSize = 100;
             DoorsCount = 0;
             Doors = new Dictionary<string, int[]>();
+            NPCs = new Dictionary<string, NPCId>();
         }
 
         public Tilemap(string path)
@@ -100,6 +103,7 @@ namespace TheDungeonGame
             CameraBounds = newTilemap.savedBounds.getRect();
             DoorsCount = newTilemap.DoorsCount;
             Doors = newTilemap.Doors;
+            NPCs = newTilemap.NPCs;
         }
 
         public void Save(string path = "")
@@ -194,6 +198,12 @@ namespace TheDungeonGame
                 Texture2D texture = AssetManager.GetTileTexture(TileType.Door);
                 Rectangle rect = new Rectangle(GetPos(loc), texture.Bounds.Size);
                 Camera.Draw(texture, rect, Color.White);
+            }
+
+            foreach (string loc in NPCs.Keys)
+            {
+                Point pos = GetPos(loc);
+                AssetManager.GetNPC(NPCs[loc]).Draw(new Vector2(pos.X + 50, pos.Y + 50));
             }
         }
 
