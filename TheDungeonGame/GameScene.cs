@@ -61,9 +61,10 @@ namespace TheDungeonGame
                 SceneManager.BackScene();
             Dungeon.CheckIfChangingTilemap(player);
 
-            if (InputManager.IsPressed(Input.ContinueDialogue))
+            string loc = Tilemap.GetLoc(InputManager.GetTilemapMousePos());
+            if (InputManager.IsPressed(Input.LMB) && Dungeon.IsInteractive(loc))
             {
-                Dungeon.Interact("2;4"); 
+                Dungeon.Interact(loc);
             }
 
         }

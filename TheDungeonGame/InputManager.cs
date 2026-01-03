@@ -82,6 +82,7 @@ namespace TheDungeonGame
 
 
         public static Point GetMousePos() => currentMouseState.Position;
+        public static Point GetTilemapMousePos() => Dungeon.GetTilemapPos(Camera.InverseOffset(GetMousePos()));
 
         public static bool IsPressed(Input input)
         {
