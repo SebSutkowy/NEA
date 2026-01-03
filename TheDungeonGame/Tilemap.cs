@@ -151,6 +151,15 @@ namespace TheDungeonGame
             return GetLoc(newPos);
         }
 
+        public void Interact(string loc)
+        {
+            if (NPCs.ContainsKey(loc))
+            {
+                AssetManager.GetNPC(NPCs[loc]).Interact();
+            }
+
+        }
+
         public bool IsValid(Rectangle bounds)
         {
             // works only for tileSize x tileSize entities

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace TheDungeonGame
 {
@@ -18,6 +19,8 @@ namespace TheDungeonGame
 
         private DialogueBox DialogueBox { get; set; }
         private List<string> Dialogue { get; set; }
+        private int CurrentDialogue { get; set; }
+        private bool IsTalking { get; set; }
 
         public NPC() : base()
         { }
@@ -31,19 +34,50 @@ namespace TheDungeonGame
             AnimationManager.ChangeAnimation(AnimationNames.Idle);
 
             Id = id;
-            DialogueBox = new DialogueBox();
-            Dialogue = new List<string>();
+            DialogueBox = new DialogueBox(new Rectangle(10, Camera.ScreenHeight / 2 + 10, Camera.ScreenWidth - 20, Camera.ScreenHeight / 2 - 20), new Color(20, 20, 20, 200), "");
+            Dialogue = AssetManager.GetDialogue(id);
+            
+            CurrentDialogue = 0;
+            IsTalking = false;
+        }
+
+        public void Update()
+        {
+            if (IsTalking)
+            {
+                DialogueBox.IsVisible = true;
+                DialogueBox.Update();
+            }
+            else
+            {
+                DialogueBox.IsVisible = false;
+            }
         }
 
         public void Interact()
         {
             // Do something
+            if (Dialogue.Count > 0)
+            {
+                CurrentDialogue = ++CurrentDialogue % (Dialogue.Count + 1);
+                if (CurrentDialogue > 0)
+                {
+                    DialogueBox.ChangeText(Dialogue[CurrentDialogue - 1]);
+                    IsTalking = true;
+                }
+                else
+                {
+                    IsTalking = false;
+                }
 
+            }
         }
 
         public void Draw(Vector2 pos)
         {
             AnimationManager.Draw(pos, Rotation, Origin);
+            if (IsTalking)
+                DialogueBox.Draw();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace TheDungeonGame
 {
@@ -43,6 +44,7 @@ namespace TheDungeonGame
             AssetManager.LoadSpriteSheet(Content, SpriteSheets.Weapons, "WeaponSpriteSheet");
             AssetManager.LoadSpriteSheet(Content, SpriteSheets.Entity, "PointedCircle");
 
+            AssetManager.LoadDialogue(NPCId.Shopkeep, "Shopkeep.json");
             AssetManager.LoadNPC(NPCId.Shopkeep, new NPC(0f, NPCId.Shopkeep));
 
             Camera.Initialize(_spriteBatch, _cameraFont);

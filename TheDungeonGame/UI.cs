@@ -99,6 +99,12 @@ namespace TheDungeonGame
             FinalText = finalText;
         }
 
+        public new void ChangeText(string text)
+        {
+            FinalText = text;
+            Text = "";
+        }
+
         public void Update()
         {
             if(!IsFinished && !IsPaused)

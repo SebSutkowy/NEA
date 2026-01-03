@@ -3,6 +3,7 @@ using Microsoft.VisualBasic.FileIO;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Net.NetworkInformation;
 using System.Text.Json;
@@ -103,8 +104,9 @@ namespace TheDungeonGame
             return "";
         }
 
-        public static List<string> GetDialouge(NPCId id)
+        public static List<string> GetDialogue(NPCId id)
         {
+            Debug.WriteLine(Dialogues.ContainsKey(id));
             if (Dialogues.ContainsKey(id)) return Dialogues[id];
             return new List<string>();
         }

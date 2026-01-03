@@ -12,7 +12,6 @@ namespace TheDungeonGame
         UIRect healthBar;
         int healthBarMaxLength = Camera.ScreenWidth - 10 * 2;
         Enemy enemy;
-        DialogueBox dialogueBox;
 
         public GameScene(ContentManager Content)
         {
@@ -33,12 +32,6 @@ namespace TheDungeonGame
                 new Rectangle(10, 10, healthBarMaxLength, 25),
                 Color.Red
                 );
-
-            dialogueBox = new DialogueBox(new Rectangle(10, 10 + Camera.ScreenHeight / 2, Camera.ScreenWidth - 20, Camera.ScreenHeight / 2 - 20), 
-                                          new Color(20, 20, 20, 200), 
-                                          "This is a test to see if the dialogue box works."
-                                          ); 
-
         }
 
         public override void OnSwitch()
@@ -70,16 +63,9 @@ namespace TheDungeonGame
 
             if (InputManager.IsPressed(Input.ContinueDialogue))
             {
-                if (!dialogueBox.IsVisible)
-                    dialogueBox.IsVisible = true;
-                else
-                    dialogueBox.SkipDialogue();
+                Dungeon.Interact("2;4"); 
             }
 
-            if (dialogueBox.IsVisible)
-                dialogueBox.Update();
-
-                
         }
 
         public override void Draw()
@@ -88,7 +74,6 @@ namespace TheDungeonGame
             player.Draw();
 
             healthBar.Draw();
-            dialogueBox.Draw();
         }
     }
 }

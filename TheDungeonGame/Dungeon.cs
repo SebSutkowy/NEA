@@ -53,7 +53,17 @@ namespace TheDungeonGame
         public static void Update()
         {
             EnemyManager.Update();
+            foreach (NPCId id in CurrentTilemap.NPCs.Values)
+            {
+                AssetManager.GetNPC(id).Update();
+            }
         }
+
+        public static void Interact(string loc)
+        {
+            CurrentTilemap.Interact(loc);
+        }
+
 
         public static void CheckIfChangingTilemap(Player player)
         {
