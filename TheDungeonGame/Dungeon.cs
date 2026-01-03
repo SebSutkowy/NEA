@@ -13,6 +13,8 @@ namespace TheDungeonGame
         private static Dictionary<Tilemaps, Tilemap> ActiveTilemaps = new Dictionary<Tilemaps, Tilemap>();
         public static Tilemaps CurrentTilemapName { get; private set; } = Tilemaps.None;
         private static Tilemap CurrentTilemap => ActiveTilemaps[CurrentTilemapName];
+        public static int TileSize => CurrentTilemap.TileSize;
+        public static bool IsActive => CurrentTilemapName != Tilemaps.None;
         public static Rectangle? CameraBounds => CurrentTilemap.CameraBounds;
         public static Dictionary<(Tilemaps, string), (Tilemaps, string)> Doors = new Dictionary<(Tilemaps, string), (Tilemaps, string)>(); // door -> destination
         private static bool ChangingTilemap = false;
@@ -27,6 +29,14 @@ namespace TheDungeonGame
         {
             ActiveTilemaps.Clear();
             CurrentTilemapName = Tilemaps.None;
+        }
+
+        public static Point GetTilemapPos(Point pos)
+        {
+            Point res = pos;
+            res.X = (int)Math.Floor((float)res.X / (float)TileSize);
+            res.Y = (int)Math.Floor((float)res.Y / (float)TileSize);
+            return res;
         }
 
         public static void AddTilemap(Tilemaps newTilemap)
@@ -57,6 +67,12 @@ namespace TheDungeonGame
             {
                 AssetManager.GetNPC(id).Update();
             }
+        }
+
+        public static bool IsInteractive(string loc)
+        {
+            if (CurrentTilemap.NPCs.ContainsKey(loc)) return true;
+            return false;
         }
 
         public static void Interact(string loc)

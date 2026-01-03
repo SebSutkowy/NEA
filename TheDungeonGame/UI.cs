@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace TheDungeonGame
@@ -7,12 +8,31 @@ namespace TheDungeonGame
     public static class UI
     {
         private static Texture2D pixelRect;
+        private static Point CursorPos;
+        private static Color CursorColor = Color.Green;
         
         public static void LoadUI(GraphicsDevice graphicsDevice)
         {
             pixelRect = new Texture2D(graphicsDevice, 1, 1);
             pixelRect.SetData(new[] { Color.White });
         }
+
+        public static void Update()
+        {
+            CursorPos = InputManager.GetMousePos();
+            if (!Dungeon.IsActive) return;
+            Point tilemapPos = Dungeon.GetTilemapPos(Camera.InverseOffset(CursorPos));
+            string loc = Tilemap.GetLoc(tilemapPos);
+            if (Dungeon.IsInteractive(loc))
+            {
+                CursorColor = Color.Red;
+            }
+            else
+            {
+                CursorColor = Color.Green;
+            }
+        }
+
         public static void DrawRect(Rectangle rect, Color color, bool drawAbsolute=true)
         {
             Camera.Draw(pixelRect, rect, color, drawAbsolute);
@@ -21,6 +41,12 @@ namespace TheDungeonGame
         public static void DrawText(string text, Vector2 position, Color color)
         {
             Camera.DrawString(text, position, color);
+        }
+
+        public static void Draw()
+        {
+            DrawRect(new Rectangle(CursorPos, new Point(10)), CursorColor);
+
         }
     }
 

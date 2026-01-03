@@ -57,6 +57,7 @@ namespace TheDungeonGame
         {
 
             SceneManager.Update();
+            UI.Update();
 
             base.Update(gameTime);
         }
@@ -68,6 +69,7 @@ namespace TheDungeonGame
             _spriteBatch.Begin();
 
             SceneManager.Draw();
+            UI.Draw();
 
             _spriteBatch.End();
 
