@@ -60,9 +60,9 @@ namespace TheDungeonGame
             newLoc = ActiveTilemaps[newTilemap].GetDoorLoc(newLoc); 
         }
 
-        public static void Update()
+        public static void Update(Player player)
         {
-            EnemyManager.Update();
+            EnemyManager.Update(player);
             foreach (NPCId id in CurrentTilemap.NPCs.Values)
             {
                 AssetManager.GetNPC(id).Update();
@@ -74,6 +74,9 @@ namespace TheDungeonGame
             if (CurrentTilemap.NPCs.ContainsKey(loc)) return true;
             return false;
         }
+
+        public static bool IsTraversable(string loc) => CurrentTilemap.IsTraversable(loc);
+        public static bool IsTraversable(Point point) => CurrentTilemap.IsTraversable(point);
 
         public static void Interact(string loc)
         {

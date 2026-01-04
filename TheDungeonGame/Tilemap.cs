@@ -57,7 +57,7 @@ namespace TheDungeonGame
 
     public class Tilemap
     {
-        public readonly HashSet<TileType> TraversableTiles = new HashSet<TileType>()
+        public static readonly HashSet<TileType> TraversableTiles = new HashSet<TileType>()
         {
             TileType.Floor
         };
@@ -114,6 +114,9 @@ namespace TheDungeonGame
                 File.WriteAllText(path, text);
             Debug.WriteLine(text);
         }
+
+        public bool IsTraversable(string loc) => TraversableTiles.Contains(this[loc]);
+        public bool IsTraversable(Point point) => TraversableTiles.Contains(this[point]);
 
         public static string GetLoc(Point point) => $"{point.X};{point.Y}";
         public static Point GetPoint(string loc) => new Point(int.Parse(loc.Split(';')[0]), int.Parse(loc.Split(';')[1]));
