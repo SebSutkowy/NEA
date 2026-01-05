@@ -92,7 +92,7 @@ namespace TheDungeonGame
             else
                 base.Draw();
             if(IsAttacking && attacks.IsAttacking)
-                awttacks.Draw();
+                attacks.Draw();
             HealthBar.Draw(false);
         }
     }
