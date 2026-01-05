@@ -38,6 +38,7 @@ namespace TheDungeonGame
 
     public class Skillset : Sprite
     {
+        public bool IsAttacking => AnimationManager.CurrentAnimation != AnimationNames.None;
 
         public Attacks NormalAttack { get; set; }
         public Attacks SpecialAttack { get; set; }

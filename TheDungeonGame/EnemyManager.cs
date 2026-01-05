@@ -104,7 +104,8 @@ namespace TheDungeonGame
                 else
                 {
                     GivePaths(playerPos, enemy);
-                    enemy.Update();
+                    float dist = Vector2.DistanceSquared(enemy.Position, player.Position);
+                    enemy.Update(dist);
                 }
 
                     

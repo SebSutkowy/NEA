@@ -14,6 +14,12 @@ namespace TheDungeonGame
         private int HealthBarMaxLength;
         private int FrameDamageTime;
         private Queue<Point> Path;
+        private Skillset attacks = new Skillset(Classes.Berserker);
+        private int AttackCooldown;
+        private const int MaxAttackCooldown = 30;
+        private bool IsAttacking;
+
+        private const float MinSquareDistToPlayer = 10000f; 
 
         public Enemy(AnimationManager animationManager, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed) : base(animationManager, position, rotation, maxHealth, health, damage, speed)
         {
@@ -24,18 +30,35 @@ namespace TheDungeonGame
                     );
             FrameDamageTime = 15;
             FramesSinceDamage = FrameDamageTime;
+            AttackCooldown = 0;
+            IsAttacking = false;
         }
 
-        public void Update()
+        public void Update(float distanceToPlayer)
         {
+            AttackCooldown = Math.Min(++AttackCooldown, MaxAttackCooldown);
+            if (IsAttacking && attacks.IsAttacking)
+                attacks.Update(Position, Rotation);
+            else if (IsAttacking && !attacks.IsAttacking)
+                IsAttacking = false;
+
             // follow player if there is a path
-            if(Path.Count > 0)
+            bool IsCloseToPlayer = distanceToPlayer < MinSquareDistToPlayer;
+            if(Path.Count > 0 && !IsCloseToPlayer)
                 Move();
+
+            if (IsCloseToPlayer && AttackCooldown >= MaxAttackCooldown)
+            {
+                attacks.Attack(AttackType.NormalAttack);
+                IsAttacking = true;
+                AttackCooldown = 0;
+            }
             
             FramesSinceDamage = MathHelper.Min(FrameDamageTime, FramesSinceDamage+1);
             
             HealthBar.ChangeSize(new Vector2((float)Health * (float)MaxHealth / (float)HealthBarMaxLength, 10));
             HealthBar.ChangePos(new Vector2(Position.X - AnimationManager.CurrentFrameRect.Width / 2, Position.Y - AnimationManager.CurrentFrameRect.Height / 2 - 12));
+
 
         }
         
@@ -68,7 +91,8 @@ namespace TheDungeonGame
                 base.Draw(Color.Red);
             else
                 base.Draw();
-
+            if(IsAttacking && attacks.IsAttacking)
+                awttacks.Draw();
             HealthBar.Draw(false);
         }
     }

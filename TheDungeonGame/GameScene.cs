@@ -12,6 +12,7 @@ namespace TheDungeonGame
         UIRect healthBar;
         int healthBarMaxLength = Camera.ScreenWidth - 10 * 2;
         Enemy enemy;
+        Enemy enemy2;
 
         public GameScene(ContentManager Content)
         {
@@ -47,8 +48,10 @@ namespace TheDungeonGame
             enemyIdle.Pause();
             enemyAnimationManager.AddAnimation(AnimationNames.Idle, enemyIdle);
             enemyAnimationManager.ChangeAnimation(AnimationNames.Idle);
-            enemy = new Enemy(enemyAnimationManager, Vector2.Zero, 0f, 100, 100, 1f, 1f);
+            enemy = new Enemy(enemyAnimationManager, new Vector2(200f), 0f, 100, 100, 1f, 2.5f);
+            enemy2 = new Enemy(new AnimationManager(enemyAnimationManager), new Vector2(-200f), 0f, 100, 100, 1f, 3f);
             Dungeon.AddEnemy(Tilemaps.Lobby, enemy);
+            Dungeon.AddEnemy(Tilemaps.Lobby, enemy2);
         }
 
         public override void Update()

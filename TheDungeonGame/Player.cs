@@ -39,11 +39,11 @@ namespace TheDungeonGame
                 IsAttacking = true;
                 AttackCooldown = 0;
             }
-            if (IsAttacking && Skills.AnimationManager.CurrentAnimation != AnimationNames.None)
+            if (IsAttacking && Skills.IsAttacking)
             {
                 Skills.Update(Position, Rotation); // just updates the animation
             }
-            else if (IsAttacking && Skills.AnimationManager.CurrentAnimation == AnimationNames.None)
+            else if (IsAttacking && !Skills.IsAttacking)
             {
                 IsAttacking = false;
             }
@@ -102,7 +102,7 @@ namespace TheDungeonGame
         {
             UI.DrawRect(Hitbox, Color.Red, false);
             base.Draw();
-            if (IsAttacking && Skills.AnimationManager.CurrentAnimation != AnimationNames.None)
+            if (IsAttacking && Skills.IsAttacking)
                 Skills.Draw(); 
         }
    }
