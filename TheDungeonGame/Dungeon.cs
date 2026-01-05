@@ -21,6 +21,7 @@ namespace TheDungeonGame
         private static Tilemaps newTilemap;
         private static string newLoc;
         private static Dictionary<Tilemaps, EnemyManager> EnemyManagers = new Dictionary<Tilemaps, EnemyManager>();
+        private static Stack<(Rectangle, float)> Attacks = new Stack<(Rectangle, float)>();
         private static EnemyManager EnemyManager => EnemyManagers[CurrentTilemapName];
 
         public static bool IsValid(Rectangle Bounds) => CurrentTilemap.IsValid(Bounds);
@@ -63,10 +64,18 @@ namespace TheDungeonGame
         public static void Update(Player player)
         {
             EnemyManager.Update(player);
+            while (Attacks.Count > 0)
+            {
+                (Rectangle hitbox, float damage) = Attacks.Pop();
+                if (hitbox.Intersects(player.Hitbox))
+                    player.TakeDamage((int)damage);
+            }
+
             foreach (NPCId id in CurrentTilemap.NPCs.Values)
             {
                 AssetManager.GetNPC(id).Update();
             }
+            Debug.WriteLine(player.Health);
         }
 
         public static bool IsInteractive(string loc)
@@ -115,6 +124,13 @@ namespace TheDungeonGame
         {
             EnemyManager.Attack(hitbox, damage);
         }
+
+        public static void AttackPlayer(Rectangle hitbox, float damage)
+        {
+            // replace with player manager when online
+            Attacks.Push((hitbox, damage));
+        }
+
 
         public static void AddEnemy(Enemy enemy)
         {

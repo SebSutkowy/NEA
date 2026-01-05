@@ -14,7 +14,7 @@ namespace TheDungeonGame
         private int HealthBarMaxLength;
         private int FrameDamageTime;
         private Queue<Point> Path;
-        private Skillset attacks = new Skillset(Classes.Berserker);
+        private Skillset Attacks = new Skillset(Classes.Berserker);
         private int AttackCooldown;
         private const int MaxAttackCooldown = 30;
         private bool IsAttacking;
@@ -37,9 +37,9 @@ namespace TheDungeonGame
         public void Update(Vector2 playerPos)
         {
             AttackCooldown = Math.Min(++AttackCooldown, MaxAttackCooldown);
-            if (IsAttacking && attacks.IsAttacking)
-                attacks.Update(Position, Rotation);
-            else if (IsAttacking && !attacks.IsAttacking)
+            if (IsAttacking && Attacks.IsAttacking)
+                Attacks.Update(Position, Rotation);
+            else if (IsAttacking && !Attacks.IsAttacking)
                 IsAttacking = false;
 
             // follow player if there is a path
@@ -50,9 +50,10 @@ namespace TheDungeonGame
 
             if (IsCloseToPlayer && AttackCooldown >= MaxAttackCooldown)
             {
-                attacks.Attack(AttackType.NormalAttack);
+                Attacks.Attack(AttackType.NormalAttack);
                 IsAttacking = true;
                 AttackCooldown = 0;
+                Dungeon.AttackPlayer(Attacks.Hitbox, Attacks.GetDamage(AttackType.NormalAttack));
             }
             
             FramesSinceDamage = MathHelper.Min(FrameDamageTime, FramesSinceDamage+1);
@@ -94,8 +95,8 @@ namespace TheDungeonGame
                 base.Draw(Color.Red);
             else
                 base.Draw();
-            if(IsAttacking && attacks.IsAttacking)
-                attacks.Draw();
+            if(IsAttacking && Attacks.IsAttacking)
+                Attacks.Draw();
             HealthBar.Draw(false);
         }
     }

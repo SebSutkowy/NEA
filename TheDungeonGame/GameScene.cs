@@ -58,8 +58,8 @@ namespace TheDungeonGame
         {
             Camera.MoveCamera(player.Position, 0.3f, Dungeon.CameraBounds);
             player.Update();
+            healthBar.ChangeSize(new Vector2(((float)player.Health / player.MaxHealth) * healthBarMaxLength, healthBar.Rectangle.Height));
             Dungeon.Update(player);
-            healthBar.ChangeSize(new Vector2((player.Health / player.MaxHealth) * healthBarMaxLength, healthBar.Rectangle.Height));
             if (InputManager.IsPressed(Input.Escape))
                 SceneManager.BackScene();
             Dungeon.CheckIfChangingTilemap(player);
