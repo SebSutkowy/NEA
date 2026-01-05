@@ -34,7 +34,7 @@ namespace TheDungeonGame
             IsAttacking = false;
         }
 
-        public void Update(float distanceToPlayer)
+        public void Update(Vector2 playerPos)
         {
             AttackCooldown = Math.Min(++AttackCooldown, MaxAttackCooldown);
             if (IsAttacking && attacks.IsAttacking)
@@ -43,6 +43,7 @@ namespace TheDungeonGame
                 IsAttacking = false;
 
             // follow player if there is a path
+            float distanceToPlayer = Vector2.DistanceSquared(Position, playerPos);
             bool IsCloseToPlayer = distanceToPlayer < MinSquareDistToPlayer;
             if(Path.Count > 0 && !IsCloseToPlayer)
                 Move();
@@ -59,6 +60,8 @@ namespace TheDungeonGame
             HealthBar.ChangeSize(new Vector2((float)Health * (float)MaxHealth / (float)HealthBarMaxLength, 10));
             HealthBar.ChangePos(new Vector2(Position.X - AnimationManager.CurrentFrameRect.Width / 2, Position.Y - AnimationManager.CurrentFrameRect.Height / 2 - 12));
 
+            Rotation = (float)Math.Atan2(playerPos.Y - Position.Y, playerPos.X - Position.X);
+            Rotation = (Rotation + MathHelper.Pi / 2) % (MathHelper.Pi * 2);
 
         }
         
