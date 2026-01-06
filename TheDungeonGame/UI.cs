@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -10,11 +11,27 @@ namespace TheDungeonGame
         private static Texture2D pixelRect;
         private static Point CursorPos;
         private static Color CursorColor = Color.Green;
+        public static GUINames CurrentGUIName { get; private set; }
+        public static GUI CurrentGUI => GUIs[CurrentGUIName];
+        private static GUINames? NewGUI = null;
+        private static Dictionary<GUINames, GUI> GUIs = new Dictionary<GUINames, GUI>();
         
         public static void LoadUI(GraphicsDevice graphicsDevice)
         {
             pixelRect = new Texture2D(graphicsDevice, 1, 1);
             pixelRect.SetData(new[] { Color.White });
+        }
+
+        public static void AddGUI(GUINames name, GUI gui)
+        {
+            GUIs.Add(name, gui);
+        }
+
+        public static GUI GetGUI(GUINames name) => GUIs[name];
+
+        public static void SetGUI(GUINames name)
+        {
+            NewGUI = name;
         }
 
         public static void Update()
@@ -31,6 +48,11 @@ namespace TheDungeonGame
             {
                 CursorColor = Color.Green;
             }
+            if (NewGUI != null)
+            {
+                CurrentGUIName = NewGUI.Value;
+                NewGUI = null;
+            }
         }
 
         public static void DrawRect(Rectangle rect, Color color, bool drawAbsolute=true)
@@ -46,7 +68,6 @@ namespace TheDungeonGame
         public static void Draw()
         {
             DrawRect(new Rectangle(CursorPos, new Point(10)), CursorColor);
-
         }
     }
 

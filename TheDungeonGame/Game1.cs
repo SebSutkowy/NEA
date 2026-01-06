@@ -50,6 +50,22 @@ namespace TheDungeonGame
             Camera.Initialize(_spriteBatch, _cameraFont);
             UI.LoadUI(GraphicsDevice);
             SceneManager.LoadScenes(Content);
+
+            GUI gameGUI = new GUI(GUINames.Game);
+            UIRect healthBar = new UIRect(new Rectangle((int) (0.01f * Camera.ScreenWidth), (int) (0.01f * Camera.ScreenHeight), (int) (0.98f * Camera.ScreenWidth), (int) (0.02f * Camera.ScreenHeight)), Color.Red);
+            gameGUI.AddElement((int)GameGUIElements.HealthBar, healthBar);
+
+            GUI shopGUI = new GUI(GUINames.Shop);
+            UIRect background = new UIRect(new Rectangle((int)0.1f * Camera.ScreenWidth, (int)0.1f * Camera.ScreenHeight, (int)0.8f * Camera.ScreenWidth, (int)0.8f * Camera.ScreenHeight), new Color(50, 50, 50, 200));
+            UIRect upgradeNormalAttackRect = new UIRect(new Rectangle((int) 0.25f * Camera.ScreenWidth, (int) 0.4f * Camera.ScreenHeight, (int) 0.15f * Camera.ScreenWidth, (int) 0.15f * Camera.ScreenHeight), Color.Green);
+            UIRect upgradeSpecialAttackRect = new UIRect(new Rectangle((int) 0.6f * Camera.ScreenWidth, (int) 0.4f * Camera.ScreenHeight, (int) 0.15f * Camera.ScreenWidth, (int) 0.15f * Camera.ScreenHeight), Color.Green);
+            shopGUI.AddElement((int)ShopGUIElements.Background, background);
+            shopGUI.AddElement((int)ShopGUIElements.UpgradeNormalAttack, upgradeNormalAttackRect);
+            shopGUI.AddElement((int)ShopGUIElements.UpgradeSpecialAttack, upgradeSpecialAttackRect);
+
+
+            UI.AddGUI(GUINames.Game, gameGUI);
+            UI.AddGUI(GUINames.Shop, shopGUI);
             
         }
 

@@ -10,7 +10,7 @@ namespace TheDungeonGame
         public const SceneName Name = SceneName.Game;
         Player player;
         UIRect healthBar;
-        int healthBarMaxLength = Camera.ScreenWidth - 10 * 2;
+        int healthBarMaxLength = (int)(0.98f * Camera.ScreenWidth);
         Enemy enemy;
         Enemy enemy2;
 
@@ -28,11 +28,6 @@ namespace TheDungeonGame
             playerAnimationManager.AddAnimation(AnimationNames.Idle, playerIdle);
             playerAnimationManager.ChangeAnimation(AnimationNames.Idle);
             player = new Player(playerAnimationManager, Vector2.Zero, 0f, playerMaxHealth, playerHealth, playerDamage, playerSpeed, Classes.Berserker);
-
-            healthBar = new UIRect(
-                new Rectangle(10, 10, healthBarMaxLength, 25),
-                Color.Red
-                );
         }
 
         public override void OnSwitch()
@@ -52,13 +47,40 @@ namespace TheDungeonGame
             enemy2 = new Enemy(new AnimationManager(enemyAnimationManager), new Vector2(-200f), 0f, 100, 100, 1f, 3f);
             Dungeon.AddEnemy(Tilemaps.Lobby, enemy);
             Dungeon.AddEnemy(Tilemaps.Lobby, enemy2);
+
+            UI.SetGUI(GUINames.Game);
         }
 
         public override void Update()
         {
+            switch (UI.CurrentGUIName)
+            {
+                case GUINames.Game:
+                    UpdateGame();
+                    break;
+                case GUINames.Shop:
+                    // shop
+                    break;
+                case GUINames.Dialogue:
+                    // dialogue
+                    break;
+                default:
+                    break;
+
+            }
+
+        }
+
+        public void UpdateDialogue()
+        {
+
+        }
+
+        public void UpdateGame()
+        {
             Camera.MoveCamera(player.Position, 0.3f, Dungeon.CameraBounds);
             player.Update();
-            healthBar.ChangeSize(new Vector2(((float)player.Health / player.MaxHealth) * healthBarMaxLength, healthBar.Rectangle.Height));
+            UI.CurrentGUI[(int)GameGUIElements.HealthBar].ChangeSize(new Vector2(((float)player.Health / player.MaxHealth) * healthBarMaxLength, UI.CurrentGUI[(int)GameGUIElements.HealthBar].Rectangle.Height));
             Dungeon.Update(player);
             if (InputManager.IsPressed(Input.Escape))
                 SceneManager.BackScene();
@@ -77,7 +99,7 @@ namespace TheDungeonGame
             Dungeon.Draw();
             player.Draw();
 
-            healthBar.Draw();
+            UI.CurrentGUI.Draw();
         }
     }
 }
