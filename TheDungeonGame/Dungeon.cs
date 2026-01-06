@@ -30,6 +30,10 @@ namespace TheDungeonGame
         {
             ActiveTilemaps.Clear();
             CurrentTilemapName = Tilemaps.None;
+            Doors.Clear();
+            ChangingTilemap = false;
+            EnemyManagers.Clear();
+            Attacks.Clear();
         }
 
         public static Point GetTilemapPos(Point pos)
