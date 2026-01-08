@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace TheDungeonGame
 {
@@ -56,17 +57,24 @@ namespace TheDungeonGame
             gameGUI.AddElement((int)GameGUIElements.HealthBar, healthBar);
 
             GUI shopGUI = new GUI(GUINames.Shop);
-            UIRect background = new UIRect(new Rectangle((int)0.1f * Camera.ScreenWidth, (int)0.1f * Camera.ScreenHeight, (int)0.8f * Camera.ScreenWidth, (int)0.8f * Camera.ScreenHeight), new Color(50, 50, 50, 200));
-            UIRect upgradeNormalAttackRect = new UIRect(new Rectangle((int) 0.25f * Camera.ScreenWidth, (int) 0.4f * Camera.ScreenHeight, (int) 0.15f * Camera.ScreenWidth, (int) 0.15f * Camera.ScreenHeight), Color.Green);
-            UIRect upgradeSpecialAttackRect = new UIRect(new Rectangle((int) 0.6f * Camera.ScreenWidth, (int) 0.4f * Camera.ScreenHeight, (int) 0.15f * Camera.ScreenWidth, (int) 0.15f * Camera.ScreenHeight), Color.Green);
+            UIRect background = new UIRect(new Rectangle((int) (0.1f * Camera.ScreenWidth), (int) (0.1f * Camera.ScreenHeight), (int) (0.8f * Camera.ScreenWidth), (int) (0.8f * Camera.ScreenHeight)), new Color(50, 50, 50, 200));
+            UIRect HealButton = new UIRect(new Rectangle((int)(0.2f * Camera.ScreenWidth), (int)(0.7f * Camera.ScreenHeight), (int)(0.1f * Camera.ScreenWidth), (int)(0.1f * Camera.ScreenHeight)), Color.Green, "Heal");
+            UIRect upgradeNormalAttackRect = new UIRect(new Rectangle((int) (0.4f * Camera.ScreenWidth), (int) (0.7f * Camera.ScreenHeight), (int) (0.15f * Camera.ScreenWidth), (int) (0.1f * Camera.ScreenHeight)), Color.Green, "Upgrade\nNormal\nAttack");
+            UIRect upgradeSpecialAttackRect = new UIRect(new Rectangle((int)(0.65f * Camera.ScreenWidth), (int)(0.7f * Camera.ScreenHeight), (int)(0.15f * Camera.ScreenWidth), (int)(0.1f * Camera.ScreenHeight)), Color.Green, "Upgrade\nSpecial\nAttack");
+            UIRect healthBarShop = new UIRect(new Rectangle((int) (0.01f * Camera.ScreenWidth), (int) (0.01f * Camera.ScreenHeight), (int) (0.98f * Camera.ScreenWidth), (int) (0.02f * Camera.ScreenHeight)), Color.Red);
             shopGUI.AddElement((int)ShopGUIElements.Background, background);
             shopGUI.AddElement((int)ShopGUIElements.UpgradeNormalAttack, upgradeNormalAttackRect);
             shopGUI.AddElement((int)ShopGUIElements.UpgradeSpecialAttack, upgradeSpecialAttackRect);
+            shopGUI.AddElement((int)ShopGUIElements.HealButton, HealButton);
+            shopGUI.AddElement((int)ShopGUIElements.HealthBar, healthBarShop);
 
+            GUI dialogueGUI = new GUI(GUINames.Dialogue);
+            DialogueBox dialogueBox = new DialogueBox(new Rectangle((int)(0.1f * Camera.ScreenWidth), (int)(0.5f * Camera.ScreenHeight), (int)(0.8f * Camera.ScreenWidth), (int)(0.4f * Camera.ScreenHeight)), new Color(20, 20, 20, 200), new List<string>());
+            dialogueGUI.AddElement((int)DialogueGUIElements.DialogueBox, dialogueBox);
 
             UI.AddGUI(GUINames.Game, gameGUI);
             UI.AddGUI(GUINames.Shop, shopGUI);
-            
+            UI.AddGUI(GUINames.Dialogue, dialogueGUI);
         }
 
         protected override void Update(GameTime gameTime)

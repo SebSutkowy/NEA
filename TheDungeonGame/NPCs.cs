@@ -34,7 +34,7 @@ namespace TheDungeonGame
             AnimationManager.ChangeAnimation(AnimationNames.Idle);
 
             Id = id;
-            DialogueBox = new DialogueBox(new Rectangle(10, Camera.ScreenHeight / 2 + 10, Camera.ScreenWidth - 20, Camera.ScreenHeight / 2 - 20), new Color(20, 20, 20, 200), "");
+            DialogueBox = new DialogueBox(new Rectangle(10, Camera.ScreenHeight / 2 + 10, Camera.ScreenWidth - 20, Camera.ScreenHeight / 2 - 20), new Color(20, 20, 20, 200), AssetManager.GetDialogue(id));
             Dialogue = AssetManager.GetDialogue(id);
             
             CurrentDialogue = 0;
@@ -43,34 +43,12 @@ namespace TheDungeonGame
 
         public void Update()
         {
-            if (IsTalking)
-            {
-                DialogueBox.IsVisible = true;
-                DialogueBox.Update();
-            }
-            else
-            {
-                DialogueBox.IsVisible = false;
-            }
         }
 
         public void Interact()
         {
-            // Do something
-            if (Dialogue.Count > 0)
-            {
-                CurrentDialogue = ++CurrentDialogue % (Dialogue.Count + 1);
-                if (CurrentDialogue > 0)
-                {
-                    DialogueBox.ChangeText(Dialogue[CurrentDialogue - 1]);
-                    IsTalking = true;
-                }
-                else
-                {
-                    IsTalking = false;
-                }
-
-            }
+            UI.SetGUI(GUINames.Dialogue);
+            UI.SetDialogue(Dialogue);
         }
 
         public void Draw(Vector2 pos)

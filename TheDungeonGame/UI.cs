@@ -34,6 +34,11 @@ namespace TheDungeonGame
             NewGUI = name;
         }
 
+        public static void SetDialogue(List<string> texts)
+        {
+            GUIs[GUINames.Dialogue][(int)DialogueGUIElements.DialogueBox].SetTexts(texts);
+        }
+
         public static void Update()
         {
             CursorPos = InputManager.GetMousePos();
@@ -107,10 +112,15 @@ namespace TheDungeonGame
             Text = text;
         }
 
+
         public void ChangeColor(Color newColor)
         {
             Color = newColor;
         }
+
+        public virtual void Interact() { }
+        public virtual void SetTexts(List<string> text) { }
+        public virtual void Update() { }
 
         public void Draw(bool DrawAbsolute=true)
         {
@@ -123,50 +133,77 @@ namespace TheDungeonGame
 
     public class DialogueBox : UIRect
     {
+        private List<string> Texts { get; set; }
+        private int CurrentTextNum { get; set; }
+        private string CurrentText => Texts.Count > 0 ? Texts[CurrentTextNum] : ""; 
 
-        private string FinalText { get; set; }
-
-        public bool IsFinished => FinalText.Length <= Text.Length;
+        public bool IsFinished => CurrentText.Length <= Text.Length;
+        public bool IsCompleted => (CurrentTextNum == Texts.Count - 1) && IsFinished;
 
         public bool IsPaused { get; protected set; }
         public bool IsVisible { get; set; }
 
         public DialogueBox() : base()
         {
-            FinalText = string.Empty;
+            Texts = new List<string>();
+            CurrentTextNum = 0;
         }
 
-        public DialogueBox(Rectangle rect, Color color, string finalText) : base(rect, color, "")
+        public DialogueBox(Rectangle rect, Color color, List<string> texts) : base(rect, color, "")
         {
-            FinalText = finalText;
+            CurrentTextNum = 0;
+            Texts = texts;
         }
 
-        public DialogueBox(Rectangle rect, Color color, string finalText, Color textColor) : base(rect, color, textColor, "")
+        public DialogueBox(Rectangle rect, Color color, List<string> texts, Color textColor) : base(rect, color, textColor, "")
         {
-            FinalText = finalText;
+            CurrentTextNum = 0;
+            Texts = texts;
         }
 
-        public new void ChangeText(string text)
+        public override void SetTexts(List<string> texts)
         {
-            FinalText = text;
+            Texts = texts;
+            CurrentTextNum = 0;
             Text = "";
         }
 
-        public void Update()
+        public void IncrementText()
         {
-            if(!IsFinished && !IsPaused)
-                Text += FinalText[Text.Length];
-                
+            if (Texts.Count <= 0)
+                return;
+            CurrentTextNum = ++CurrentTextNum % Texts.Count;
+            Text = "";
         }
 
-        public void SkipDialogue()
+        public override void Update()
         {
-            if(!IsFinished)
-                Text = FinalText;
-            else
+            if(!IsFinished && !IsPaused)
+                Text += CurrentText[Text.Length];
+        }
+
+        public void Reset()
+        {
+            CurrentTextNum = 0;
+            Text = "";
+            UnPause();
+            IsVisible = true;
+        }
+
+        public override void Interact()
+        {
+            if (!IsFinished)
+                Text = CurrentText;
+            else if (IsFinished && !IsCompleted)
+            {
+                IncrementText();
+            }
+            else if (IsCompleted)
             {
                 IsVisible = false;
                 IsPaused = true;
+                Reset();
+                UI.SetGUI(GUINames.Shop);
             }
         }
 

@@ -59,10 +59,10 @@ namespace TheDungeonGame
                     UpdateGame();
                     break;
                 case GUINames.Shop:
-                    // shop
+                    UpdateShop();
                     break;
                 case GUINames.Dialogue:
-                    // dialogue
+                    UpdateDialogue();
                     break;
                 default:
                     break;
@@ -71,9 +71,22 @@ namespace TheDungeonGame
 
         }
 
+        public void UpdateShop()
+        {
+            UI.CurrentGUI[(int)ShopGUIElements.HealthBar].ChangeSize(new Vector2(((float)player.Health / player.MaxHealth) * healthBarMaxLength, UI.CurrentGUI[(int)ShopGUIElements.HealthBar].Rectangle.Height));
+            if (InputManager.IsPressed(Input.Escape))
+                UI.SetGUI(GUINames.Game);
+        }
+
         public void UpdateDialogue()
         {
-
+            UI.CurrentGUI[(int)DialogueGUIElements.DialogueBox].Update();
+            Camera.MoveCamera(player.Position, 0.4f, Dungeon.CameraBounds);
+            if (InputManager.IsPressed(Input.Escape))
+                SceneManager.BackScene();
+            Dungeon.CheckIfChangingTilemap(player);
+            if (InputManager.IsPressed(Input.LMB))
+                UI.CurrentGUI[(int)DialogueGUIElements.DialogueBox].Interact(); 
         }
 
         public void UpdateGame()

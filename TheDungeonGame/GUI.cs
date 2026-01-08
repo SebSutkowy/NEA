@@ -16,7 +16,14 @@ namespace TheDungeonGame
     {
         Background = 0,
         UpgradeNormalAttack = 1,
-        UpgradeSpecialAttack = 2
+        UpgradeSpecialAttack = 2,
+        HealButton = 3,
+        HealthBar = 4,
+    }
+
+    public enum DialogueGUIElements : int
+    {
+        DialogueBox = 0
     }
 
     public enum GameGUIElements : int
