@@ -150,13 +150,18 @@ namespace TheDungeonGame
             PathfindCache[start] = path;
         }
 
-        public void Attack(Rectangle hitbox, float damage)
+        public void Attack(int playerId, Rectangle hitbox, float damage)
         {
             foreach (Enemy enemy in Enemies)
             {
                 if (enemy.Hitbox.Intersects(hitbox))
                 {
                     enemy.TakeDamage((int)damage);
+                    if (enemy.Health <= 0)
+                    {
+                        Dungeon.EnemyKilled(playerId);
+                    }
+
                 }
             }
         }

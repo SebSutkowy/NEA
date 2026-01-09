@@ -8,11 +8,13 @@ namespace TheDungeonGame
 {
     public class Player : Entity
     {
+        public int playerId = 0;
         private int AttackCooldown = 0; // so that you can't spam attacks
         private const int MaxAttackCooldown = 30;
         private bool IsAttacking = false;
         private Skillset Skills;
         private Classes Class;
+        private int Score = 0;
 
         public Player() : base()
         { }
@@ -50,6 +52,25 @@ namespace TheDungeonGame
             else
             {
                 AttackCooldown = Math.Min(++AttackCooldown, MaxAttackCooldown);
+            }
+        }
+
+        public void EnemyKilled()
+        {
+            Score += 5;
+        }
+
+
+        public void UpgradeAttack(AttackType attackType)
+        {
+            switch (attackType)
+            {
+                case AttackType.NormalAttack:
+                    Skills.UpgradeLevel(attackType);
+                    break;
+                case AttackType.SpecialAttack:
+                    Skills.UpgradeLevel(attackType);
+                    break;
             }
         }
 
@@ -95,7 +116,7 @@ namespace TheDungeonGame
         public void Attack(AttackType attackType)
         {
             Skills.Attack(attackType);
-            Dungeon.Attack(Skills.Hitbox, Skills.GetDamage(attackType));
+            Dungeon.Attack(playerId, Skills.Hitbox, Skills.GetDamage(attackType));
         }
 
         public new void Draw()

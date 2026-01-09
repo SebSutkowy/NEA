@@ -73,7 +73,54 @@ namespace TheDungeonGame
 
         public void UpdateShop()
         {
-            UI.CurrentGUI[(int)ShopGUIElements.HealthBar].ChangeSize(new Vector2(((float)player.Health / player.MaxHealth) * healthBarMaxLength, UI.CurrentGUI[(int)ShopGUIElements.HealthBar].Rectangle.Height));
+            UIRect healthBar = UI.CurrentGUI[(int)ShopGUIElements.HealthBar],
+                   healButton = UI.CurrentGUI[(int)ShopGUIElements.HealButton],
+                   normalAttack = UI.CurrentGUI[(int)ShopGUIElements.UpgradeNormalAttack],
+                   specialAttack = UI.CurrentGUI[(int)ShopGUIElements.UpgradeSpecialAttack]; // used as variables to improve readability and shorten lines
+
+            healthBar.ChangeSize(new Vector2(((float)player.Health / player.MaxHealth) * healthBarMaxLength, healthBar.Rectangle.Height));
+
+            if (healButton.Contains(InputManager.GetMousePos()))
+            {
+                if (InputManager.IsPressed(Input.LMB))
+                {
+                    player.Heal(5);
+                }
+                healButton.ChangeColor(Color.Green);
+            }
+            else
+            {
+                healButton.ChangeColor(Color.Red);
+            }
+            if (normalAttack.Contains(InputManager.GetMousePos()))
+            {
+                if (InputManager.IsPressed(Input.LMB))
+                {
+                    player.UpgradeAttack(AttackType.NormalAttack);
+                }
+                normalAttack.ChangeColor(Color.Green);
+            }
+            else
+            {
+                normalAttack.ChangeColor(Color.Red);
+            }
+            if (specialAttack.Contains(InputManager.GetMousePos()))
+            {
+                if (InputManager.IsPressed(Input.LMB))
+                {
+                    player.UpgradeAttack(AttackType.SpecialAttack);
+                }
+                specialAttack.ChangeColor(Color.Green);
+            }
+            else
+            {
+                specialAttack.ChangeColor(Color.Red);
+            }
+
+
+
+
+
             if (InputManager.IsPressed(Input.Escape))
                 UI.SetGUI(GUINames.Game);
         }

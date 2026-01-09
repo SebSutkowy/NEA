@@ -116,10 +116,29 @@ namespace TheDungeonGame
             AnimationManager.Play(name);
         }
 
+        public void UpgradeLevel(AttackType attackType)
+        {
+            switch (attackType)
+            {
+                case AttackType.NormalAttack:
+                    NormalAttackLevel = Math.Min(++NormalAttackLevel, 7);
+                    break;
+                case AttackType.SpecialAttack:
+                    SpecialAttackLevel = Math.Min(++SpecialAttackLevel, 7);
+                    break;
+            }
+        }
+
         public float GetDamage(AttackType attackType)
         {
             /* in notepad, create a table / data set for damage of all attacks and level scaling e.g. swing = 5 (+2 per level) */
-
+            switch (attackType)
+            {
+                case AttackType.NormalAttack:
+                    return 5f + 2f * NormalAttackLevel;
+                case AttackType.SpecialAttack:
+                    return 7f + 3f * SpecialAttackLevel;
+            }
             return 5f;
         }
 

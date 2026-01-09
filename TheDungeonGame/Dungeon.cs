@@ -124,9 +124,14 @@ namespace TheDungeonGame
         }
 
         #region Enemy Manager Methods
-        public static void Attack(Rectangle hitbox, float damage)
+        public static void Attack(int playerId, Rectangle hitbox, float damage)
         {
-            EnemyManager.Attack(hitbox, damage);
+            EnemyManager.Attack(playerId, hitbox, damage);
+        }
+
+        public static void EnemyKilled(int playerId)
+        {
+
         }
 
         public static void AttackPlayer(Rectangle hitbox, float damage)
