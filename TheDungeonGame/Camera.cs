@@ -21,6 +21,8 @@ namespace TheDungeonGame
             Font = font;
         }
 
+
+        public static Rectangle GetScaledRect(float x, float y, float width, float height) => new Rectangle((int)(x * ScreenWidth), (int)(y * ScreenHeight), (int)(width * ScreenWidth), (int)(height * ScreenHeight));
         public static Rectangle OffsetRect(Rectangle rect) => new Rectangle(rect.X - (int)Position.X, rect.Y - (int)Position.Y, rect.Width, rect.Height);  
         public static Vector2 OffsetPos(Vector2 pos) => pos - Position; // draw overloads require this way, Maps in game pos -> screen pos
         public static Point OffsetPoint(Point pos) => pos - new Point((int)Position.X, (int)Position.Y);

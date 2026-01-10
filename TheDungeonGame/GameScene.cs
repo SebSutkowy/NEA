@@ -8,45 +8,15 @@ namespace TheDungeonGame
     public class GameScene : Scene
     {
         public const SceneName Name = SceneName.Game;
-        Player player;
-        UIRect healthBar;
-        int healthBarMaxLength = (int)(0.98f * Camera.ScreenWidth);
-        Enemy enemy;
-        Enemy enemy2;
 
         public GameScene(ContentManager Content)
         {
-            Texture2D entityTexture = Content.Load<Texture2D>("PointedCircle");
 
-            int playerMaxHealth = 100;
-            int playerHealth = 100;
-            float playerDamage = 5f;
-            float playerSpeed = 5f;
-            AnimationManager playerAnimationManager = new AnimationManager(entityTexture);
-            Animation playerIdle = new Animation(new Vector2(100f), 0, 1, 1);
-            playerIdle.Pause();
-            playerAnimationManager.AddAnimation(AnimationNames.Idle, playerIdle);
-            playerAnimationManager.ChangeAnimation(AnimationNames.Idle);
-            player = new Player(playerAnimationManager, Vector2.Zero, 0f, playerMaxHealth, playerHealth, playerDamage, playerSpeed, Classes.Berserker);
         }
 
         public override void OnSwitch()
         {
             Dungeon.Clear();
-            Dungeon.AddTilemap(Tilemaps.Lobby);
-            Dungeon.AddTilemap(Tilemaps.Hallway1);
-            Dungeon.ConnectDoors(Tilemaps.Lobby, "0;-6", Tilemaps.Hallway1, "0;6");
-            Dungeon.ChangeTilemap(Tilemaps.Lobby);
-
-            AnimationManager enemyAnimationManager = new AnimationManager(AssetManager.GetSpriteSheet(SpriteSheets.Entity));
-            Animation enemyIdle = new Animation(new Vector2(100f), 0, 1, 1);
-            enemyIdle.Pause();
-            enemyAnimationManager.AddAnimation(AnimationNames.Idle, enemyIdle);
-            enemyAnimationManager.ChangeAnimation(AnimationNames.Idle);
-            enemy = new Enemy(enemyAnimationManager, new Vector2(200f), 0f, 100, 100, 1f, 2.5f);
-            enemy2 = new Enemy(new AnimationManager(enemyAnimationManager), new Vector2(-200f), 0f, 100, 100, 1f, 3f);
-            Dungeon.AddEnemy(Tilemaps.Lobby, enemy);
-            Dungeon.AddEnemy(Tilemaps.Lobby, enemy2);
 
             UI.SetGUI(GUINames.Game);
         }
@@ -73,91 +43,27 @@ namespace TheDungeonGame
 
         public void UpdateShop()
         {
-            UIRect healthBar = UI.CurrentGUI[(int)ShopGUIElements.HealthBar],
-                   healButton = UI.CurrentGUI[(int)ShopGUIElements.HealButton],
-                   normalAttack = UI.CurrentGUI[(int)ShopGUIElements.UpgradeNormalAttack],
-                   specialAttack = UI.CurrentGUI[(int)ShopGUIElements.UpgradeSpecialAttack]; // used as variables to improve readability and shorten lines
 
-            healthBar.ChangeSize(new Vector2(((float)player.Health / player.MaxHealth) * healthBarMaxLength, healthBar.Rectangle.Height));
-
-            if (healButton.Contains(InputManager.GetMousePos()))
-            {
-                if (InputManager.IsPressed(Input.LMB))
-                {
-                    player.Heal(5);
-                }
-                healButton.ChangeColor(Color.Green);
-            }
-            else
-            {
-                healButton.ChangeColor(Color.Red);
-            }
-            if (normalAttack.Contains(InputManager.GetMousePos()))
-            {
-                if (InputManager.IsPressed(Input.LMB))
-                {
-                    player.UpgradeAttack(AttackType.NormalAttack);
-                }
-                normalAttack.ChangeColor(Color.Green);
-            }
-            else
-            {
-                normalAttack.ChangeColor(Color.Red);
-            }
-            if (specialAttack.Contains(InputManager.GetMousePos()))
-            {
-                if (InputManager.IsPressed(Input.LMB))
-                {
-                    player.UpgradeAttack(AttackType.SpecialAttack);
-                }
-                specialAttack.ChangeColor(Color.Green);
-            }
-            else
-            {
-                specialAttack.ChangeColor(Color.Red);
-            }
-
-
-
-
-
-            if (InputManager.IsPressed(Input.Escape))
-                UI.SetGUI(GUINames.Game);
         }
 
         public void UpdateDialogue()
         {
-            UI.CurrentGUI[(int)DialogueGUIElements.DialogueBox].Update();
-            Camera.MoveCamera(player.Position, 0.4f, Dungeon.CameraBounds);
-            if (InputManager.IsPressed(Input.Escape))
-                SceneManager.BackScene();
-            Dungeon.CheckIfChangingTilemap(player);
-            if (InputManager.IsPressed(Input.LMB))
-                UI.CurrentGUI[(int)DialogueGUIElements.DialogueBox].Interact(); 
         }
 
         public void UpdateGame()
         {
-            Camera.MoveCamera(player.Position, 0.3f, Dungeon.CameraBounds);
-            player.Update();
-            UI.CurrentGUI[(int)GameGUIElements.HealthBar].ChangeSize(new Vector2(((float)player.Health / player.MaxHealth) * healthBarMaxLength, UI.CurrentGUI[(int)GameGUIElements.HealthBar].Rectangle.Height));
-            Dungeon.Update(player);
-            if (InputManager.IsPressed(Input.Escape))
-                SceneManager.BackScene();
-            Dungeon.CheckIfChangingTilemap(player);
-
-            string loc = Tilemap.GetLoc(InputManager.GetTilemapMousePos());
-            if (InputManager.IsPressed(Input.LMB) && Dungeon.IsInteractive(loc))
-            {
-                Dungeon.Interact(loc);
-            }
-
+            // move camera to player
+            // update players
+            // update the dungeon
+            // handle pausing 
+            // handle changing tilemap
+            // handle interactions
         }
 
         public override void Draw()
         {
             Dungeon.Draw();
-            player.Draw();
+            PlayerManager.Draw();
 
             UI.CurrentGUI.Draw();
         }

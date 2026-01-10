@@ -9,6 +9,7 @@ namespace TheDungeonGame
     {
         MainMenu,
         Game,
+        OnlineTesting,
     }
 
     public static class SceneManager
@@ -25,6 +26,7 @@ namespace TheDungeonGame
             CurrentSceneName = SceneName.MainMenu;
             Scenes.Add(SceneName.MainMenu, new MainMenuScene(Content));
             Scenes.Add(SceneName.Game, new GameScene(Content));
+            Scenes.Add(SceneName.OnlineTesting, new OnlineTestingScene(Content));
         }
 
         public static void Update()

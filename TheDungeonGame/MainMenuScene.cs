@@ -27,7 +27,7 @@ namespace TheDungeonGame
                 switchSceneRect.ChangeColor(Color.Gray);
 
             if (InputManager.IsPressed(Input.LMB) && switchSceneRect.Color == Color.DarkGray)
-                SceneManager.SwitchScene(SceneName.Game);
+                SceneManager.SwitchScene(SceneName.OnlineTesting);
 
             if (quitGameRect.Contains(InputManager.GetMousePos()))
                 quitGameRect.ChangeColor(Color.DarkGray);

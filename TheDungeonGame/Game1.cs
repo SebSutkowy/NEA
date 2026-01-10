@@ -82,6 +82,7 @@ namespace TheDungeonGame
 
             SceneManager.Update();
             UI.Update();
+            Network.Update(gameTime);
 
             base.Update(gameTime);
         }

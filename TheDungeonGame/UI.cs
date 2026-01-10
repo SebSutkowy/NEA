@@ -127,10 +127,9 @@ namespace TheDungeonGame
             UI.DrawRect(Rectangle, Color, DrawAbsolute);
             Vector2 textSize = Camera.MeasureString(Text);
             Vector2 Position = new Vector2(Rectangle.Center.X - textSize.X / 2, Rectangle.Center.Y - textSize.Y / 2);
-            Camera.DrawString(Text, Position, Color.White);
+            Camera.DrawString(Text, Position, TextColor);
         }
     }
-
     public class DialogueBox : UIRect
     {
         private List<string> Texts { get; set; }
