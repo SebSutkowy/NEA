@@ -9,24 +9,7 @@ enum MessageType : ushort
     ClientJoin = 1,
     ClientDisconnect = 2,
     SendMessage = 3,
-    SpawnPlayer = 4,
-    PlayerSpawnRequest = 5,
-    PlayerState = 6,
-    PlayerInput = 7,
-    Interaction = 8,
-    InteractionConfirmation = 9,
-    PlayerHealthChange = 10,
-    TrapActivation = 11,
-    EnteredBossRoom = 12,
-    ChangeTilemap = 13,
-    UpdateEnemy = 14,
-    PlayerAttacking = 15
-}
-
-enum TrapActivationStatus : ushort
-{
-    Active = 0,
-    Inactive = 1
+    ListClients = 4, 
 }
 
 static class Message
@@ -73,6 +56,12 @@ static class Message
             case MessageType.SendMessage:
                 Network.SetMessage($"Hello");
                 break;
+
+            case MessageType.ListClients:
+                id = int.Parse(splitMessage[1]);
+                Network.AddClient(id);
+                break;
+                
 
                 //    case MessageType.SpawnPlayer:
                 //    case MessageType.PlayerState:
@@ -208,6 +197,8 @@ static class Message
     public static string CreateClientDisconnectMessage(int id) => $"{(ushort)MessageType.ClientDisconnect} {id}";
 
     public static string CreateSendMessage() => $"{(ushort)MessageType.SendMessage}";
+
+    public static string CreateListClientsMessage(int id) => $"{(ushort)MessageType.ListClients} {id}";
 
     ////public static string CreatePlayerSpawnMessage(int id, int tick, Vector2 position) => $"{(ushort)MessageType.SpawnPlayer} {id} {tick} {position.X} {position.Y}";
 

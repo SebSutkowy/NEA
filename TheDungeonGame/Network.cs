@@ -32,8 +32,8 @@ namespace TheDungeonGame
 
         public static string LastMessage { get; private set; } = ""; 
 
-        private static List<int> ConnectedClients = new List<int>();
-        public static List<int> GetConnections => ConnectedClients;
+        private static HashSet<int> ConnectedClients = new HashSet<int>();
+        public static HashSet<int> GetConnections => ConnectedClients;
 
         public static ConnectionType GetMode() => NetworkMode;
 
@@ -59,8 +59,13 @@ namespace TheDungeonGame
                 case ConnectionType.Host:
                     NetworkMode = ConnectionType.Host;
                     Server.StartServer(serverPort);
+                    ConnectedClients.Add(0);
                     break;
                 case ConnectionType.None:
+                    ConnectedClients.Clear();
+                    Server = new Server();
+                    Client = new Client();
+                    _localId = -1;
                     break;
             }
 
@@ -70,6 +75,12 @@ namespace TheDungeonGame
         {
             Client.SetTick(tick);
         }
+
+        public static void AddClient(int id)
+        {
+            if (!ConnectedClients.Contains(id)) ConnectedClients.Add(id);
+        }
+
 
         public static void OnClientJoin(int id)
         {

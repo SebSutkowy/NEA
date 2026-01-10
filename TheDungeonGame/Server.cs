@@ -61,6 +61,11 @@ namespace TheDungeonGame
                 string message = Message.CreateClientJoinMessage(playerId, CurrentTick);
                 SendMessage(peer, message);
                 Network.OnClientJoin(playerId);
+                foreach (int Id in ConnectedClients.Keys)
+                {
+                    message = Message.CreateListClientsMessage(Id);
+                    SendGlobalMessage(message);
+                }
             };
 
             Listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod, channel) =>
@@ -91,7 +96,7 @@ namespace TheDungeonGame
                 {
                     _Server.Stop();
                     IsStopped = true;
-                }
+            }
                 return;
             }
             _Server.PollEvents();

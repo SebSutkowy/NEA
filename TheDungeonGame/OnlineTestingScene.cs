@@ -15,17 +15,19 @@ namespace TheDungeonGame
         private UIRect SendMessageButton { get; set; }
         private UIRect ReceivedMessageButton { get; set; }
         private UIRect ConnectedClientsList { get; set; }
+        private UIRect LocalIdButton { get; set; }
 
         public OnlineTestingScene() { }
         
         public OnlineTestingScene(ContentManager Content)
         {
-            ClientModeButton = new UIRect(Camera.GetScaledRect(0.125f, 0.375f, 0.25f, 0.25f), Color.Yellow, Color.Black, "Switch To\nClient");
-            ServerModeButton = new UIRect(Camera.GetScaledRect(0.625f, 0.375f, 0.25f, 0.25f), Color.Green, "Switch To\nServer");
+            ClientModeButton = new UIRect(Camera.GetScaledRect(0.125f, 0.375f, 0.25f, 0.15f), Color.Yellow, Color.Black, "Switch To\nClient");
+            ServerModeButton = new UIRect(Camera.GetScaledRect(0.625f, 0.375f, 0.25f, 0.15f), Color.Green, "Switch To\nServer");
             ExitNetworkButton = new UIRect(Camera.GetScaledRect(0.125f, 0.125f, 0.125f, 0.125f), Color.Red, "Exit");
             SendMessageButton = new UIRect(Camera.GetScaledRect(0.125f, 0.375f, 0.25f, 0.125f), Color.Green, "Send");
             ReceivedMessageButton = new UIRect(Camera.GetScaledRect(0.375f, 0.375f, 0.5f, 0.125f), Color.White, Color.Black);
             ConnectedClientsList = new UIRect(Camera.GetScaledRect(0.375f, 0.55f, 0.5f, 0.375f), Color.Gray);
+            LocalIdButton = new UIRect(Camera.GetScaledRect(0.5f, 0.125f, 0.25f, 0.15f), Color.Black, Color.White);
         }
 
 
@@ -61,12 +63,6 @@ namespace TheDungeonGame
                 ServerModeButton.ChangeColor(Color.Green);
             }
 
-            string clientsList = "";
-            foreach (int client in Network.GetConnections)
-            {
-                clientsList += $"Client {client}\n"; 
-            }
-            ConnectedClientsList.ChangeText(clientsList);
         }
 
         public void UpdateClient(Point mpos)
@@ -89,12 +85,29 @@ namespace TheDungeonGame
             {
                 SendMessageButton.ChangeColor(Color.Green);
             }
-            
+
+            string clientsList = "";
+            foreach (int client in Network.GetConnections)
+            {
+                clientsList += $"Client {client}\n"; 
+            }
+            Debug.WriteLine(clientsList);
+            ConnectedClientsList.ChangeText(clientsList);
+            LocalIdButton.ChangeText($"Local Id: {Network.LocalId}");
         }
 
         public void UpdateServer(Point mpos)
         {
             ReceivedMessageButton.ChangeText(Network.LastMessage);
+
+            string clientsList = "";
+            foreach (int client in Network.GetConnections)
+            {
+                clientsList += $"Client {client}\n"; 
+            }
+            Debug.WriteLine(clientsList);
+            ConnectedClientsList.ChangeText(clientsList);
+            LocalIdButton.ChangeText($"Local Id: {Network.LocalId}");
         }
 
         public override void Update()
@@ -129,6 +142,7 @@ namespace TheDungeonGame
                 SendMessageButton.Draw();
                 ReceivedMessageButton.Draw();
                 ConnectedClientsList.Draw();
+                LocalIdButton.Draw();
             }
         }
     }
