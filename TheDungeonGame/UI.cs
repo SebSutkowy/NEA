@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 
 namespace TheDungeonGame
 {
@@ -222,5 +224,62 @@ namespace TheDungeonGame
                 base.Draw();
         }
 
+    }
+
+    public class TextBox : UIRect
+    {
+        private GameWindow Window { get; set; }
+        private bool IsFocused { get; set; }
+        private StringBuilder Input { get; set; }
+        public string SubmittedText { get; private set; }
+
+        public TextBox() : base()
+        {
+            IsFocused = false;
+        }
+
+        public TextBox(GameWindow window, Rectangle rect, Color color) : base(rect, color)
+        {
+            Window = window;
+            IsFocused = false;
+        }
+
+        private void OnTextInput(object sender, TextInputEventArgs e)
+        {
+            char c = e.Character;
+
+            switch (c)
+            {
+                case '\b':
+                    if (Input.Length > 0)
+                        Input.Remove(Input.Length - 1, 1);
+                    break;
+                case '\r':
+                case '\n':
+                    SubmittedText = Input.ToString();
+                    Input.Clear();
+                    break;
+                default:
+                    Input.Append(c);
+                    break;
+            }
+        }
+
+        public void OnClick(Point mpos)
+        {
+            if (Contains(mpos))
+            {
+                IsFocused = true;
+                RegisterTextInput(OnTextInput); 
+            }
+            else
+            {
+                IsFocused = false;
+                UnRegisterTextInput(OnTextInput);
+            }
+        }
+
+        private void RegisterTextInput(EventHandler<TextInputEventArgs> handler) => Window.TextInput += handler; 
+        private void UnRegisterTextInput(EventHandler<TextInputEventArgs> handler) => Window.TextInput -= handler;
     }
 }

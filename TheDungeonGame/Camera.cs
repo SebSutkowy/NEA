@@ -10,6 +10,9 @@ namespace TheDungeonGame
         private static Vector2 Position;
         private static SpriteBatch SpriteBatch;
         private static SpriteFont Font;
+        private static GameWindow Window;
+        public static GameWindow GetWindow() => Window;
+
         public const int ScreenWidth = 1000;
         public const int ScreenHeight = 1000;
         public static Vector2 ScreenDimensions => new Vector2(ScreenWidth, ScreenHeight);
