@@ -30,17 +30,26 @@ namespace TheDungeonGame
         private static Client Client = new Client();
         private static Server Server = new Server();
 
-        public static string LastMessage { get; private set; } = ""; 
+        private static Queue<string> Messages = new Queue<string>();
+        private static string LastMessage = string.Empty;
 
         private static HashSet<int> ConnectedClients = new HashSet<int>();
         public static HashSet<int> GetConnections => ConnectedClients;
 
         public static ConnectionType GetMode() => NetworkMode;
 
-        public static void SetMessage(string message)
+        public static void AddMessage(string message)
         {
             LastMessage = message;
+            Messages.Enqueue(message);
+            while (Messages.Count > 10)
+            {
+                Messages.Dequeue();
+            }
         }
+
+        public static Queue<string> GetMessages() => Messages;
+        public static string GetLastMessage() => LastMessage;
 
         public static void SetLocalId(int localId)
         {
@@ -87,20 +96,25 @@ namespace TheDungeonGame
             if (NetworkMode == ConnectionType.Client && _localId == -1)
                 _localId = id;
             ConnectedClients.Add(id);
-            LastMessage = ($"[NETWORK] Client {id} Joined.");
+            AddMessage($"[NETWORK] Client {id} Joined.");
         }
 
         public static void OnClientDisconnect(int id)
         {
             ConnectedClients.Remove(id);
-            LastMessage = ($"[NETWORK] Client {id} Disconnected.");
+            AddMessage($"[NETWORK] Client {id} Disconnected.");
         }
 
         public static void SendMessage(string message)
         {
-            if (NetworkMode == ConnectionType.Client)
+            switch (NetworkMode)
             {
-                Client.SendMessage(message);
+                case ConnectionType.Client:
+                    Client.SendMessage(message);
+                    break;
+                case ConnectionType.Host:
+                    Server.SendGlobalMessage(message);
+                    break;
             }
         }
 

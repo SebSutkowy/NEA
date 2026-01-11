@@ -48,7 +48,7 @@ namespace TheDungeonGame
             AssetManager.LoadDialogue(NPCId.Shopkeep, "Shopkeep.json");
             AssetManager.LoadNPC(NPCId.Shopkeep, new NPC(0f, NPCId.Shopkeep));
 
-            Camera.Initialize(_spriteBatch, _cameraFont);
+            Camera.Initialize(_spriteBatch, _cameraFont, Window);
             UI.LoadUI(GraphicsDevice);
             SceneManager.LoadScenes(Content);
 

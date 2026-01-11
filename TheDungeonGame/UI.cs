@@ -231,7 +231,7 @@ namespace TheDungeonGame
         private GameWindow Window { get; set; }
         private bool IsFocused { get; set; }
         private StringBuilder Input { get; set; }
-        public string SubmittedText { get; private set; }
+        public bool Entered { get; set; }
 
         public TextBox() : base()
         {
@@ -242,27 +242,33 @@ namespace TheDungeonGame
         {
             Window = window;
             IsFocused = false;
+            Entered = false;
         }
 
         private void OnTextInput(object sender, TextInputEventArgs e)
         {
             char c = e.Character;
 
+            Entered = false;
             switch (c)
             {
                 case '\b':
-                    if (Input.Length > 0)
-                        Input.Remove(Input.Length - 1, 1);
+                    if (Text.Length > 0)
+                        Text = Text.Remove(Text.Length - 1);
                     break;
                 case '\r':
                 case '\n':
-                    SubmittedText = Input.ToString();
-                    Input.Clear();
+                    Entered = true;
                     break;
                 default:
-                    Input.Append(c);
+                    Text += c;
                     break;
             }
+        }
+
+        public void Reset()
+        {
+            Text = string.Empty;
         }
 
         public void OnClick(Point mpos)

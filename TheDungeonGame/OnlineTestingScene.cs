@@ -9,8 +9,6 @@ namespace TheDungeonGame
     {
         public readonly SceneName Name = SceneName.OnlineTesting;
 
-        private Queue<string> Messages;
-
         // UI elements
         private UIRect ClientModeButton { get; set; }
         private UIRect ServerModeButton { get; set; }
@@ -25,17 +23,15 @@ namespace TheDungeonGame
         
         public OnlineTestingScene(ContentManager Content)
         {
-            Messages = new Queue<string>();
-
-            float div = 0.0625f; // size of a pixel in the ui grid ( for simpler designing)
-            ClientModeButton = new UIRect(Camera.GetScaledRect(2f * div, 6f * div, 4f * div, 2.4f * div), Color.Yellow, Color.Black, "Switch To\nClient");
-            ServerModeButton = new UIRect(Camera.GetScaledRect(10f * div, 6f * div, 4f * div, 2.4f * div), Color.Green, "Switch To\nServer");
-            ExitNetworkButton = new UIRect(Camera.GetScaledRect(1f * div, 1f * div, 1f * div, 1f * div), Color.Red, "Exit");
-            SendMessageButton = new UIRect(Camera.GetScaledRect(3f * div, 6f * div, 4f * div, 2f * div), Color.Green, "Send");
-            MessageTextBox = new TextBox(Camera.GetWindow(), Camera.GetScaledRect(8f * div, 3f * div, 8f * div, 2f * div), Color.Gray);
-            ReceivedMessages = new UIRect(Camera.GetScaledRect(8f * div, 8f * div, 8f * div, 8f * div), Color.Gray, Color.Black);
-            ConnectedClientsList = new UIRect(Camera.GetScaledRect(3f * div, 8f * div, 2f * div, 8f * div), Color.Gray);
-            LocalIdButton = new UIRect(Camera.GetScaledRect(8f * div, 1f * div, 2f * div, 1f * div), Color.Gray, Color.Black);
+            float div = (1f/16f); // size of a pixel in the ui grid ( for simpler designing)
+            ClientModeButton = new UIRect(Camera.GetScaledRect(2f, 6f, 4f, 2.4f, div), Color.Yellow, Color.Black, "Switch To\nClient");
+            ServerModeButton = new UIRect(Camera.GetScaledRect(10f, 6f, 4f, 2.4f, div), Color.Green, "Switch To\nServer");
+            ExitNetworkButton = new UIRect(Camera.GetScaledRect(1f, 1f, 1f, 1f, div), Color.Red, "Exit");
+            SendMessageButton = new UIRect(Camera.GetScaledRect(2f, 5f, 4f, 2f, div), Color.Green, "Send");
+            MessageTextBox = new TextBox(Camera.GetWindow(), Camera.GetScaledRect(6f, 5f, 8f, 2f, div), Color.Gray);
+            ReceivedMessages = new UIRect(Camera.GetScaledRect(7f, 8f, 7f, 7f, div), Color.Gray, Color.Black);
+            ConnectedClientsList = new UIRect(Camera.GetScaledRect(2f, 8f, 4f, 7f, div), Color.Gray);
+            LocalIdButton = new UIRect(Camera.GetScaledRect(8f, 1f, 2f, 1f, div), Color.Gray, Color.Black);
         }
 
 
@@ -73,25 +69,47 @@ namespace TheDungeonGame
 
         }
 
+        public void SendMessage()
+        {
+            string message = Message.CreateSendMessage(Network.LocalId, MessageTextBox.Text);
+            Network.AddMessage($"[{Network.LocalId}] {MessageTextBox.Text}");
+            Network.SendMessage(message);
+            MessageTextBox.Reset();
+        }
+
         public void UpdateClient(Point mpos)
         {
-            ReceivedMessageButton.ChangeText(Network.LastMessage);
+
+            string receivedMessages = "";
+            foreach (string message in Network.GetMessages())
+            {
+                receivedMessages += $"{message}\n";
+            }
+            ReceivedMessages.ChangeText(receivedMessages);
+
             if (InputManager.IsPressed(Input.LMB) && ExitNetworkButton.Contains(mpos))
             {
                 // exit network
             }
+            if (MessageTextBox.Entered && MessageTextBox.Text != string.Empty)
+            {
+                SendMessage();
+            }
             if (SendMessageButton.Contains(mpos))
             {
                 SendMessageButton.ChangeColor(Color.LightGreen);
-                if (InputManager.IsPressed(Input.LMB))
+                if (InputManager.IsPressed(Input.LMB) && MessageTextBox.Text != string.Empty)
                 {
-                    string message = Message.CreateSendMessage();
-                    Network.SendMessage(message);
+                    SendMessage();
                 }
             }
             else
             {
                 SendMessageButton.ChangeColor(Color.Green);
+            }
+            if (InputManager.IsPressed(Input.LMB))
+            {
+                MessageTextBox.OnClick(mpos);
             }
 
             string clientsList = "";
@@ -130,7 +148,7 @@ namespace TheDungeonGame
                     UpdateClient(mpos);
                     break;
                 case ConnectionType.Host:
-                    UpdateServer(mpos);
+                    UpdateClient(mpos);
                     break;
             }
 

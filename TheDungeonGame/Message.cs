@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 namespace TheDungeonGame;
@@ -26,6 +27,7 @@ static class Message
 
 
         int tick, id;
+        string passedMessage; 
         //float X, Y;
         //Point tilemapPos = new Point();
         //string seed;
@@ -37,24 +39,26 @@ static class Message
         {
             case MessageType.Sync:
                 Network.SetTick(int.Parse(splitMessage[1]));
-                Network.SetMessage("Received Tick Sync");
+                Network.AddMessage("Received Tick Sync");
                 break;
 
             case MessageType.ClientJoin:
                 id = int.Parse(splitMessage[1]);
                 tick = int.Parse(splitMessage[2]);
                 Network.OnClientJoin(id);
-                Network.SetMessage($"{id} Joined");
+                Network.AddMessage($"{id} Joined");
                 break;
 
             case MessageType.ClientDisconnect:
                 id = int.Parse(splitMessage[1]);
                 Network.OnClientDisconnect(id);
-                Network.SetMessage($"{id} Disconnected");
+                Network.AddMessage($"{id} Disconnected");
                 break;
 
             case MessageType.SendMessage:
-                Network.SetMessage($"Hello");
+                id = int.Parse(splitMessage[1]);
+                passedMessage = string.Join(" ", splitMessage, 2, splitMessage.Count()-2);
+                Network.AddMessage($"[{id}] {passedMessage}");
                 break;
 
             case MessageType.ListClients:
@@ -196,7 +200,7 @@ static class Message
 
     public static string CreateClientDisconnectMessage(int id) => $"{(ushort)MessageType.ClientDisconnect} {id}";
 
-    public static string CreateSendMessage() => $"{(ushort)MessageType.SendMessage}";
+    public static string CreateSendMessage(int id, string message = "") => $"{(ushort)MessageType.SendMessage} {id} {message}";
 
     public static string CreateListClientsMessage(int id) => $"{(ushort)MessageType.ListClients} {id}";
 

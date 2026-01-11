@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TheDungeonGame
 {
@@ -17,14 +18,16 @@ namespace TheDungeonGame
         public const int ScreenHeight = 1000;
         public static Vector2 ScreenDimensions => new Vector2(ScreenWidth, ScreenHeight);
 
-        public static void Initialize(SpriteBatch spriteBatch, SpriteFont font)
+        public static void Initialize(SpriteBatch spriteBatch, SpriteFont font, GameWindow window)
         {
             Position = Vector2.Zero;
             SpriteBatch = spriteBatch;
             Font = font;
+            Window = window;
         }
 
 
+        public static Rectangle GetScaledRect(float x, float y, float width, float height, float division) => GetScaledRect(x * division, y * division, width * division, height * division);
         public static Rectangle GetScaledRect(float x, float y, float width, float height) => new Rectangle((int)(x * ScreenWidth), (int)(y * ScreenHeight), (int)(width * ScreenWidth), (int)(height * ScreenHeight));
         public static Rectangle OffsetRect(Rectangle rect) => new Rectangle(rect.X - (int)Position.X, rect.Y - (int)Position.Y, rect.Width, rect.Height);  
         public static Vector2 OffsetPos(Vector2 pos) => pos - Position; // draw overloads require this way, Maps in game pos -> screen pos
