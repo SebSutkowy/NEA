@@ -149,6 +149,24 @@ namespace TheDungeonGame
             }
         }
 
+        public void SendExclusiveMessage(string message, HashSet<NetPeer> excludedPeers)
+        {
+            foreach (NetPeer peer in ConnectedClients.Values)
+            {
+                if (!excludedPeers.Contains(peer))
+                    SendMessage(peer, message);
+            }
+        }
+
+        public void SendExclusiveMessage(string message, HashSet<int> excludedPeers)
+        {
+            foreach (int peerId in ConnectedClients.Keys)
+            {
+                if (!excludedPeers.Contains(peerId))
+                    SendMessage(peerId, message);
+            }
+        }
+
         public void SendMessage(NetPeer client, string message)
         {
             NetDataWriter writer = new NetDataWriter();

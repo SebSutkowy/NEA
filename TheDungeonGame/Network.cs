@@ -1,4 +1,4 @@
-﻿
+﻿using LiteNetLib;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -118,6 +118,15 @@ namespace TheDungeonGame
             }
         }
 
+        public static void SendExclusiveMessage(string message, HashSet<int> exlcudedPeers)
+        {
+            Server.SendExclusiveMessage(message, exlcudedPeers);
+        }
+
+        public static void SendExclusiveMessage(string message, HashSet<NetPeer> exlcudedPeers)
+        {
+            Server.SendExclusiveMessage(message, exlcudedPeers);
+        }
 
         public static void Update(GameTime gameTime)
         {

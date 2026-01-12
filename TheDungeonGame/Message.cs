@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -57,6 +58,11 @@ static class Message
 
             case MessageType.SendMessage:
                 id = int.Parse(splitMessage[1]);
+                if(Network.GetMode() == ConnectionType.Host)
+                {
+                    HashSet<int> excludedPeers = new HashSet<int> { id };
+                    Network.SendExclusiveMessage(message, excludedPeers);
+                }
                 passedMessage = string.Join(" ", splitMessage, 2, splitMessage.Count()-2);
                 Network.AddMessage($"[{id}] {passedMessage}");
                 break;
