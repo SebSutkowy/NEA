@@ -35,6 +35,10 @@ namespace TheDungeonGame
 
         private static HashSet<int> ConnectedClients = new HashSet<int>();
         public static HashSet<int> GetConnections => ConnectedClients;
+        private static HashSet<int> MutedConnections = new HashSet<int>();
+        public static bool IsMuted(int id) => MutedConnections.Contains(id);
+        public static void Mute(int id) => MutedConnections.Add(id);
+        public static void Unmute(int id) => MutedConnections.Remove(id);
 
         public static ConnectionType GetMode() => NetworkMode;
 

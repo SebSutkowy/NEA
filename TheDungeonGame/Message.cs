@@ -63,6 +63,7 @@ static class Message
                     HashSet<int> excludedPeers = new HashSet<int> { id };
                     Network.SendExclusiveMessage(message, excludedPeers);
                 }
+                if (Network.IsMuted(id)) return;
                 passedMessage = string.Join(" ", splitMessage, 2, splitMessage.Count()-2);
                 Network.AddMessage($"[{id}] {passedMessage}");
                 break;

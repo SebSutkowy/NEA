@@ -273,12 +273,12 @@ namespace TheDungeonGame
 
         public void OnClick(Point mpos)
         {
-            if (Contains(mpos))
+            if (Contains(mpos) && !IsFocused)
             {
                 IsFocused = true;
-                RegisterTextInput(OnTextInput); 
+                RegisterTextInput(OnTextInput);
             }
-            else
+            else if(!Contains(mpos) && IsFocused)
             {
                 IsFocused = false;
                 UnRegisterTextInput(OnTextInput);
