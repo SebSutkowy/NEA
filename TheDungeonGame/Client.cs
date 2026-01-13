@@ -38,6 +38,7 @@ namespace TheDungeonGame
             _Client.Start();
             Server = _Client.Connect(ip, port, key);
 
+
             Listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod, channel) =>
             {
                 int maxMessageLength = 100;
@@ -56,6 +57,8 @@ namespace TheDungeonGame
             bool Connection = CheckServerConnection();
             if (Connection)
             {
+                if (!Network.GetConnections.Contains(0))
+                    Network.AddClient(0);
                 TickTimer();
             }
         }
