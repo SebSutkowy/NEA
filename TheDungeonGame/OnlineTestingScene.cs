@@ -16,7 +16,7 @@ namespace TheDungeonGame
         private UIRect SendMessageButton { get; set; }
         private UIRect ReceivedMessages { get; set; }
         private TextBox MessageTextBox { get; set; }
-        private UIRect ConnectedClientsList { get; set; }
+        private List<UIRect> ConnectedClientsList { get; set; }
         private UIRect LocalIdButton { get; set; }
 
         public OnlineTestingScene() { }
@@ -30,7 +30,8 @@ namespace TheDungeonGame
             SendMessageButton = new UIRect(Camera.GetScaledRect(2f, 5f, 4f, 2f, div), Color.Green, "Send");
             MessageTextBox = new TextBox(Camera.GetWindow(), Camera.GetScaledRect(6f, 5f, 8f, 2f, div), Color.Gray);
             ReceivedMessages = new UIRect(Camera.GetScaledRect(7f, 8f, 7f, 7f, div), Color.Gray, Color.Black);
-            ConnectedClientsList = new UIRect(Camera.GetScaledRect(2f, 8f, 4f, 7f, div), Color.Gray);
+            ConnectedClientsList = new List<UIRect>();
+            //ConnectedClientsList = new UIRect(Camera.GetScaledRect(2f, 8f, 4f, 7f, div), Color.Gray);
             LocalIdButton = new UIRect(Camera.GetScaledRect(8f, 1f, 2f, 1f, div), Color.Gray, Color.Black);
         }
 
@@ -112,29 +113,50 @@ namespace TheDungeonGame
                 MessageTextBox.OnClick(mpos);
             }
 
-            string clientsList = "";
+            ConnectedClientsList.Clear();
+            int i = 0;
+            UIRect current;
             foreach (int client in Network.GetConnections)
             {
-                clientsList += $"Client {client}\n"; 
+                current = new UIRect(Camera.GetScaledRect(2f, 8f + i, 4f, 1f, (1f / 16f)), Color.Gray, $"Client {client}");
+                if (current.Contains(mpos))
+                {
+                    current.ChangeColor(Color.LightGray);
+                    if (InputManager.IsPressed(Input.LMB) && Network.LocalId != client)
+                    {
+                        if (Network.IsMuted(client))
+                            Network.Unmute(client);
+                        else
+                            Network.Mute(client);
+                    }
+                }
+                if (Network.IsMuted(client))
+                {
+                    current.ChangeText(current.Text + " (muted)");
+                }
+                ConnectedClientsList.Add(current);
+                
+
+                i++;
             }
-            Debug.WriteLine(clientsList);
-            ConnectedClientsList.ChangeText(clientsList);
+
+
             LocalIdButton.ChangeText($"Local Id: {Network.LocalId}");
         }
 
-        public void UpdateServer(Point mpos)
-        {
-            //ReceivedMessageButton.ChangeText(Network.LastMessage);
+        //public void UpdateServer(Point mpos)
+        //{
+        //    //ReceivedMessageButton.ChangeText(Network.LastMessage);
 
-            string clientsList = "";
-            foreach (int client in Network.GetConnections)
-            {
-                clientsList += $"Client {client}\n"; 
-            }
-            Debug.WriteLine(clientsList);
-            ConnectedClientsList.ChangeText(clientsList);
-            LocalIdButton.ChangeText($"Local Id: {Network.LocalId}");
-        }
+        //    string clientsList = "";
+        //    foreach (int client in Network.GetConnections)
+        //    {
+        //        clientsList += $"Client {client}\n"; 
+        //    }
+        //    Debug.WriteLine(clientsList);
+        //    ConnectedClientsList[i].ChangeText(clientsList);
+        //    LocalIdButton.ChangeText($"Local Id: {Network.LocalId}");
+        //}
 
         public override void Update()
         {
@@ -167,8 +189,12 @@ namespace TheDungeonGame
                 SendMessageButton.Draw();
                 ReceivedMessages.Draw();
                 MessageTextBox.Draw();
-                ConnectedClientsList.Draw();
                 LocalIdButton.Draw();
+
+                foreach (UIRect client in ConnectedClientsList)
+                {
+                    client.Draw();
+                }
             }
         }
     }
