@@ -8,7 +8,7 @@ namespace TheDungeonGame
 {
     public class Player : Entity
     {
-        public int playerId = 0;
+        public int playerId = -1;
         private int AttackCooldown = 0; // so that you can't spam attacks
         private const int MaxAttackCooldown = 30;
         private bool IsAttacking = false;
@@ -27,7 +27,7 @@ namespace TheDungeonGame
 
         }
 
-        public void Update()
+        public void LocalUpdate()
         {
             Move();
 
@@ -41,6 +41,10 @@ namespace TheDungeonGame
                 IsAttacking = true;
                 AttackCooldown = 0;
             }
+        }
+
+        public void Update()
+        {
             if (IsAttacking && Skills.IsAttacking)
             {
                 Skills.Update(Position, Rotation); // just updates the animation
@@ -90,6 +94,7 @@ namespace TheDungeonGame
 
         public void Move()
         {
+            Vector2 oldPosition = Position;
             Vector2 vels = Vector2.Zero;
 
             // horizontal velocities
@@ -105,6 +110,13 @@ namespace TheDungeonGame
             if (Dungeon.IsValid(collisionBox)) Position = new Vector2(Position.X + vels.X, Position.Y);
             collisionBox = new Rectangle(Hitbox.X, (int)(Hitbox.Y + vels.Y), Hitbox.Width, Hitbox.Height);
             if (Dungeon.IsValid(collisionBox)) Position = new Vector2(Position.X, Position.Y + vels.Y);
+
+            if (oldPosition != Position && Network.GetMode() != ConnectionType.None)
+            {
+                string message = Message.CreateUpdatePlayerPosMessage(Network.LocalId, Position.X, Position.Y);
+                Network.SendMessage(message);
+            }
+                
 
             // calculating player rotation based on mouse pos
             Point mpos = InputManager.GetMousePos();

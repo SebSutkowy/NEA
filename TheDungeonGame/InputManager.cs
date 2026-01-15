@@ -10,7 +10,7 @@ namespace TheDungeonGame
     public enum Input
     {
         MoveRight, MoveLeft, MoveUp, MoveDown, // Orthogonal movement binds
-        SaveBinds, LMB, Escape, ContinueDialogue // misc
+        SaveBinds, LMB, Escape, Space, ContinueDialogue // misc
     }
 
     public enum InputMethod
@@ -45,6 +45,7 @@ namespace TheDungeonGame
             {Input.Escape, new KeyBind(){ Method = InputMethod.Keyboard, Key = Keys.Escape } },
             {Input.LMB, new KeyBind(){ Method = InputMethod.Mouse, Button = MouseButtons.LeftButton } },
             {Input.ContinueDialogue, new KeyBind(){ Method = InputMethod.Keyboard, Key = Keys.Space } },
+            {Input.Space, new KeyBind(){ Method=InputMethod.Keyboard, Key=Keys.Space } },
         };
         private static KeyboardState currentKeyboardState = new KeyboardState();
         private static KeyboardState prevKeyboardState;

@@ -13,11 +13,11 @@ namespace TheDungeonGame
         private UIRect HealthBar;
         private int HealthBarMaxLength;
         private int FrameDamageTime;
-        private Queue<Point> Path;
-        private Skillset Attacks = new Skillset(Classes.Berserker);
+        private Skillset attacks = new Skillset(Classes.Berserker);
         private int AttackCooldown;
         private const int MaxAttackCooldown = 30;
         private bool IsAttacking;
+        public int TrackedPlayerId { get; private set; } 
 
         private const float MinSquareDistToPlayer = 10000f; 
 
@@ -32,48 +32,48 @@ namespace TheDungeonGame
             FramesSinceDamage = FrameDamageTime;
             AttackCooldown = 0;
             IsAttacking = false;
+            TrackedPlayerId = -1;
         }
 
-        public void Update(Vector2 playerPos)
+        public void LockOnPlayer(int id) => TrackedPlayerId = id;
+
+        public void Update(Point? dest)
         {
             AttackCooldown = Math.Min(++AttackCooldown, MaxAttackCooldown);
-            if (IsAttacking && Attacks.IsAttacking)
-                Attacks.Update(Position, Rotation);
-            else if (IsAttacking && !Attacks.IsAttacking)
+            if (IsAttacking && attacks.IsAttacking)
+                attacks.Update(Position, Rotation);
+            else if (IsAttacking && !attacks.IsAttacking)
                 IsAttacking = false;
 
-            // follow player if there is a path
-            float distanceToPlayer = Vector2.DistanceSquared(Position, playerPos);
-            bool IsCloseToPlayer = distanceToPlayer < MinSquareDistToPlayer;
-            if(Path.Count > 0 && !IsCloseToPlayer)
-                Move();
-
-            if (IsCloseToPlayer && AttackCooldown >= MaxAttackCooldown)
+            // follow player if there is a path and if there is a player
+            if (TrackedPlayerId != -1)
             {
-                Attacks.Attack(AttackType.NormalAttack);
-                IsAttacking = true;
-                AttackCooldown = 0;
-                Dungeon.AttackPlayer(Attacks.Hitbox, Attacks.GetDamage(AttackType.NormalAttack));
+                Vector2 playerPos = PlayerManager.GetPlayerPosition(TrackedPlayerId);
+                float distanceToPlayer = Vector2.DistanceSquared(Position, playerPos);
+                bool IsCloseToPlayer = distanceToPlayer < MinSquareDistToPlayer;
+                if (dest != null && !IsCloseToPlayer)
+                    Move(dest.Value);
+
+                if (IsCloseToPlayer && AttackCooldown >= MaxAttackCooldown)
+                {
+                    attacks.Attack(AttackType.NormalAttack);
+                    IsAttacking = true;
+                    AttackCooldown = 0;
+                    Dungeon.AttackPlayer(attacks.Hitbox, attacks.GetDamage(AttackType.NormalAttack));
+                }
+
+                Rotation = (float)Math.Atan2(playerPos.Y - Position.Y, playerPos.X - Position.X);
+                Rotation = (Rotation + MathHelper.Pi / 2) % (MathHelper.Pi * 2);
             }
             
             FramesSinceDamage = MathHelper.Min(FrameDamageTime, FramesSinceDamage+1);
             
             HealthBar.ChangeSize(new Vector2((float)Health * (float)MaxHealth / (float)HealthBarMaxLength, 10));
             HealthBar.ChangePos(new Vector2(Position.X - AnimationManager.CurrentFrameRect.Width / 2, Position.Y - AnimationManager.CurrentFrameRect.Height / 2 - 12));
-
-            Rotation = (float)Math.Atan2(playerPos.Y - Position.Y, playerPos.X - Position.X);
-            Rotation = (Rotation + MathHelper.Pi / 2) % (MathHelper.Pi * 2);
-
-        }
-        
-        public void GivePath(Queue<Point> path)
-        {
-            Path = path;
         }
 
-        public void Move()
+        public void Move(Point dest)
         {
-            Point dest = Path.Peek();
             dest = new Point(Dungeon.TileSize * dest.X + Dungeon.TileSize/2, Dungeon.TileSize * dest.Y + Dungeon.TileSize/2);
 
             Vector2 vel = Vector2.Zero;
@@ -95,8 +95,8 @@ namespace TheDungeonGame
                 base.Draw(Color.Red);
             else
                 base.Draw();
-            if(IsAttacking && Attacks.IsAttacking)
-                Attacks.Draw();
+            if(IsAttacking && attacks.IsAttacking)
+                attacks.Draw();
             HealthBar.Draw(false);
         }
     }

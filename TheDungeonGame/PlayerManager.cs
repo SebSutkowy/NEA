@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
 
 namespace TheDungeonGame
 {
@@ -7,8 +9,10 @@ namespace TheDungeonGame
     {
         private static Dictionary<int, Player> Players = new Dictionary<int, Player>();
 
+        private static int MaxHealth = 100;
         private static Point PlayerSize = new Point(100);
         private static float PlayerSpeed = 5f;
+        private static float PlayerDamage = 5f;
 
         public static List<string> GetPlayerHealth()
         {
@@ -20,20 +24,80 @@ namespace TheDungeonGame
             return data;
         }
 
+        public static void AddPlayer(int playerId)
+        {
+            AnimationManager animationManager = new AnimationManager(AssetManager.GetSpriteSheet(SpriteSheets.Player));
+            Animation idleAnimation = new Animation(new Vector2(100f), 0, 1, 0);
+            idleAnimation.Pause();
+            animationManager.AddAnimation(AnimationNames.Idle, idleAnimation);
+            // all class berserker for now
+            Player player = new Player(animationManager, new Vector2(0f), 0f, MaxHealth, MaxHealth, PlayerDamage, PlayerSpeed, Classes.Berserker);
+            Players.Add(playerId, player);
+        }
+
+        public static void UpdatePos(int playerId, Vector2 newPos)
+        {
+            if (Players.ContainsKey(playerId)) Players[playerId].Position = newPos;
+        }
+
         public static void RemovePlayer(int playerId)
         {
             Players.Remove(playerId);
         }
 
+        public static int Count => Players.Count;
         public static bool Contains(int playerId) => Players.ContainsKey(playerId);
 
         public static void UpdatePlayers()
         {
             foreach (int playerId in Players.Keys)
             {
+                if (playerId == Network.LocalId || Network.LocalId == -1)
+                    Players[playerId].LocalUpdate();
+
                 Players[playerId].Update();
             }
+        }
 
+        public static Vector2 GetPlayerPosition(int id) => Players[id].Position;
+
+        public static int GetClosestPlayer(Vector2 pos)
+        {
+            int closestId = -1;
+            float minDist = -1f;
+            foreach ((int id, Player player) in Players)
+            {
+                if (closestId == -1)
+                {
+                    closestId = id;
+                    minDist = Vector2.DistanceSquared(pos, player.Position);
+                }
+                else if (Vector2.DistanceSquared(pos, player.Position) < minDist)
+                {
+                    closestId = id;
+                    minDist = Vector2.DistanceSquared(pos, player.Position);
+                }
+            }
+            return closestId;
+        }
+
+        public static int GetRandomId()
+        {
+            Random random = new Random();
+            int choice = random.Next() % Count;
+            return Players.ElementAt(choice).Key;
+        }
+
+        public static void Attack(Rectangle hitbox, float damage)
+        {
+            foreach (Player player in Players.Values)
+            {
+                if (player.Hitbox.Intersects(hitbox))
+                {
+                    player.TakeDamage((int)damage);
+                }
+
+            }
         }
 
         public static void Reset()

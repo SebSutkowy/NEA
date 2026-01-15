@@ -12,6 +12,9 @@ enum MessageType : ushort
     ClientDisconnect = 2,
     SendMessage = 3,
     ListClients = 4, 
+    SpawnPlayer=5,
+    UpdatePlayerPos=6,
+    PlayerDeath=7
 }
 
 static class Message
@@ -29,7 +32,7 @@ static class Message
 
         int tick, id;
         string passedMessage; 
-        //float X, Y;
+        float x, y;
         //Point tilemapPos = new Point();
         //string seed;
         //TilemapChange Change;
@@ -71,6 +74,20 @@ static class Message
             case MessageType.ListClients:
                 id = int.Parse(splitMessage[1]);
                 Network.AddClient(id);
+                break;
+            case MessageType.SpawnPlayer:
+                id = int.Parse(splitMessage[1]);
+                PlayerManager.AddPlayer(id);
+                break;
+            case MessageType.UpdatePlayerPos:
+                id = int.Parse(splitMessage[1]);
+                x = float.Parse(splitMessage[2]);
+                y = float.Parse(splitMessage[3]);
+                PlayerManager.UpdatePos(id, new Vector2(x, y));
+                break;
+            case MessageType.PlayerDeath:
+                id = int.Parse(splitMessage[1]);
+                PlayerManager.RemovePlayer(id);
                 break;
                 
 
@@ -210,6 +227,12 @@ static class Message
     public static string CreateSendMessage(int id, string message = "") => $"{(ushort)MessageType.SendMessage} {id} {message}";
 
     public static string CreateListClientsMessage(int id) => $"{(ushort)MessageType.ListClients} {id}";
+
+    public static string CreateSpawnPlayerMessage(int id) => $"{(ushort)MessageType.SpawnPlayer} {id}";
+
+    public static string CreateUpdatePlayerPosMessage(int id, float x, float y) => $"{(ushort)MessageType.UpdatePlayerPos} {id} {x} {y}";
+
+    public static string CreatePlayerDeathMessage(int id) => $"{(ushort)MessageType.PlayerDeath} {id}";
 
     ////public static string CreatePlayerSpawnMessage(int id, int tick, Vector2 position) => $"{(ushort)MessageType.SpawnPlayer} {id} {tick} {position.X} {position.Y}";
 

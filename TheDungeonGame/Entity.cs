@@ -12,6 +12,8 @@ namespace TheDungeonGame
         public float Speed { get; private set; } = 5.0f;
         protected int FramesSinceDamage { get; set; }
 
+        public bool IsAlive => Health > 0;
+
         public Entity() : base() { }
 
         public Entity(AnimationManager animationManager, Vector2 position, float rotation, int maxHealth, int health, float damage, float speed) : base(animationManager, position, rotation)

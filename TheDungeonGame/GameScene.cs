@@ -9,6 +9,7 @@ namespace TheDungeonGame
     public class GameScene : Scene
     {
         public const SceneName Name = SceneName.Game;
+        public int TrackedPlayerId;
 
         public GameScene(ContentManager Content)
         {
@@ -54,8 +55,34 @@ namespace TheDungeonGame
         public void UpdateGame()
         {
             // move camera to player
+            TrackedPlayerId = -1;
+            if (PlayerManager.Contains(Network.LocalId))
+            {
+                TrackedPlayerId = Network.LocalId;
+            }
+            else
+            {
+                if (InputManager.IsPressed(Input.Space))
+                {
+                    string message = Message.CreateSpawnPlayerMessage(TrackedPlayerId);
+                    Network.SendMessage(message);
+                    if (Network.GetMode() == ConnectionType.Host)
+                    {
+                        PlayerManager.AddPlayer(Network.LocalId);
+                    }
+                }
+
+                TrackedPlayerId = PlayerManager.GetRandomId();
+            }
+
+            Camera.MoveCamera(PlayerManager.GetPlayerPosition(TrackedPlayerId));
+
             // update players
+            PlayerManager.UpdatePlayers();
+
             // update the dungeon
+            Dungeon.Update();
+
             // handle pausing 
             // handle changing tilemap
             // handle interactions

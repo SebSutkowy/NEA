@@ -60,6 +60,11 @@ namespace TheDungeonGame
             return result;
         }
 
+        public Point? GetNextPoint(Point start)
+        {
+            if (Contains(start)) return path[start];
+            return null;
+        }
     }
 
     public class EnemyManager
@@ -87,43 +92,62 @@ namespace TheDungeonGame
             Enemies.Add(enemy);
         }
 
-        public void Update(Player player)
+        public void Update()
         {
             Enemy enemy;
-            Pathfind(player);
-            Point playerPos = new Point((int)player.Position.X, (int)player.Position.Y);
-            playerPos = Dungeon.GetTilemapPos(playerPos);
+            
+            //Pathfind(player);
+            //Point playerPos = new Point((int)player.Position.X, (int)player.Position.Y);
+            //playerPos = Dungeon.GetTilemapPos(playerPos);
             for (int i = Enemies.Count - 1; i >= 0; i--)
             {
                 enemy = Enemies[i];
-                if (enemy.Health <= 0)
+                if (!enemy.IsAlive)
                 {
                     Debug.WriteLine($"Enemy died at {enemy.Position}, spawn basic loot");
                     Enemies.RemoveAt(i);
                 }
                 else
                 {
-                    GivePaths(playerPos, enemy);
-                    enemy.Update(player.Position);
+                    // check if enemies tracked player exists
+                    int id = enemy.TrackedPlayerId;
+                    if(!PlayerManager.Contains(id))
+                    {
+                        // if not then find the next closest player
+                        id = PlayerManager.GetClosestPlayer(enemy.Position);
+                    }
+                    // make the enemy track that player
+                    enemy.LockOnPlayer(id);
+                    Point? dest = GetNextPoint(enemy);
+                    enemy.Update(dest);
                 }
 
                     
             }
         }
 
-        public void GivePaths(Point playerPos, Enemy enemy)
+        public Point? GetNextPoint(Enemy enemy)
         {
+            // get enemy position
             Point enemyPos = new Point((int)enemy.Position.X, (int)enemy.Position.Y);
             enemyPos = Dungeon.GetTilemapPos(enemyPos);
-            Queue<Point> enemyPath = PathfindCache[playerPos].GetPath(enemyPos);
-            enemy.GivePath(enemyPath);
+            // get player pos
+            Vector2 playerPos = PlayerManager.GetPlayerPosition(enemy.TrackedPlayerId);
+            Point playerTilemapPos = Dungeon.GetTilemapPos(new Point((int)playerPos.X, (int)playerPos.Y));
+            // check if it exists in the pathfind cache
+            Point? dest = null;
+            if (!PathfindCache.ContainsKey(playerTilemapPos))
+            {
+                Pathfind(playerTilemapPos);
+            }
+            dest = PathfindCache[playerTilemapPos].GetNextPoint(enemyPos);
+            // if it exists update the enemy with it
+            // if not update the player with null destination
+            return dest;
         }
 
-        public void Pathfind(Player player)
+        public void Pathfind(Point start)
         {
-            Point start = new Point((int)player.Position.X, (int)player.Position.Y);
-            start = Dungeon.GetTilemapPos(start);
-            
             // check if in cache
             if (PathfindCache.ContainsKey(start))
             {

@@ -65,21 +65,19 @@ namespace TheDungeonGame
             newLoc = ActiveTilemaps[newTilemap].GetDoorLoc(newLoc); 
         }
 
-        public static void Update(Player player)
+        public static void Update()
         {
-            EnemyManager.Update(player);
+            EnemyManager.Update();
             while (Attacks.Count > 0)
             {
                 (Rectangle hitbox, float damage) = Attacks.Pop();
-                if (hitbox.Intersects(player.Hitbox))
-                    player.TakeDamage((int)damage);
+                PlayerManager.Attack(hitbox, damage);
             }
 
             foreach (NPCId id in CurrentTilemap.NPCs.Values)
             {
                 AssetManager.GetNPC(id).Update();
             }
-            Debug.WriteLine(player.Health);
         }
 
         public static bool IsInteractive(string loc)
