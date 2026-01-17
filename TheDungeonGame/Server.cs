@@ -114,7 +114,8 @@ namespace TheDungeonGame
         public void RemoveId(int id)
         {
             ConnectedClients.Remove(id);
-            PlayerManager.RemovePlayer(id);
+            if(PlayerManager.Contains(id))
+                PlayerManager.RemovePlayer(id);
         }
 
         public int GetClientId(NetPeer peer)

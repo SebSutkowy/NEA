@@ -33,6 +33,10 @@ namespace TheDungeonGame
         private static Queue<string> Messages = new Queue<string>();
         private static string LastMessage = string.Empty;
 
+        private static string LastTranslatedMessage = string.Empty;
+        public static void SetTranslatedMessage(string s) => LastTranslatedMessage = s;
+        public static string GetTranslatedMessage() => LastTranslatedMessage;
+
         private static HashSet<int> ConnectedClients = new HashSet<int>();
         public static HashSet<int> GetConnections => ConnectedClients;
         private static HashSet<int> MutedConnections = new HashSet<int>();

@@ -8,8 +8,9 @@ namespace TheDungeonGame
     {
         public const SceneName Name = SceneName.MainMenu;
 
-        private UIRect switchSceneRect = new UIRect(new Rectangle(100, 100, 200, 75), Color.Red, "Play");
-        private UIRect quitGameRect = new UIRect(new Rectangle(100, 200, 200, 75), Color.Red, "Quit");
+        private UIRect startServerRect = new UIRect(new Rectangle(100, 100, 200, 75), Color.Red, "Start Server"); 
+        private UIRect joinServerRect = new UIRect(new Rectangle(100, 200, 200, 75), Color.Red, "Join Server");
+        private UIRect quitGameRect = new UIRect(new Rectangle(100, 300, 200, 75), Color.Red, "Quit");
 
         public MainMenuScene(ContentManager content)
         { }
@@ -21,13 +22,28 @@ namespace TheDungeonGame
 
         public override void Update()
         {
-            if (switchSceneRect.Contains(InputManager.GetMousePos()))
-                switchSceneRect.ChangeColor(Color.DarkGray);
+            if (startServerRect.Contains(InputManager.GetMousePos()))
+                startServerRect.ChangeColor(Color.DarkGray);
             else
-                switchSceneRect.ChangeColor(Color.Gray);
+                startServerRect.ChangeColor(Color.Gray);
 
-            if (InputManager.IsPressed(Input.LMB) && switchSceneRect.Color == Color.DarkGray)
-                SceneManager.SwitchScene(SceneName.OnlineTesting);
+            if (InputManager.IsPressed(Input.LMB) && startServerRect.Color == Color.DarkGray)
+            {
+                SceneManager.SwitchScene(SceneName.Game);
+                Network.ChangeNetworkMode(ConnectionType.Host);
+            }
+
+            if (joinServerRect.Contains(InputManager.GetMousePos()))
+                joinServerRect.ChangeColor(Color.DarkGray);
+            else
+                joinServerRect.ChangeColor(Color.Gray);
+
+            if (InputManager.IsPressed(Input.LMB) && joinServerRect.Color == Color.DarkGray)
+            {
+                SceneManager.SwitchScene(SceneName.Game);
+                Network.ChangeNetworkMode(ConnectionType.Client);
+            }
+
 
             if (quitGameRect.Contains(InputManager.GetMousePos()))
                 quitGameRect.ChangeColor(Color.DarkGray);
@@ -43,7 +59,8 @@ namespace TheDungeonGame
         public override void Draw()
         {
             Camera.DrawString("Hello, this is main menu", Vector2.Zero, Color.White);
-            switchSceneRect.Draw();
+            startServerRect.Draw();
+            joinServerRect.Draw();
             quitGameRect.Draw();
         }
     }

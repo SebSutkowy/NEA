@@ -35,6 +35,7 @@ namespace TheDungeonGame
             {
                 InputManager.SaveBinds();
             }
+
             if (InputManager.IsPressed(Input.LMB) && AttackCooldown >= MaxAttackCooldown) // for attacking
             {
                 Attack(AttackType.NormalAttack);

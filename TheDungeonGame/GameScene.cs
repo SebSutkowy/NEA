@@ -19,6 +19,10 @@ namespace TheDungeonGame
         public override void OnSwitch()
         {
             Dungeon.Clear();
+            Dungeon.AddTilemap(Tilemaps.Lobby);
+            Dungeon.ChangeTilemap(Tilemaps.Lobby);
+
+            TrackedPlayerId = -1;
 
             UI.SetGUI(GUINames.Game);
         }
@@ -54,28 +58,29 @@ namespace TheDungeonGame
 
         public void UpdateGame()
         {
+            PlayerManager.WriteIds();
             // move camera to player
-            TrackedPlayerId = -1;
             if (PlayerManager.Contains(Network.LocalId))
             {
                 TrackedPlayerId = Network.LocalId;
             }
-            else
+            else if (InputManager.IsPressed(Input.Space))
             {
-                if (InputManager.IsPressed(Input.Space))
+                string message = Message.CreateSpawnPlayerMessage(Network.LocalId);
+                Network.SendMessage(message);
+                if (Network.GetMode() == ConnectionType.Host)
                 {
-                    string message = Message.CreateSpawnPlayerMessage(TrackedPlayerId);
-                    Network.SendMessage(message);
-                    if (Network.GetMode() == ConnectionType.Host)
-                    {
-                        PlayerManager.AddPlayer(Network.LocalId);
-                    }
+                    PlayerManager.AddPlayer(Network.LocalId);
                 }
-
-                TrackedPlayerId = PlayerManager.GetRandomId();
             }
+            else 
+            {
+                TrackedPlayerId = PlayerManager.GetClosestPlayer(new Vector2(0f));
+            }
+            
 
-            Camera.MoveCamera(PlayerManager.GetPlayerPosition(TrackedPlayerId));
+            if(PlayerManager.Count > 0)
+                Camera.MoveCamera(PlayerManager.GetPlayerPosition(TrackedPlayerId));
 
             // update players
             PlayerManager.UpdatePlayers();
@@ -94,6 +99,10 @@ namespace TheDungeonGame
             PlayerManager.Draw();
 
             UI.CurrentGUI.Draw();
+            string localIdText = $"Local id: {Network.LocalId}";
+            UI.DrawText(localIdText, new Vector2(0f), Color.White);
+            UI.DrawText(Network.GetTranslatedMessage(), new Vector2(0f, Camera.MeasureString(localIdText).Y + 2), Color.White);
+            
         }
     }
 }

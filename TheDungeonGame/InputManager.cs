@@ -87,6 +87,7 @@ namespace TheDungeonGame
 
         public static bool IsPressed(Input input)
         {
+            if (!Camera.IsFocused) return false;
             if (Binds[input].Method == InputMethod.Keyboard)
                 return currentKeyboardState.IsKeyDown(Binds[input].Key) && !prevKeyboardState.IsKeyDown(Binds[input].Key);
             if (Binds[input].Button == MouseButtons.LeftButton)
@@ -99,6 +100,7 @@ namespace TheDungeonGame
         }
         public static bool IsHeld(Input input)
         {
+            if (!Camera.IsFocused) return false;
             if (Binds[input].Method == InputMethod.Keyboard)
                 return currentKeyboardState.IsKeyDown(Binds[input].Key);
             if (Binds[input].Button == MouseButtons.LeftButton)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -22,6 +23,7 @@ static class Message
     
     public static void Decode(string message)
     {
+        Debug.WriteLine($"Received: {message}");
         string[] splitMessage = message.Split(' ');
         ushort typeValue = (ushort)int.Parse(splitMessage[0]);
         bool isDefined = Enum.IsDefined(typeof(MessageType), typeValue);
@@ -44,6 +46,7 @@ static class Message
             case MessageType.Sync:
                 Network.SetTick(int.Parse(splitMessage[1]));
                 Network.AddMessage("Received Tick Sync");
+                Network.SetTranslatedMessage("Tick sync");
                 break;
 
             case MessageType.ClientJoin:
@@ -51,12 +54,14 @@ static class Message
                 tick = int.Parse(splitMessage[2]);
                 Network.OnClientJoin(id);
                 Network.AddMessage($"{id} Joined");
+                Network.SetTranslatedMessage("client joined");
                 break;
 
             case MessageType.ClientDisconnect:
                 id = int.Parse(splitMessage[1]);
                 Network.OnClientDisconnect(id);
                 Network.AddMessage($"{id} Disconnected");
+                Network.SetTranslatedMessage("client disconnected");
                 break;
 
             case MessageType.SendMessage:
@@ -74,20 +79,33 @@ static class Message
             case MessageType.ListClients:
                 id = int.Parse(splitMessage[1]);
                 Network.AddClient(id);
+                Network.SetTranslatedMessage("client listing");
                 break;
             case MessageType.SpawnPlayer:
                 id = int.Parse(splitMessage[1]);
                 PlayerManager.AddPlayer(id);
+                if (Network.GetMode() == ConnectionType.Host)
+                {
+                    Network.SendMessage(message);
+                }
+                Network.SetTranslatedMessage("spawning player");
                 break;
             case MessageType.UpdatePlayerPos:
                 id = int.Parse(splitMessage[1]);
                 x = float.Parse(splitMessage[2]);
                 y = float.Parse(splitMessage[3]);
                 PlayerManager.UpdatePos(id, new Vector2(x, y));
+                if (Network.GetMode() == ConnectionType.Host)
+                {
+                    HashSet<int> excluded = new HashSet<int>() { id };
+                    Network.SendExclusiveMessage(message, excluded);
+                }
+                Network.SetTranslatedMessage($"updating {id} to {x}, {y}");
                 break;
             case MessageType.PlayerDeath:
                 id = int.Parse(splitMessage[1]);
                 PlayerManager.RemovePlayer(id);
+                Network.SetTranslatedMessage($"{id} died");
                 break;
                 
 

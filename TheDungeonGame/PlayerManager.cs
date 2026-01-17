@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -30,6 +31,7 @@ namespace TheDungeonGame
             Animation idleAnimation = new Animation(new Vector2(100f), 0, 1, 0);
             idleAnimation.Pause();
             animationManager.AddAnimation(AnimationNames.Idle, idleAnimation);
+            animationManager.ChangeAnimation(AnimationNames.Idle);
             // all class berserker for now
             Player player = new Player(animationManager, new Vector2(0f), 0f, MaxHealth, MaxHealth, PlayerDamage, PlayerSpeed, Classes.Berserker);
             Players.Add(playerId, player);
@@ -48,6 +50,14 @@ namespace TheDungeonGame
         public static int Count => Players.Count;
         public static bool Contains(int playerId) => Players.ContainsKey(playerId);
 
+        public static void WriteIds()
+        {
+            foreach (int id in PlayerManager.Players.Keys)
+            {
+                Debug.WriteLine(id);
+            }
+        }
+
         public static void UpdatePlayers()
         {
             foreach (int playerId in Players.Keys)
@@ -59,7 +69,7 @@ namespace TheDungeonGame
             }
         }
 
-        public static Vector2 GetPlayerPosition(int id) => Players[id].Position;
+        public static Vector2 GetPlayerPosition(int id) => PlayerManager.Contains(id) ? Players[id].Position : new Vector2(0f);
 
         public static int GetClosestPlayer(Vector2 pos)
         {
@@ -79,13 +89,6 @@ namespace TheDungeonGame
                 }
             }
             return closestId;
-        }
-
-        public static int GetRandomId()
-        {
-            Random random = new Random();
-            int choice = random.Next() % Count;
-            return Players.ElementAt(choice).Key;
         }
 
         public static void Attack(Rectangle hitbox, float damage)

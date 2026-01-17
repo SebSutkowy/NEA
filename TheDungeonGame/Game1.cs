@@ -30,6 +30,8 @@ namespace TheDungeonGame
 
         }
 
+        public bool IsFocused() => this.IsActive;
+
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
@@ -79,7 +81,8 @@ namespace TheDungeonGame
 
         protected override void Update(GameTime gameTime)
         {
-
+            Camera.SetFocus(this.IsActive);
+            
             SceneManager.Update();
             UI.Update();
             Network.Update(gameTime);

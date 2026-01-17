@@ -14,6 +14,11 @@ namespace TheDungeonGame
         private static GameWindow Window;
         public static GameWindow GetWindow() => Window;
 
+
+        public static void SetFocus(bool focus) => _Focus = focus;
+        private static bool _Focus;
+        public static bool IsFocused => _Focus;
+
         public const int ScreenWidth = 1000;
         public const int ScreenHeight = 1000;
         public static Vector2 ScreenDimensions => new Vector2(ScreenWidth, ScreenHeight);
