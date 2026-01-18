@@ -66,6 +66,11 @@ namespace TheDungeonGame
                     message = Message.CreateListClientsMessage(Id);
                     SendGlobalMessage(message);
                 }
+                foreach (string msg in PlayerManager.OnClientJoin())
+                {
+                    SendMessage(peer, msg);
+                }
+                
             };
 
             Listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod, channel) =>

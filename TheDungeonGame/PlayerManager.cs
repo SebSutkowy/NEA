@@ -37,6 +37,17 @@ namespace TheDungeonGame
             Players.Add(playerId, player);
         }
 
+        public static List<string> OnClientJoin()
+        {
+            List<string> messages = new List<string>();
+            foreach ((int id, Player player) in Players)
+            {
+                messages.Add(Message.CreateSpawnPlayerMessage(id));
+                messages.Add(Message.CreateUpdatePlayerPosMessage(id, player.Position.X, player.Position.Y));
+            }
+            return messages;
+        }
+
         public static void UpdatePos(int playerId, Vector2 newPos)
         {
             if (Players.ContainsKey(playerId)) Players[playerId].Position = newPos;

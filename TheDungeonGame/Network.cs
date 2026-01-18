@@ -113,6 +113,18 @@ namespace TheDungeonGame
             AddMessage($"[NETWORK] Client {id} Disconnected.");
         }
 
+        public static void PlayerAttacked()
+        {
+            if (NetworkMode == ConnectionType.Host)
+            {
+                // send attack message
+            }
+            else if (NetworkMode == ConnectionType.Client)
+            {
+                // create attack
+            }
+        }
+
         public static void SendMessage(string message)
         {
             switch (NetworkMode)
