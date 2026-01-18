@@ -43,14 +43,19 @@ namespace TheDungeonGame
             foreach ((int id, Player player) in Players)
             {
                 messages.Add(Message.CreateSpawnPlayerMessage(id));
-                messages.Add(Message.CreateUpdatePlayerPosMessage(id, player.Position.X, player.Position.Y));
+                messages.Add(Message.CreateUpdatePlayerPosMessage(id, player.Position.X, player.Position.Y, player.Rotation));
             }
             return messages;
         }
 
-        public static void UpdatePos(int playerId, Vector2 newPos)
+        public static void UpdatePos(int playerId, Vector2 newPos, float rotation)
         {
-            if (Players.ContainsKey(playerId)) Players[playerId].Position = newPos;
+            if (Players.ContainsKey(playerId))
+            {
+                Players[playerId].Position = newPos;
+                Players[playerId].Rotation = rotation;
+            }
+
         }
 
         public static void RemovePlayer(int playerId)
@@ -100,6 +105,11 @@ namespace TheDungeonGame
                 }
             }
             return closestId;
+        }
+
+        public static void PlayerAttacked(int id)
+        {
+            Players[id].Attack(AttackType.NormalAttack);
         }
 
         public static void Attack(Rectangle hitbox, float damage)

@@ -15,7 +15,8 @@ enum MessageType : ushort
     ListClients = 4, 
     SpawnPlayer=5,
     UpdatePlayerPos=6,
-    PlayerDeath=7
+    PlayerDeath=7,
+    PlayerAttack=8,
 }
 
 static class Message
@@ -34,7 +35,7 @@ static class Message
 
         int tick, id;
         string passedMessage; 
-        float x, y;
+        float x, y, rotation;
         //Point tilemapPos = new Point();
         //string seed;
         //TilemapChange Change;
@@ -94,18 +95,28 @@ static class Message
                 id = int.Parse(splitMessage[1]);
                 x = float.Parse(splitMessage[2]);
                 y = float.Parse(splitMessage[3]);
-                PlayerManager.UpdatePos(id, new Vector2(x, y));
+                rotation = float.Parse(splitMessage[4]);
+                PlayerManager.UpdatePos(id, new Vector2(x, y), rotation);
                 if (Network.GetMode() == ConnectionType.Host)
                 {
                     HashSet<int> excluded = new HashSet<int>() { id };
                     Network.SendExclusiveMessage(message, excluded);
                 }
-                Network.SetTranslatedMessage($"updating {id} to {x}, {y}");
+                Network.SetTranslatedMessage($"updating {id} to {x}, {y}, {rotation}");
                 break;
             case MessageType.PlayerDeath:
                 id = int.Parse(splitMessage[1]);
                 PlayerManager.RemovePlayer(id);
                 Network.SetTranslatedMessage($"{id} died");
+                break;
+            case MessageType.PlayerAttack:
+                id = int.Parse(splitMessage[1]);
+                PlayerManager.PlayerAttacked(id);
+                if (Network.GetMode() == ConnectionType.Host)
+                {
+                    HashSet<int> excluded = new HashSet<int>() { id };
+                    Network.SendExclusiveMessage(message, excluded);
+                }
                 break;
                 
 
@@ -248,9 +259,11 @@ static class Message
 
     public static string CreateSpawnPlayerMessage(int id) => $"{(ushort)MessageType.SpawnPlayer} {id}";
 
-    public static string CreateUpdatePlayerPosMessage(int id, float x, float y) => $"{(ushort)MessageType.UpdatePlayerPos} {id} {x} {y}";
+    public static string CreateUpdatePlayerPosMessage(int id, float x, float y, float rotation) => $"{(ushort)MessageType.UpdatePlayerPos} {id} {x} {y} {rotation}";
 
     public static string CreatePlayerDeathMessage(int id) => $"{(ushort)MessageType.PlayerDeath} {id}";
+
+    public static string CreatePlayerAttackMessage(int id) => $"{(ushort)MessageType.PlayerAttack} {id}";
 
     ////public static string CreatePlayerSpawnMessage(int id, int tick, Vector2 position) => $"{(ushort)MessageType.SpawnPlayer} {id} {tick} {position.X} {position.Y}";
 

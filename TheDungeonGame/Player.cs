@@ -39,8 +39,7 @@ namespace TheDungeonGame
             if (InputManager.IsPressed(Input.LMB) && AttackCooldown >= MaxAttackCooldown) // for attacking
             {
                 Attack(AttackType.NormalAttack);
-                IsAttacking = true;
-                AttackCooldown = 0;
+                Network.PlayerAttacked(Network.LocalId);
             }
         }
 
@@ -96,6 +95,7 @@ namespace TheDungeonGame
         public void Move()
         {
             Vector2 oldPosition = Position;
+            float oldRotation = Rotation;   
             Vector2 vels = Vector2.Zero;
 
             // horizontal velocities
@@ -112,24 +112,25 @@ namespace TheDungeonGame
             collisionBox = new Rectangle(Hitbox.X, (int)(Hitbox.Y + vels.Y), Hitbox.Width, Hitbox.Height);
             if (Dungeon.IsValid(collisionBox)) Position = new Vector2(Position.X, Position.Y + vels.Y);
 
-            if (oldPosition != Position && Network.GetMode() != ConnectionType.None)
-            {
-                string message = Message.CreateUpdatePlayerPosMessage(Network.LocalId, Position.X, Position.Y);
-                Network.SendMessage(message);
-            }
-                
-
             // calculating player rotation based on mouse pos
             Point mpos = InputManager.GetMousePos();
             mpos = Camera.InverseOffset(mpos);
             Rotation = (float)Math.Atan2(mpos.Y - Position.Y, mpos.X - Position.X);
             Rotation = (Rotation + MathHelper.Pi / 2) % (MathHelper.Pi * 2);
+            
+            if ((oldPosition != Position || oldRotation != Rotation) && Network.GetMode() != ConnectionType.None)
+            {
+                string message = Message.CreateUpdatePlayerPosMessage(Network.LocalId, Position.X, Position.Y, Rotation);
+                Network.SendMessage(message);
+            }
         }
 
         public void Attack(AttackType attackType)
         {
             Skills.Attack(attackType);
             Dungeon.Attack(playerId, Skills.Hitbox, Skills.GetDamage(attackType));
+            IsAttacking = true;
+            AttackCooldown = 0;
         }
 
         public new void Draw()
