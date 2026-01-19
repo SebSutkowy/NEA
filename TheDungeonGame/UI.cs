@@ -229,8 +229,7 @@ namespace TheDungeonGame
     public class TextBox : UIRect
     {
         private GameWindow Window { get; set; }
-        private bool IsFocused { get; set; }
-        private StringBuilder Input { get; set; }
+        public bool IsFocused { get; private set; }
         public bool Entered { get; set; }
 
         public TextBox() : base()
@@ -259,6 +258,10 @@ namespace TheDungeonGame
                 case '\r':
                 case '\n':
                     Entered = true;
+                    break;
+                case '\u001b':
+                    IsFocused = false;
+                    UnRegisterTextInput(OnTextInput);
                     break;
                 default:
                     Text += c;

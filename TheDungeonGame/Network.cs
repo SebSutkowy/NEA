@@ -164,9 +164,5 @@ namespace TheDungeonGame
                     break;
             }
         }
-
-
-
-
     }
 }

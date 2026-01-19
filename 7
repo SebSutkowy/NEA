@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
@@ -73,7 +73,7 @@ namespace TheDungeonGame
             if (Chat.Entered && Chat.Text != string.Empty)
             {
                 string message = Message.CreateSendMessage(Network.LocalId, Chat.Text);
-                Network.AddMessage($"[{Network.LocalId}] {Chat.Text}");
+                Network.AddMessage($"[{Network.LocalId}] {message}");
                 Network.SendMessage(message);
                 Chat.Reset();
             }
@@ -86,7 +86,7 @@ namespace TheDungeonGame
                 Chat.ChangeColor(new Color(0, 0, 0, 150));
             }
 
-            Messages = new Queue<string>(Network.GetMessages());
+                Messages = Network.GetMessages();
 
 
             // move camera to player

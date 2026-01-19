@@ -74,11 +74,11 @@ namespace TheDungeonGame
             }
         }
 
-        public static void UpdatePlayers()
+        public static void UpdatePlayers(bool updateLocal=true)
         {
             foreach (int playerId in Players.Keys)
             {
-                if (playerId == Network.LocalId || Network.LocalId == -1)
+                if (updateLocal && playerId == Network.LocalId || Network.LocalId == -1)
                     Players[playerId].LocalUpdate();
 
                 Players[playerId].Update();
