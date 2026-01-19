@@ -74,7 +74,11 @@ namespace TheDungeonGame
                 return;
             string dir = FileManager.GetDirectory(path);
             string text = File.ReadAllText(dir);
-            Binds = JsonSerializer.Deserialize<Dictionary<Input, KeyBind>>(text);
+            try
+            {
+                Binds = JsonSerializer.Deserialize<Dictionary<Input, KeyBind>>(text);
+            }
+            catch { }
         }
 
 

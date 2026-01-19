@@ -49,6 +49,7 @@ namespace TheDungeonGame
                 Exit();
 
             // TODO: Add your update logic here
+            Debug.WriteLine($"Player position: {_player.Position}");
             InputManager.Update();
             Camera.MoveCamera(_player.Position);
             _player.Update();
