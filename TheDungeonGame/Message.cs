@@ -12,11 +12,12 @@ enum MessageType : ushort
     ClientJoin = 1,
     ClientDisconnect = 2,
     SendMessage = 3,
-    ListClients = 4, 
-    SpawnPlayer=5,
-    UpdatePlayerPos=6,
-    PlayerDeath=7,
-    PlayerAttack=8,
+    SendPrivateMessage = 4,
+    ListClients = 5, 
+    SpawnPlayer=6,
+    UpdatePlayerPos=7,
+    PlayerDeath=8,
+    PlayerAttack=9,
 }
 
 static class Message
@@ -33,7 +34,7 @@ static class Message
         MessageType type = (MessageType)typeValue;
 
 
-        int tick, id;
+        int tick, id, targetId;
         string passedMessage; 
         float x, y, rotation;
         //Point tilemapPos = new Point();
@@ -41,7 +42,7 @@ static class Message
         //TilemapChange Change;
         //TilemapName tilemap;
         //EntityType entityType;
-        
+
         switch (type)
         {
             case MessageType.Sync:
@@ -67,14 +68,28 @@ static class Message
 
             case MessageType.SendMessage:
                 id = int.Parse(splitMessage[1]);
-                if(Network.GetMode() == ConnectionType.Host)
+                if (Network.GetMode() == ConnectionType.Host)
                 {
                     HashSet<int> excludedPeers = new HashSet<int> { id };
                     Network.SendExclusiveMessage(message, excludedPeers);
                 }
                 if (Network.IsMuted(id)) return;
-                passedMessage = string.Join(" ", splitMessage, 2, splitMessage.Count()-2);
+                passedMessage = string.Join(" ", splitMessage, 2, splitMessage.Count() - 2);
                 Network.AddMessage($"[{id}] {passedMessage}");
+                break;
+
+            case MessageType.SendPrivateMessage:
+                id = int.Parse(splitMessage[1]);
+                targetId = int.Parse(splitMessage[2]);
+                passedMessage = string.Join(" ", splitMessage, 3, splitMessage.Count() - 3); 
+                if (Network.LocalId == targetId)
+                {
+                    Network.AddMessage($"[{id}->{targetId}] {passedMessage}");
+                }
+                else if (Network.GetMode() == ConnectionType.Host)
+                {
+                        Network.SendMessage(message, targetId); 
+                }
                 break;
 
             case MessageType.ListClients:
@@ -254,6 +269,8 @@ static class Message
     public static string CreateClientDisconnectMessage(int id) => $"{(ushort)MessageType.ClientDisconnect} {id}";
 
     public static string CreateSendMessage(int id, string message = "") => $"{(ushort)MessageType.SendMessage} {id} {message}";
+
+    public static string CreateSendPrivateMessage(int id, int recipientId, string message = "") => $"{(ushort)MessageType.SendPrivateMessage} {id} {recipientId} {message}";
 
     public static string CreateListClientsMessage(int id) => $"{(ushort)MessageType.ListClients} {id}";
 

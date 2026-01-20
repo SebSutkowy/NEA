@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Text;
 
 namespace TheDungeonGame
 {
@@ -18,6 +19,9 @@ namespace TheDungeonGame
         private Queue<string> Messages;
 
         private List<UIRect> TabList;
+        private Dictionary<int, UIRect> MuteButtons;
+        private Dictionary<int, UIRect> PMButtons;
+        private int TargetPlayer;
         private bool ShowingTabList;
 
         public GameScene(ContentManager Content)
@@ -26,6 +30,8 @@ namespace TheDungeonGame
             ChatHistory = new UIRect(Camera.GetScaledRect(0f, 3f, 3f, 2f, 0.1f), new Color(0, 0, 0, 150));
             Chat = new TextBox(Camera.GetWindow(), Camera.GetScaledRect(0f, 5f, 3f, 1f, 0.1f), new Color(0, 0, 0, 150));
             TabList = new List<UIRect>();
+            MuteButtons = new Dictionary<int, UIRect>();
+            PMButtons = new Dictionary<int, UIRect>();
         }
 
         public override void OnSwitch()
@@ -35,6 +41,7 @@ namespace TheDungeonGame
             Dungeon.ChangeTilemap(Tilemaps.Lobby);
 
             TrackedPlayerId = -1;
+            TargetPlayer = -1;
             ShowingTabList = false;
 
             UI.SetGUI(GUINames.Game);
@@ -69,50 +76,129 @@ namespace TheDungeonGame
         {
         }
 
+        public void CreateTabList()
+        {
+            HashSet<int> connections = Network.GetConnections;
+            //Debug.WriteLine(connections.Count)
+            UIRect rect;
+            UIRect muteRect;
+            UIRect pmRect;
+            string playerStatus;
+            int health;
+            foreach (int connection in connections)
+            {
+                playerStatus = $"Client {connection}   ";
+                health = PlayerManager.GetPlayerHealth(connection);
+                switch (health)
+                {
+                    case -1:
+                        playerStatus += "Dead";
+                        break;
+                    default:
+                        playerStatus += $"♥ {health}";
+                        break;
+                }
+                if (connection == Network.LocalId)
+                {
+                    rect = new UIRect(Camera.GetScaledRect(3f, (float)(1 + TabList.Count), 4f, 1f, 0.1f), new Color(0, 0, 0, 150), playerStatus);
+                }
+                else
+                {
+                    rect = new UIRect(Camera.GetScaledRect(3f, (float)(1 + TabList.Count), 2f, 1f, 0.1f), new Color(0, 0, 0, 150), playerStatus);
+                    muteRect = new UIRect(Camera.GetScaledRect(5f, (float)(1 + TabList.Count), 1f, 1f, 0.1f), new Color(0, 0, 0, 150), "Mute");
+                    pmRect = new UIRect(Camera.GetScaledRect(6f, (float)(1 + TabList.Count), 1f, 1f, 0.1f), new Color(0, 0, 0, 150), "Msg");
+                    MuteButtons.Add(connection, muteRect);
+                    PMButtons.Add(connection, pmRect);
+                }
+
+                TabList.Add(rect);
+            }
+        }
+
+        private void CheckTabList()
+        {
+            Point mpos = InputManager.GetMousePos();
+            // MUTE
+            foreach ((int id, UIRect rect) in MuteButtons)
+            {
+                if (Network.IsMuted(id))
+                {
+                    if (rect.Contains(mpos))
+                    {
+                        rect.ChangeColor(new Color(150, 150, 150, 150));
+                        if (InputManager.IsPressed(Input.LMB))
+                            Network.Unmute(id);
+                    }
+                    else
+                        rect.ChangeColor(new Color(100, 100, 100, 150));
+                }
+                else
+                {
+                    if (rect.Contains(mpos))
+                    {
+                        rect.ChangeColor(new Color(50, 50, 50, 150));
+                        if (InputManager.IsPressed(Input.LMB))
+                            Network.Mute(id);
+                    }
+                    else
+                        rect.ChangeColor(new Color(0, 0, 0, 150));
+                }
+
+            }
+
+            // PRIVATE MESSAGE
+            foreach ((int id, UIRect rect) in PMButtons)
+            {
+                if (id == TargetPlayer)
+                {
+                    if (rect.Contains(mpos))
+                    {
+                        rect.ChangeColor(new Color(150, 150, 150, 150));
+                        if (InputManager.IsPressed(Input.LMB))
+                            TargetPlayer = -1;
+                    }
+                    else
+                        rect.ChangeColor(new Color(100, 100, 100, 150));
+                }
+                else
+                {
+                    if (rect.Contains(mpos))
+                    {
+                        rect.ChangeColor(new Color(50, 50, 50, 150));
+                        if (InputManager.IsPressed(Input.LMB))
+                            TargetPlayer = id;
+                    }
+                    else
+                        rect.ChangeColor(new Color(0, 0, 0, 150));
+                }
+            }
+        }
+
+        private void ClearTabList()
+        {
+            TabList.Clear();
+            MuteButtons.Clear();
+            PMButtons.Clear();
+        }
+
+
         public void UpdateGame()
         {
             //tablist
             if (InputManager.IsPressed(Input.Tab))
             {
                 ShowingTabList = true;
-                HashSet<int> connections = Network.GetConnections;
-                //Debug.WriteLine(connections.Count)
-                UIRect rect;
-                string playerStatus;
-                int health;
-                foreach (int connection in connections)
-                {
-                    playerStatus = $"Client {connection}   ";
-                    health = PlayerManager.GetPlayerHealth(connection);
-                    switch (health)
-                    {
-                        case -1:
-                            playerStatus += "Dead";
-                            break;
-                        default:
-                            playerStatus += $"♥ {health}";
-                            break;
-                    }
-                    if (connection == Network.LocalId)
-                    {
-                        rect = new UIRect(Camera.GetScaledRect(3f, (float)(1 + TabList.Count), 4f, 1f, 0.1f), new Color(0, 0, 0, 150), playerStatus);
-                    }
-                    else
-                    {
-                        rect = new UIRect();
-                    }
-
-                    TabList.Add(rect);
-                }
+                CreateTabList();
             }
-            else if (InputManager.IsHeld(Input.Tab))
+            if (InputManager.IsHeld(Input.Tab))
             {
+                CheckTabList();
                 ShowingTabList = true;
             }
             else
             {
                 ShowingTabList = false;
-                TabList.Clear();
+                ClearTabList();
             }
 
 
@@ -122,10 +208,20 @@ namespace TheDungeonGame
                 Chat.OnClick(InputManager.GetMousePos());
             if (Chat.Entered && Chat.Text != string.Empty)
             {
-                string message = Message.CreateSendMessage(Network.LocalId, Chat.Text);
-                Network.AddMessage($"[{Network.LocalId}] {Chat.Text}");
-                Network.SendMessage(message);
-                Chat.Reset();
+                if (TargetPlayer == -1)
+                {
+                    string message = Message.CreateSendMessage(Network.LocalId, Chat.Text);
+                    Network.AddMessage($"[{Network.LocalId}] {Chat.Text}");
+                    Network.SendMessage(message);
+                }
+                else
+                {
+                    string message = Message.CreateSendPrivateMessage(Network.LocalId, TargetPlayer, Chat.Text);
+                    Network.AddMessage($"[{Network.LocalId}->{TargetPlayer}] {Chat.Text}");
+                    Network.SendMessage(message);
+                }
+
+                    Chat.Reset();
             }
             if (Chat.IsFocused)
             {
@@ -195,6 +291,14 @@ namespace TheDungeonGame
             if (ShowingTabList)
             {
                 foreach (UIRect rect in TabList)
+                {
+                    rect.Draw();
+                }
+                foreach (UIRect rect in MuteButtons.Values)
+                {
+                    rect.Draw();
+                }
+                foreach (UIRect rect in PMButtons.Values)
                 {
                     rect.Draw();
                 }

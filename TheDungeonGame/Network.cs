@@ -41,8 +41,16 @@ namespace TheDungeonGame
         public static HashSet<int> GetConnections => ConnectedClients;
         private static HashSet<int> MutedConnections = new HashSet<int>();
         public static bool IsMuted(int id) => MutedConnections.Contains(id);
-        public static void Mute(int id) => MutedConnections.Add(id);
-        public static void Unmute(int id) => MutedConnections.Remove(id);
+        public static void Mute(int id)
+        {
+            MutedConnections.Add(id);
+            AddMessage($"[CHAT] Muted {id}");
+        }
+        public static void Unmute(int id)
+        {
+            MutedConnections.Remove(id);
+            AddMessage($"[CHAT] Unmuted {id}");
+        }
 
         public static ConnectionType GetMode() => NetworkMode;
 
@@ -126,7 +134,7 @@ namespace TheDungeonGame
             }
         }
 
-        public static void SendMessage(string message)
+        public static void SendMessage(string message, int id=-1)
         {
             switch (NetworkMode)
             {
@@ -134,7 +142,10 @@ namespace TheDungeonGame
                     Client.SendMessage(message);
                     break;
                 case ConnectionType.Host:
-                    Server.SendGlobalMessage(message);
+                    if (id == -1)
+                        Server.SendGlobalMessage(message);
+                    else
+                        Server.SendMessage(id, message);
                     break;
             }
         }

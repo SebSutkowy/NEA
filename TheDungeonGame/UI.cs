@@ -259,6 +259,9 @@ namespace TheDungeonGame
                 case '\n':
                     Entered = true;
                     break;
+                case '\t':
+                    Text += "  ";
+                    break;
                 case '\u001b':
                     IsFocused = false;
                     UnRegisterTextInput(OnTextInput);
