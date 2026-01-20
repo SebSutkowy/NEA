@@ -74,7 +74,6 @@ namespace TheDungeonGame
             //tablist
             if (InputManager.IsPressed(Input.Tab))
             {
-                Debug.WriteLine("pressed tab");
                 ShowingTabList = true;
                 HashSet<int> connections = Network.GetConnections;
                 //Debug.WriteLine(connections.Count)
@@ -83,7 +82,7 @@ namespace TheDungeonGame
                 int health;
                 foreach (int connection in connections)
                 {
-                    playerStatus = $"Client {connection} - Health: ";
+                    playerStatus = $"Client {connection}   ";
                     health = PlayerManager.GetPlayerHealth(connection);
                     switch (health)
                     {
@@ -91,16 +90,23 @@ namespace TheDungeonGame
                             playerStatus += "Dead";
                             break;
                         default:
-                            playerStatus += $"{health}/100";
+                            playerStatus += $"♥ {health}";
                             break;
                     }
-                    rect = new UIRect(Camera.GetScaledRect(3f, (float)(1 + TabList.Count), 3f, 1f, 0.1f), new Color(0, 0, 0, 150), playerStatus);
+                    if (connection == Network.LocalId)
+                    {
+                        rect = new UIRect(Camera.GetScaledRect(3f, (float)(1 + TabList.Count), 4f, 1f, 0.1f), new Color(0, 0, 0, 150), playerStatus);
+                    }
+                    else
+                    {
+                        rect = new UIRect();
+                    }
+
                     TabList.Add(rect);
                 }
             }
             else if (InputManager.IsHeld(Input.Tab))
             {
-                Debug.WriteLine("holding tab");
                 ShowingTabList = true;
             }
             else
