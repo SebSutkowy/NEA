@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 
@@ -16,12 +17,15 @@ namespace TheDungeonGame
         private TextBox Chat;
         private Queue<string> Messages;
 
+        private List<UIRect> TabList;
+        private bool ShowingTabList;
+
         public GameScene(ContentManager Content)
         {
             // 03 25
             ChatHistory = new UIRect(Camera.GetScaledRect(0f, 3f, 3f, 2f, 0.1f), new Color(0, 0, 0, 150));
             Chat = new TextBox(Camera.GetWindow(), Camera.GetScaledRect(0f, 5f, 3f, 1f, 0.1f), new Color(0, 0, 0, 150));
-
+            TabList = new List<UIRect>();
         }
 
         public override void OnSwitch()
@@ -31,6 +35,7 @@ namespace TheDungeonGame
             Dungeon.ChangeTilemap(Tilemaps.Lobby);
 
             TrackedPlayerId = -1;
+            ShowingTabList = false;
 
             UI.SetGUI(GUINames.Game);
         }
@@ -66,9 +71,48 @@ namespace TheDungeonGame
 
         public void UpdateGame()
         {
-            // chat
+            //tablist
+            if (InputManager.IsPressed(Input.Tab))
+            {
+                Debug.WriteLine("pressed tab");
+                ShowingTabList = true;
+                HashSet<int> connections = Network.GetConnections;
+                //Debug.WriteLine(connections.Count)
+                UIRect rect;
+                string playerStatus;
+                int health;
+                foreach (int connection in connections)
+                {
+                    playerStatus = $"Client {connection} - Health: ";
+                    health = PlayerManager.GetPlayerHealth(connection);
+                    switch (health)
+                    {
+                        case -1:
+                            playerStatus += "Dead";
+                            break;
+                        default:
+                            playerStatus += $"{health}/100";
+                            break;
+                    }
+                    rect = new UIRect(Camera.GetScaledRect(3f, (float)(1 + TabList.Count), 3f, 1f, 0.1f), new Color(0, 0, 0, 150), playerStatus);
+                    TabList.Add(rect);
+                }
+            }
+            else if (InputManager.IsHeld(Input.Tab))
+            {
+                Debug.WriteLine("holding tab");
+                ShowingTabList = true;
+            }
+            else
+            {
+                ShowingTabList = false;
+                TabList.Clear();
+            }
 
-            if(InputManager.IsPressed(Input.LMB))
+
+
+            // chat
+            if (InputManager.IsPressed(Input.LMB))
                 Chat.OnClick(InputManager.GetMousePos());
             if (Chat.Entered && Chat.Text != string.Empty)
             {
@@ -140,6 +184,14 @@ namespace TheDungeonGame
                 string message = Messages.Dequeue();
                 Camera.DrawString(message, new Vector2(0, 300 + height), Color.White);
                 height += (int)Camera.MeasureString(message).Y;
+            }
+
+            if (ShowingTabList)
+            {
+                foreach (UIRect rect in TabList)
+                {
+                    rect.Draw();
+                }
             }
 
             string localIdText = $"Local id: {Network.LocalId}";

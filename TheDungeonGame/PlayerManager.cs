@@ -15,7 +15,14 @@ namespace TheDungeonGame
         private static float PlayerSpeed = 5f;
         private static float PlayerDamage = 5f;
 
-        public static List<string> GetPlayerHealth()
+        public static int GetPlayerHealth(int id)
+        {
+            if (Contains(id)) return Players[id].Health;
+            return -1;
+        }
+            
+
+        public static List<string> GetPlayersHealth()
         {
             List<string> data = new List<string>();
             foreach (int playerId in Players.Keys)
