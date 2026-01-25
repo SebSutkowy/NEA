@@ -1,9 +1,11 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
 using System.Collections.Generic;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
+using Microsoft.Data.Sqlite;
+using System.Security.Cryptography;
 using System.Diagnostics;
+using System.Text;
+using System;
 
 namespace TheDungeonGame
 {
@@ -20,6 +22,7 @@ namespace TheDungeonGame
 
         private EventBasedNetListener Listener { get; set; }
         private NetManager _Server { get; set; }
+        private string DatabaseConnectionString { get; set; }
 
         public Dictionary<int, NetPeer> ConnectedClients { get; private set; }
 
@@ -90,7 +93,19 @@ namespace TheDungeonGame
                 Network.OnClientDisconnect(id);
             };
 
-
+            DatabaseConnectionString = $"Data Source={FileManager.GetDatabasePath()}";
+            using SqliteConnection connection = new SqliteConnection(DatabaseConnectionString);
+            connection.Open();
+            using SqliteCommand command = connection.CreateCommand();
+            command.CommandText = """
+                CREATE TABLE IF NOT EXISTS players (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL UNIQUE,
+                    password TEXT NOT NULL,
+                    salt TEXT NOT NULL
+                );
+                """;
+            command.ExecuteNonQuery();
         }
 
         public void Update()
@@ -114,6 +129,98 @@ namespace TheDungeonGame
                 CurrentTick++;
             }
         }
+
+        public void Stop() => IsRunning = false;
+
+        #region Database
+
+        public string Hash(string input, byte[] salt)
+        {
+            byte[] hash = Rfc2898DeriveBytes.Pbkdf2(
+                input,
+                salt,
+                iterations: 100_000,
+                hashAlgorithm: HashAlgorithmName.SHA256,
+                outputLength: 32);
+            return Convert.ToHexString(hash);
+        }
+
+        public void CreatePlayer(int id, string username, string password, string salt)
+        {
+            string hashedPassword = Hash(password, Convert.FromBase64String(salt));
+
+            using SqliteConnection connection = new SqliteConnection(DatabaseConnectionString);
+            connection.Open();
+            using SqliteCommand command = connection.CreateCommand();
+            command.CommandText = @"
+                INSERT INTO Players (name, password, salt)
+                VALUES (@name, @password, @salt)
+                ON CONFLICT(name) DO NOTHING;
+            ";
+
+            command.Parameters.AddWithValue("@name", username);
+            command.Parameters.AddWithValue("@password", Hash(password, Convert.FromBase64String(salt)));
+            command.Parameters.AddWithValue("@salt", salt);
+
+            int rowsAffected = command.ExecuteNonQuery();
+
+            string message;
+            if (rowsAffected > 0)
+            {
+                message = Message.CreateAccountCreationSuccess();
+            }
+            else
+            {
+                message = Message.CreateAccountCreationFail();
+            }
+            if (id == 0)
+                Message.Decode(message);
+            else
+                SendMessage(id, message);
+
+
+        }
+
+
+        
+        public void VerifyLogin(int id, string username, string password)
+        {
+            // compare to database password
+            using SqliteConnection connection = new SqliteConnection(DatabaseConnectionString);
+            connection.Open();
+            using SqliteCommand command = connection.CreateCommand();
+            command.CommandText = "SELECT salt, password FROM players WHERE name = $n;";
+            command.Parameters.AddWithValue("$n", username);
+
+            SqliteDataReader reader = command.ExecuteReader();
+            string message, hashedPassword;
+
+            if (reader.Read())
+            {
+                string dpSalt = reader.GetString(0);
+                hashedPassword = Hash(password, Convert.FromBase64String(dpSalt));
+                string dbPassword = reader.GetString(1);
+                if (dbPassword == hashedPassword)
+                {
+                    message = Message.CreateLoginSuccessMessage();
+                    Network.AddMessage($"{id} has joined");
+                }
+                else
+                {
+                    message = Message.CreateLoginFailMessage();
+                }
+            }
+            else
+            {
+                message = Message.CreateLoginFailMessage();
+            }
+            if (id == 0)
+                Message.Decode(message);
+            else
+                SendMessage(id, message);
+        }
+
+        #endregion
 
         #region Ids
         public void RemoveId(int id)

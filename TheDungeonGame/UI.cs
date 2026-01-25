@@ -127,6 +127,7 @@ namespace TheDungeonGame
         public void Draw(bool DrawAbsolute=true)
         {
             UI.DrawRect(Rectangle, Color, DrawAbsolute);
+            if (Text == string.Empty) return;
             Vector2 textSize = Camera.MeasureString(Text);
             Vector2 Position = new Vector2(Rectangle.Center.X - textSize.X / 2, Rectangle.Center.Y - textSize.Y / 2);
             Camera.DrawString(Text, Position, TextColor);
@@ -232,14 +233,21 @@ namespace TheDungeonGame
         public bool IsFocused { get; private set; }
         public bool Entered { get; set; }
 
+        public string PlaceHolderText { get; set; } 
+
         public TextBox() : base()
         {
             IsFocused = false;
         }
 
-        public TextBox(GameWindow window, Rectangle rect, Color color) : base(rect, color)
+        public TextBox(GameWindow window, Rectangle rect, Color color, string placeHolderText=""): this(window, rect, color, placeHolderText, Color.White)
+        { }
+
+        public TextBox(GameWindow window, Rectangle rect, Color color, string placeHolderText, Color textColor) : base(rect, color)
         {
             Window = window;
+            PlaceHolderText = placeHolderText;
+            TextColor = textColor;
             IsFocused = false;
             Entered = false;
         }
@@ -293,5 +301,17 @@ namespace TheDungeonGame
 
         private void RegisterTextInput(EventHandler<TextInputEventArgs> handler) => Window.TextInput += handler; 
         private void UnRegisterTextInput(EventHandler<TextInputEventArgs> handler) => Window.TextInput -= handler;
+
+        public void Draw()
+        {
+            base.Draw();
+            if (Text == string.Empty)
+            {
+                Vector2 textSize = Camera.MeasureString(PlaceHolderText);
+                Vector2 Position = new Vector2(Rectangle.Center.X - textSize.X / 2, Rectangle.Center.Y - textSize.Y / 2);
+                Camera.DrawString(PlaceHolderText, Position, TextColor);
+            }
+        }
+
     }
 }

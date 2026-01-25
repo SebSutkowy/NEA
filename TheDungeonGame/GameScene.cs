@@ -28,7 +28,7 @@ namespace TheDungeonGame
         {
             // 03 25
             ChatHistory = new UIRect(Camera.GetScaledRect(0f, 3f, 3f, 2f, 0.1f), new Color(0, 0, 0, 150));
-            Chat = new TextBox(Camera.GetWindow(), Camera.GetScaledRect(0f, 5f, 3f, 1f, 0.1f), new Color(0, 0, 0, 150));
+            Chat = new TextBox(Camera.GetWindow(), Camera.GetScaledRect(0f, 5f, 3f, 1f, 0.1f), new Color(0, 0, 0, 150), "Type something to chat", new Color(20, 20, 20, 150));
             TabList = new List<UIRect>();
             MuteButtons = new Dictionary<int, UIRect>();
             PMButtons = new Dictionary<int, UIRect>();

@@ -18,6 +18,12 @@ enum MessageType : ushort
     UpdatePlayerPos=7,
     PlayerDeath=8,
     PlayerAttack=9,
+    RequestLogin=10,
+    LoginSuccess=11,
+    LoginFail=12,
+    AccountRegister=13,
+    AccountCreationSuccess=14,
+    AccountCreationFail=15,
 }
 
 static class Message
@@ -35,7 +41,7 @@ static class Message
 
 
         int tick, id, targetId;
-        string passedMessage; 
+        string passedMessage, username, password, salt; 
         float x, y, rotation;
         //Point tilemapPos = new Point();
         //string seed;
@@ -97,6 +103,7 @@ static class Message
                 Network.AddClient(id);
                 Network.SetTranslatedMessage("client listing");
                 break;
+
             case MessageType.SpawnPlayer:
                 id = int.Parse(splitMessage[1]);
                 PlayerManager.AddPlayer(id);
@@ -106,6 +113,7 @@ static class Message
                 }
                 Network.SetTranslatedMessage("spawning player");
                 break;
+
             case MessageType.UpdatePlayerPos:
                 id = int.Parse(splitMessage[1]);
                 x = float.Parse(splitMessage[2]);
@@ -119,11 +127,13 @@ static class Message
                 }
                 Network.SetTranslatedMessage($"updating {id} to {x}, {y}, {rotation}");
                 break;
+
             case MessageType.PlayerDeath:
                 id = int.Parse(splitMessage[1]);
                 PlayerManager.RemovePlayer(id);
                 Network.SetTranslatedMessage($"{id} died");
                 break;
+
             case MessageType.PlayerAttack:
                 id = int.Parse(splitMessage[1]);
                 PlayerManager.PlayerAttacked(id);
@@ -132,6 +142,43 @@ static class Message
                     HashSet<int> excluded = new HashSet<int>() { id };
                     Network.SendExclusiveMessage(message, excluded);
                 }
+                break;
+
+            case MessageType.RequestLogin:
+                // client --> server: sends login info to server
+                id = int.Parse(splitMessage[1]);
+                username = splitMessage[2];
+                password = splitMessage[3];
+                Network.VerifyLogin(id, username, password);
+                break;
+
+            case MessageType.LoginSuccess:
+                // server --> client: client can join
+                SceneManager.SwitchScene(SceneName.Game);
+                break;
+
+            case MessageType.LoginFail:
+                // server --> client: client has to try again 
+                Debug.WriteLine("Incorrect password or username, try again :(");
+                break;
+
+            case MessageType.AccountRegister:
+                // client --> server: sends info to become registered
+                id = int.Parse(splitMessage[1]);
+                username = splitMessage[2];
+                password = splitMessage[3];
+                salt = splitMessage[4];
+                Network.CreatePlayer(id, username, password, salt);
+                break;
+
+            case MessageType.AccountCreationSuccess:
+                // server --> client: client can now log in
+                Debug.WriteLine("Account created successfully");
+                break;
+
+            case MessageType.AccountCreationFail:
+                // server --> client: username already taken
+                Debug.WriteLine("Account failed to be created");
                 break;
                 
 
@@ -282,13 +329,17 @@ static class Message
 
     public static string CreatePlayerAttackMessage(int id) => $"{(ushort)MessageType.PlayerAttack} {id}";
 
-    ////public static string CreatePlayerSpawnMessage(int id, int tick, Vector2 position) => $"{(ushort)MessageType.SpawnPlayer} {id} {tick} {position.X} {position.Y}";
+    public static string CreateRequestLoginMessage(int id, string username, string password) => $"{(ushort)MessageType.RequestLogin} {id} {username} {password}";
 
-    //public static string CreatePlayerSpawnRequestMessage(int id) => $"{(ushort)MessageType.PlayerSpawnRequest} {id}";
+    public static string CreateLoginSuccessMessage() => $"{(ushort)MessageType.LoginSuccess}";
 
-    //public static string CreatePlayerStateMessage(int id, StatePayload state) => $"{(ushort)MessageType.PlayerState} {id} {state.Tick} {state.Position.X} {state.Position.Y}";
+    public static string CreateLoginFailMessage() => $"{(ushort)MessageType.LoginFail}";
 
-    //public static string CreatePlayerInputMessage(int id, InputPayload input) => $"{(ushort)MessageType.PlayerInput} {id} {input.Tick} {input.Input.X} {input.Input.Y}";
+    public static string CreateRegisterMessage(int id, string username, string password, string salt) => $"{(ushort)MessageType.AccountRegister} {id} {username} {password} {salt}";
+
+    public static string CreateAccountCreationSuccess() => $"{(ushort)MessageType.AccountCreationSuccess}";
+
+    public static string CreateAccountCreationFail() => $"{(ushort)MessageType.AccountCreationFail}";
 
     //public static string CreateInteractionMessage(int id, int tick, TilemapName tilemap, Point tilemapPos) => $"{(ushort)MessageType.Interaction} {id} {tick} {(int)tilemap} {tilemapPos.X} {tilemapPos.Y}";
     //public static string CreateInteractionConfirmationMessage(int tick, TilemapName tilemap, Point tilemapPos, int seed) => $"{(ushort)MessageType.InteractionConfirmation} {tick} {(int)tilemap} {tilemapPos.X} {tilemapPos.Y} {seed}";

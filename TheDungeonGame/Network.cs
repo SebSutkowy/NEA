@@ -37,7 +37,7 @@ namespace TheDungeonGame
         public static void SetTranslatedMessage(string s) => LastTranslatedMessage = s;
         public static string GetTranslatedMessage() => LastTranslatedMessage;
 
-        private static HashSet<int> ConnectedClients = new HashSet<int>();
+        private static Dictionary<int, string> ConnectedClients = new Dictionary<int, string>();
         public static HashSet<int> GetConnections => ConnectedClients;
         private static HashSet<int> MutedConnections = new HashSet<int>();
         public static bool IsMuted(int id) => MutedConnections.Contains(id);
@@ -106,7 +106,6 @@ namespace TheDungeonGame
             if (!ConnectedClients.Contains(id)) ConnectedClients.Add(id);
         }
 
-
         public static void OnClientJoin(int id)
         {
             if (NetworkMode == ConnectionType.Client && _localId == -1)
@@ -160,6 +159,10 @@ namespace TheDungeonGame
             Server.SendExclusiveMessage(message, exlcudedPeers);
         }
 
+        public static void CreatePlayer(int id, string username, string password, string salt) => Server.CreatePlayer(id, username, password, salt);
+
+        public static void VerifyLogin(int id, string username, string password) => Server.VerifyLogin(id, username, password); 
+
         public static void Update(GameTime gameTime)
         {
             deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -174,6 +177,14 @@ namespace TheDungeonGame
                     Server.Update();
                     break;
             }
+        }
+
+        public static void Stop()
+        {
+            if (NetworkMode == ConnectionType.Host)
+                Server.Stop();
+            else if (NetworkMode == ConnectionType.Client)
+                Client.Stop();
         }
     }
 }

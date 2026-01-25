@@ -10,12 +10,14 @@ namespace TheDungeonGame
         MainMenu,
         Game,
         OnlineTesting,
+        Login
     }
 
     public static class SceneManager
     {
         private static SceneName CurrentSceneName = SceneName.MainMenu;
         private static SceneName? PreviousSceneName = null;
+        private static SceneName? NewScene = null;
 
         public static Scene CurrentScene => Scenes[CurrentSceneName];
 
@@ -27,12 +29,24 @@ namespace TheDungeonGame
             Scenes.Add(SceneName.MainMenu, new MainMenuScene(Content));
             Scenes.Add(SceneName.Game, new GameScene(Content));
             Scenes.Add(SceneName.OnlineTesting, new OnlineTestingScene(Content));
+            Scenes.Add(SceneName.Login, new LoginScene(Content));
         }
 
         public static void Update()
         {
             InputManager.Update();
             CurrentScene.Update();
+
+            if (NewScene != null)
+            {
+                if (!Scenes.ContainsKey(NewScene.Value))
+                    throw new NotImplementedException();
+                PreviousSceneName = CurrentSceneName;
+                CurrentSceneName = NewScene.Value;
+                NewScene = null;
+                CurrentScene.OnSwitch();
+            }
+
         }
 
         public static void Draw()
@@ -42,11 +56,7 @@ namespace TheDungeonGame
 
         public static void SwitchScene(SceneName newScene)
         {
-            if (!Scenes.ContainsKey(newScene))
-                throw new NotImplementedException();
-            PreviousSceneName = CurrentSceneName;
-            CurrentSceneName = newScene;
-            CurrentScene.OnSwitch();
+            NewScene = newScene;
         }
 
         public static void BackScene()

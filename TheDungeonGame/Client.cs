@@ -20,6 +20,7 @@ namespace TheDungeonGame
         private NetPeer Server;
 
         public bool IsRunning { get; private set; }
+        public bool IsStopped { get; private set; }
         private Stack<string> Messages = new Stack<string>();
 
         public Client()
@@ -27,6 +28,7 @@ namespace TheDungeonGame
             Timer = 0f;
             Messages = new Stack<string>();
             IsRunning = false;
+            IsStopped = false;
         }
 
         public void StartClient(string ip, int port, string key)
@@ -50,8 +52,23 @@ namespace TheDungeonGame
             };
         }
 
+        public void Stop() => IsRunning = false;
+
         public void Update()
         {
+            if (!IsRunning && !IsStopped)
+            {
+                _Client.Stop();
+                IsStopped = true;
+                return;
+            }
+            else if (IsStopped)
+            {
+                return;
+            }
+
+
+
             _Client.PollEvents();
 
             bool Connection = CheckServerConnection();

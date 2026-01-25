@@ -7,6 +7,9 @@ namespace TheDungeonGame
     internal static class FileManager
     {
         private static string BasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "DungeonGame", "Data");
+        private static string DatabasePath = Path.Combine(BasePath, "Database.db");
+
+        public static string GetDatabasePath() => DatabasePath;
 
         public static bool FileExists(string path)
         {
