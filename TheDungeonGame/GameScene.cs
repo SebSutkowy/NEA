@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Text;
 
 namespace TheDungeonGame
@@ -78,16 +79,15 @@ namespace TheDungeonGame
 
         public void CreateTabList()
         {
-            HashSet<int> connections = Network.GetConnections;
             //Debug.WriteLine(connections.Count)
             UIRect rect;
             UIRect muteRect;
             UIRect pmRect;
             string playerStatus;
             int health;
-            foreach (int connection in connections)
+            foreach ((int connection, string username) in Network.GetConnections)
             {
-                playerStatus = $"Client {connection}   ";
+                playerStatus = $"{username}   ";
                 health = PlayerManager.GetPlayerHealth(connection);
                 switch (health)
                 {
@@ -185,6 +185,8 @@ namespace TheDungeonGame
         public void UpdateGame()
         {
             //tablist
+            if (!Network.GetConnections.ContainsKey(TargetPlayer))
+                TargetPlayer = -1;
             if (InputManager.IsPressed(Input.Tab))
             {
                 ShowingTabList = true;
@@ -208,16 +210,18 @@ namespace TheDungeonGame
                 Chat.OnClick(InputManager.GetMousePos());
             if (Chat.Entered && Chat.Text != string.Empty)
             {
+                string username = Network.GetConnections[Network.LocalId];
                 if (TargetPlayer == -1)
                 {
                     string message = Message.CreateSendMessage(Network.LocalId, Chat.Text);
-                    Network.AddMessage($"[{Network.LocalId}] {Chat.Text}");
+                    Network.AddMessage($"[{username}] {Chat.Text}");
                     Network.SendMessage(message);
                 }
                 else
                 {
+                    string targetUsername = Network.GetConnections[TargetPlayer];
                     string message = Message.CreateSendPrivateMessage(Network.LocalId, TargetPlayer, Chat.Text);
-                    Network.AddMessage($"[{Network.LocalId}->{TargetPlayer}] {Chat.Text}");
+                    Network.AddMessage($"[{username}->{targetUsername}] {Chat.Text}");
                     Network.SendMessage(message);
                 }
 

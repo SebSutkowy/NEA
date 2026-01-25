@@ -74,8 +74,6 @@ namespace TheDungeonGame
             bool Connection = CheckServerConnection();
             if (Connection)
             {
-                if (!Network.GetConnections.Contains(0))
-                    Network.AddClient(0);
                 TickTimer();
             }
         }

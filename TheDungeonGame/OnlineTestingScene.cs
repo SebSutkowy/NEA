@@ -116,7 +116,7 @@ namespace TheDungeonGame
             ConnectedClientsList.Clear();
             int i = 0;
             UIRect current;
-            foreach (int client in Network.GetConnections)
+            foreach (int client in Network.GetConnections.Keys)
             {
                 current = new UIRect(Camera.GetScaledRect(2f, 8f + i, 4f, 1f, (1f / 16f)), Color.Gray, $"Client {client}");
                 if (current.Contains(mpos))

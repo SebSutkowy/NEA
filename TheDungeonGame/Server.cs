@@ -61,19 +61,8 @@ namespace TheDungeonGame
 
                 int playerId = GetNextAvailableId();
                 ConnectedClients.Add(playerId, peer);
-                string message = Message.CreateClientJoinMessage(playerId, CurrentTick);
+                string message = Message.CreateClientIdMessage(playerId);
                 SendMessage(peer, message);
-                Network.OnClientJoin(playerId);
-                foreach (int Id in ConnectedClients.Keys)
-                {
-                    message = Message.CreateListClientsMessage(Id);
-                    SendGlobalMessage(message);
-                }
-                foreach (string msg in PlayerManager.OnClientJoin())
-                {
-                    SendMessage(peer, msg);
-                }
-                
             };
 
             Listener.NetworkReceiveEvent += (fromPeer, dataReader, deliveryMethod, channel) =>
@@ -202,8 +191,17 @@ namespace TheDungeonGame
                 string dbPassword = reader.GetString(1);
                 if (dbPassword == hashedPassword)
                 {
-                    message = Message.CreateLoginSuccessMessage();
-                    Network.AddMessage($"{id} has joined");
+                    message = Message.CreateLoginSuccessMessage(username);
+                    foreach ((int Id, string Name) in Network.GetConnections)
+                    {
+                        string msg = Message.CreateClientJoinMessage(Id, Name);
+                        SendGlobalMessage(msg);
+                    }
+                    foreach (string msg in PlayerManager.OnClientJoin())
+                    {
+                        SendGlobalMessage(msg);
+                    }
+                    Network.OnClientJoin(id, username);
                 }
                 else
                 {

@@ -9,21 +9,22 @@ namespace TheDungeonGame;
 enum MessageType : ushort
 {
     Sync = 0,
-    ClientJoin = 1,
-    ClientDisconnect = 2,
-    SendMessage = 3,
-    SendPrivateMessage = 4,
-    ListClients = 5, 
-    SpawnPlayer=6,
-    UpdatePlayerPos=7,
-    PlayerDeath=8,
-    PlayerAttack=9,
-    RequestLogin=10,
-    LoginSuccess=11,
-    LoginFail=12,
-    AccountRegister=13,
-    AccountCreationSuccess=14,
-    AccountCreationFail=15,
+    IdClient = 1,
+    ClientJoin = 2,
+    ClientDisconnect = 3,
+    SendMessage = 4,
+    SendPrivateMessage = 5,
+    ListClients = 6, 
+    SpawnPlayer = 7,
+    UpdatePlayerPos = 8,
+    PlayerDeath = 9,
+    PlayerAttack = 10,
+    RequestLogin = 11,
+    LoginSuccess = 12,
+    LoginFail = 13,
+    AccountRegister = 14,
+    AccountCreationSuccess = 15,
+    AccountCreationFail = 16,
 }
 
 static class Message
@@ -57,11 +58,15 @@ static class Message
                 Network.SetTranslatedMessage("Tick sync");
                 break;
 
+            case MessageType.IdClient:
+                id = int.Parse(splitMessage[1]);
+                Network.SetLocalId(id);
+                break;
+
             case MessageType.ClientJoin:
                 id = int.Parse(splitMessage[1]);
-                tick = int.Parse(splitMessage[2]);
-                Network.OnClientJoin(id);
-                Network.AddMessage($"{id} Joined");
+                username = splitMessage[2];
+                Network.OnClientJoin(id, username);
                 Network.SetTranslatedMessage("client joined");
                 break;
 
@@ -81,7 +86,7 @@ static class Message
                 }
                 if (Network.IsMuted(id)) return;
                 passedMessage = string.Join(" ", splitMessage, 2, splitMessage.Count() - 2);
-                Network.AddMessage($"[{id}] {passedMessage}");
+                Network.AddMessage($"[{Network.GetConnections[id]}] {passedMessage}");
                 break;
 
             case MessageType.SendPrivateMessage:
@@ -90,7 +95,7 @@ static class Message
                 passedMessage = string.Join(" ", splitMessage, 3, splitMessage.Count() - 3); 
                 if (Network.LocalId == targetId)
                 {
-                    Network.AddMessage($"[{id}->{targetId}] {passedMessage}");
+                    Network.AddMessage($"[{Network.GetConnections[id]}->{Network.GetConnections[targetId]}] {passedMessage}");
                 }
                 else if (Network.GetMode() == ConnectionType.Host)
                 {
@@ -100,7 +105,8 @@ static class Message
 
             case MessageType.ListClients:
                 id = int.Parse(splitMessage[1]);
-                Network.AddClient(id);
+                username = splitMessage[2];
+                Network.AddClient(id, username);
                 Network.SetTranslatedMessage("client listing");
                 break;
 
@@ -155,6 +161,8 @@ static class Message
             case MessageType.LoginSuccess:
                 // server --> client: client can join
                 SceneManager.SwitchScene(SceneName.Game);
+                username = splitMessage[1];
+                Network.AddClient(Network.LocalId, username);
                 break;
 
             case MessageType.LoginFail:
@@ -311,7 +319,9 @@ static class Message
 
     public static string CreateSyncMessage(int tick) => $"{(ushort)MessageType.Sync} {tick}";
 
-    public static string CreateClientJoinMessage(int id, int tick) => $"{(ushort)MessageType.ClientJoin} {id} {tick}";
+    public static string CreateClientIdMessage(int id) => $"{(ushort)MessageType.IdClient} {id}";
+
+    public static string CreateClientJoinMessage(int id, string username) => $"{(ushort)MessageType.ClientJoin} {id} {username}";
 
     public static string CreateClientDisconnectMessage(int id) => $"{(ushort)MessageType.ClientDisconnect} {id}";
 
@@ -319,7 +329,7 @@ static class Message
 
     public static string CreateSendPrivateMessage(int id, int recipientId, string message = "") => $"{(ushort)MessageType.SendPrivateMessage} {id} {recipientId} {message}";
 
-    public static string CreateListClientsMessage(int id) => $"{(ushort)MessageType.ListClients} {id}";
+    public static string CreateListClientsMessage(int id, string username) => $"{(ushort)MessageType.ListClients} {id} {username}";
 
     public static string CreateSpawnPlayerMessage(int id) => $"{(ushort)MessageType.SpawnPlayer} {id}";
 
@@ -331,7 +341,7 @@ static class Message
 
     public static string CreateRequestLoginMessage(int id, string username, string password) => $"{(ushort)MessageType.RequestLogin} {id} {username} {password}";
 
-    public static string CreateLoginSuccessMessage() => $"{(ushort)MessageType.LoginSuccess}";
+    public static string CreateLoginSuccessMessage(string username) => $"{(ushort)MessageType.LoginSuccess} {username}";
 
     public static string CreateLoginFailMessage() => $"{(ushort)MessageType.LoginFail}";
 

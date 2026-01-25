@@ -38,7 +38,7 @@ namespace TheDungeonGame
         public static string GetTranslatedMessage() => LastTranslatedMessage;
 
         private static Dictionary<int, string> ConnectedClients = new Dictionary<int, string>();
-        public static HashSet<int> GetConnections => ConnectedClients;
+        public static Dictionary<int, string> GetConnections => ConnectedClients;
         private static HashSet<int> MutedConnections = new HashSet<int>();
         public static bool IsMuted(int id) => MutedConnections.Contains(id);
         public static void Mute(int id)
@@ -84,7 +84,6 @@ namespace TheDungeonGame
                 case ConnectionType.Host:
                     NetworkMode = ConnectionType.Host;
                     Server.StartServer(serverPort);
-                    ConnectedClients.Add(0);
                     break;
                 case ConnectionType.None:
                     ConnectedClients.Clear();
@@ -101,17 +100,17 @@ namespace TheDungeonGame
             Client.SetTick(tick);
         }
 
-        public static void AddClient(int id)
+        public static void AddClient(int id, string username)
         {
-            if (!ConnectedClients.Contains(id)) ConnectedClients.Add(id);
+            if (!ConnectedClients.ContainsKey(id)) ConnectedClients.Add(id, username);
         }
 
-        public static void OnClientJoin(int id)
+        public static void OnClientJoin(int id, string username)
         {
             if (NetworkMode == ConnectionType.Client && _localId == -1)
                 _localId = id;
-            ConnectedClients.Add(id);
-            AddMessage($"[NETWORK] Client {id} Joined.");
+            ConnectedClients.Add(id, username);
+            AddMessage($"[NETWORK] {username} Joined.");
         }
 
         public static void OnClientDisconnect(int id)
@@ -185,6 +184,7 @@ namespace TheDungeonGame
                 Server.Stop();
             else if (NetworkMode == ConnectionType.Client)
                 Client.Stop();
+            ChangeNetworkMode(ConnectionType.None);
         }
     }
 }
