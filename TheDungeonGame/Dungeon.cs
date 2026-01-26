@@ -121,6 +121,90 @@ namespace TheDungeonGame
             CurrentTilemapName = tilemap;
         }
 
+        public static void GenerateMap(int size, int seed) // size must be an odd integer
+        {
+            Random rng = new Random(seed);
+            HashSet<int> visited = new HashSet<int>();
+            Dictionary<int, int> path = new Dictionary<int, int>();
+            Stack<int> next = new Stack<int>();
+            HashSet<int> neighbours = new HashSet<int>
+            {
+                -1,
+                1,
+                -size,
+                size,
+            };
+            int start;
+
+            // getters
+            (int, int) GetArrayPos(int pos) => ((pos / size), (pos % size));
+            int GetOverallPos(int row, int col) => (row * size + col);
+            
+
+            // create size x size grid
+            int[,] grid = new int[size, size];
+            // place in the special rooms
+            int n = (size - 1) / 2;
+            int nextNum = n;
+            int row, col;
+            // create list of choices for special rooms locations
+            List<int> order = Enumerable.Range(0, n * n).ToList<int>();
+
+            // apply fisher-yates algorithm to shuffle elements for as many special rooms
+            int temp;
+            int i = 0;
+            for (; i < Tilemap.SpecialRooms.Count; i++)
+            {
+                nextNum = rng.Next(i, n * n);
+                temp = order[nextNum];
+                order[nextNum] = order[i];
+                order[i] = temp;
+            }
+
+            i = 0;
+            foreach (Tilemaps tilemap in Tilemap.SpecialRooms)
+            {
+                row = 2 * (order[i] % (n + 1));
+                col = 2 * (order[i] / (n + 1));
+                grid[row, col] = (int)tilemap;
+                if (tilemap == Tilemaps.Spawn)
+                    next.Push(GetOverallPos(row, col));
+                visited.Add(GetOverallPos(row, col));
+                i++;
+            }
+
+            /* 
+            // Prints the maze
+            Debug.WriteLine("#########");
+            for (i = 0; i < size; i++)
+            {
+                Debug.Write("#");
+                for (int j = 0; j < size; j++)
+                {
+                    Debug.Write(grid[i, j]);
+                }
+                Debug.Write("#\n");
+            }
+            Debug.WriteLine("#########\n");
+            */
+
+
+            // do recursive maze gen to create paths
+
+            int current;
+            while (next.Count > 0)
+            {
+                current = next.Pop();
+            }
+
+
+
+
+            // go through the maze paths and place rooms where you can
+
+            // any left alone spots will be 1 x 1 rooms
+        }
+
         #region Enemy Manager Methods
         public static void Attack(int playerId, Rectangle hitbox, float damage)
         {

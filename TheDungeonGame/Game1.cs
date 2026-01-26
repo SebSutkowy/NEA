@@ -77,6 +77,8 @@ namespace TheDungeonGame
             UI.AddGUI(GUINames.Game, gameGUI);
             UI.AddGUI(GUINames.Shop, shopGUI);
             UI.AddGUI(GUINames.Dialogue, dialogueGUI);
+
+            Dungeon.GenerateMap(7, 1067);
         }
 
         protected override void Update(GameTime gameTime)

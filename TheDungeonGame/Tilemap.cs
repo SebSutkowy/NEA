@@ -52,7 +52,11 @@ namespace TheDungeonGame
     {
         None,
         Lobby,
-        Hallway1
+        Hallway1,
+        Spawn,
+        MazePuzzle,
+        TowerOfHanoiPuzzle,
+        Boss,
     }
 
     public class Tilemap
@@ -60,6 +64,14 @@ namespace TheDungeonGame
         public static readonly HashSet<TileType> TraversableTiles = new HashSet<TileType>()
         {
             TileType.Floor
+        };
+
+        public static readonly HashSet<Tilemaps> SpecialRooms = new HashSet<Tilemaps>()
+        {
+            Tilemaps.Spawn,
+            Tilemaps.MazePuzzle,
+            Tilemaps.TowerOfHanoiPuzzle,
+            Tilemaps.Boss
         };
 
         [JsonInclude]
