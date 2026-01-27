@@ -126,7 +126,6 @@ namespace TheDungeonGame
             Random rng = new Random(seed);
             HashSet<int> visited = new HashSet<int>();
             Dictionary<int, int> path = new Dictionary<int, int>();
-            Stack<int> next = new Stack<int>();
             HashSet<int> neighbours = new HashSet<int>
             {
                 -1,
@@ -134,6 +133,7 @@ namespace TheDungeonGame
                 -size,
                 size,
             };
+
             int start;
 
             // getters
@@ -168,12 +168,71 @@ namespace TheDungeonGame
                 col = 2 * (order[i] / (n + 1));
                 grid[row, col] = (int)tilemap;
                 if (tilemap == Tilemaps.Spawn)
-                    next.Push(GetOverallPos(row, col));
+                    start = GetOverallPos(row, col);
                 visited.Add(GetOverallPos(row, col));
                 i++;
             }
 
-            /* 
+
+
+            // do recursive maze gen to create paths
+            int current = 0;
+            int next;
+            List<int> choices = new List<int>();
+            while (visited.Count < size*size)
+            {
+                choices.Clear();
+                visited.Add(current);
+                (row, col) = GetArrayPos(current);
+                grid[row, col] = -1;
+                // get choices
+                // check if on right edge
+                if (current % size != size - 1)
+                {
+                    if(!visited.Contains(current + 1))
+                        choices.Add(current + 1);
+                }
+                // check if on left edge
+                if (current % size != 0)
+                {
+                    if(!visited.Contains(current - 1))
+                        choices.Add(current - 1);
+                }
+                // check if on top edge
+                if ((int)(current / size) != 0)
+                {
+                    if (!visited.Contains(current - size))
+                        choices.Add(current - size);
+                }
+                // check if on bottom edge
+                if ((int)(current / size) != size - 1)
+                {
+                    if (!visited.Contains(current + size))
+                        choices.Add(current + size);
+                }
+
+                // check if there where any free tiles
+                if (choices.Count == 0)
+                {
+                    current = path[current]; 
+                    continue;
+                }
+
+                // pick a random one
+
+                next = choices[rng.Next(0, choices.Count)];
+                Debug.WriteLine($"{GetArrayPos(current)} --> {GetArrayPos(next)}");
+                path.Add(next, current);
+                current = next;
+            }
+
+
+
+
+            // go through the maze paths and place rooms where you can
+
+            // any left alone spots will be 1 x 1 rooms
+
             // Prints the maze
             Debug.WriteLine("#########");
             for (i = 0; i < size; i++)
@@ -186,23 +245,6 @@ namespace TheDungeonGame
                 Debug.Write("#\n");
             }
             Debug.WriteLine("#########\n");
-            */
-
-
-            // do recursive maze gen to create paths
-
-            int current;
-            while (next.Count > 0)
-            {
-                current = next.Pop();
-            }
-
-
-
-
-            // go through the maze paths and place rooms where you can
-
-            // any left alone spots will be 1 x 1 rooms
         }
 
         #region Enemy Manager Methods
