@@ -268,6 +268,76 @@ namespace TheDungeonGame
                     {
                         // not found so must be a special room
                         // link door from room to a random adjacent room 
+                        choices.Clear();
+                        if (index % size != size - 1)
+                        {
+                            choices.Add(index + 1);
+                        }
+                        // check if on left edge
+                        if (index % size != 0)
+                        {
+                            choices.Add(index - 1);
+                        }
+                        // check if on top edge
+                        if ((int)(index / size) != 0)
+                        {
+                            choices.Add(index - size);
+                        }
+                        // check if on bottom edge
+                        if ((int)(index / size) != size - 1)
+                        {
+                            choices.Add(index + size);
+                        } 
+                        next = choices[rng.Next(choices.Count)];
+                        (int id, string loc) neighbour = (0, "");
+
+                        if(index - next == -1) // right 
+                        {
+                            neighbour = (next, "-10;0");
+                            if (grid[row, col] == (int)Tilemaps.Spawn)
+                            {
+                                ConnectDoors(index, "5;0", neighbour.id, neighbour.loc);
+                            }
+                        }
+                        else if (index - next == 1) // left 
+                        {
+                            neighbour = (next, "10;0");
+                            if (grid[row, col] == (int)Tilemaps.Spawn)
+                            {
+                                ConnectDoors(index, "-5;0", neighbour.id, neighbour.loc);
+                            }
+                        }
+                        else if (index - next == size) // top 
+                        {
+                            neighbour = (next, "0;10");
+                            if (grid[row, col] == (int)Tilemaps.Spawn)
+                            {
+                                ConnectDoors(index, "0;-5", neighbour.id, neighbour.loc);
+                            }
+                        }
+                        else if (index - next == -size) // bottom
+                        {
+                            neighbour = (next, "0;-10");
+                            if (grid[row, col] == (int)Tilemaps.Spawn)
+                            {
+                                ConnectDoors(index, "0;5", neighbour.id, neighbour.loc);
+                            }
+                        }
+                        switch(grid[row, col])
+                        {
+                            case (int)Tilemaps.Boss:
+                                ConnectDoors(index, "0;5", neighbour.id, neighbour.loc);
+                                break;
+                            case (int)Tilemaps.MazePuzzle:
+                                ConnectDoors(index, "0;6", neighbour.id, neighbour.loc);
+                                break;
+                            case (int)Tilemaps.TowerOfHanoiPuzzle:
+                                ConnectDoors(index, "0;6", neighbour.id, neighbour.loc);
+                                break;
+                            default:
+                                break;
+                        }
+
                         
                     }
                 }
