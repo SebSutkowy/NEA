@@ -270,6 +270,7 @@ namespace TheDungeonGame
 
             // handle pausing 
             // handle changing tilemap
+            Dungeon.CheckIfChangingTilemap();
             // handle interactions
         }
 

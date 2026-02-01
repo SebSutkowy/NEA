@@ -3,9 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime.Remoting;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TheDungeonGame
 {
@@ -96,14 +93,13 @@ namespace TheDungeonGame
         }
 
 
-        public static void CheckIfChangingTilemap(Player player)
+        public static void CheckIfChangingTilemap()
         {
             if (ChangingTilemap)
             {
                 CurrentTilemapId = newTilemapId;
                 Point newPos = CurrentTilemap.GetPos(newLoc);
-                player.SetPos(new Vector2(newPos.X + CurrentTilemap.TileSize/2, newPos.Y + CurrentTilemap.TileSize/2));
-                
+                PlayerManager.SetAllPos(new Vector2(newPos.X + CurrentTilemap.TileSize / 2, newPos.Y + CurrentTilemap.TileSize / 2));
                 ChangingTilemap = false;
                 newTilemapId = 0;
                 newLoc = "";

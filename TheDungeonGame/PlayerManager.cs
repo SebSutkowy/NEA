@@ -62,7 +62,14 @@ namespace TheDungeonGame
                 Players[playerId].Position = newPos;
                 Players[playerId].Rotation = rotation;
             }
+        }
 
+        public static void SetAllPos(Vector2 newPos)
+        {
+            foreach(Player player in Players.Values)
+            {
+                player.SetPos(newPos);
+            }
         }
 
         public static void RemovePlayer(int playerId)
