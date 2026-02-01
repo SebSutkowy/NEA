@@ -38,8 +38,7 @@ namespace TheDungeonGame
         public override void OnSwitch()
         {
             Dungeon.Clear();
-            Dungeon.AddTilemap(Tilemaps.Lobby);
-            Dungeon.ChangeTilemap(Tilemaps.Lobby);
+            Dungeon.GenerateMap(7, 1067);
 
             TrackedPlayerId = -1;
             TargetPlayer = -1;
@@ -50,6 +49,7 @@ namespace TheDungeonGame
 
         public override void Update()
         {
+            Debug.WriteLine($"Tilemap Id in Update: {Dungeon.CurrentTilemapId}");
             switch (UI.CurrentGUIName)
             {
                 case GUINames.Game:

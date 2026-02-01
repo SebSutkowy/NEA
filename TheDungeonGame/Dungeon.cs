@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,26 +11,26 @@ namespace TheDungeonGame
 {
     public static class Dungeon
     {
-        private static Dictionary<Tilemaps, Tilemap> ActiveTilemaps = new Dictionary<Tilemaps, Tilemap>();
-        public static Tilemaps CurrentTilemapName { get; private set; } = Tilemaps.None;
-        private static Tilemap CurrentTilemap => ActiveTilemaps[CurrentTilemapName];
+        private static Dictionary<int, Tilemap> ActiveTilemaps = new Dictionary<int, Tilemap>();
+        public static int CurrentTilemapId { get; private set; } = 0;
+        private static Tilemap CurrentTilemap => ActiveTilemaps[CurrentTilemapId];
         public static int TileSize => CurrentTilemap.TileSize;
-        public static bool IsActive => CurrentTilemapName != Tilemaps.None;
+        public static bool IsActive => CurrentTilemapId != 0;
         public static Rectangle? CameraBounds => CurrentTilemap.CameraBounds;
-        public static Dictionary<(Tilemaps, string), (Tilemaps, string)> Doors = new Dictionary<(Tilemaps, string), (Tilemaps, string)>(); // door -> destination
+        public static Dictionary<(int, string), (int, string)> Doors = new Dictionary<(int, string), (int, string)>(); // door -> destination
         private static bool ChangingTilemap = false;
-        private static Tilemaps newTilemap;
+        private static int newTilemapId;
         private static string newLoc;
-        private static Dictionary<Tilemaps, EnemyManager> EnemyManagers = new Dictionary<Tilemaps, EnemyManager>();
+        private static Dictionary<int, EnemyManager> EnemyManagers = new Dictionary<int, EnemyManager>();
         private static Stack<(Rectangle, float)> Attacks = new Stack<(Rectangle, float)>();
-        private static EnemyManager EnemyManager => EnemyManagers[CurrentTilemapName];
+        private static EnemyManager EnemyManager => EnemyManagers[CurrentTilemapId];
 
         public static bool IsValid(Rectangle Bounds) => CurrentTilemap.IsValid(Bounds);
         
         public static void Clear()
         {
             ActiveTilemaps.Clear();
-            CurrentTilemapName = Tilemaps.None;
+            CurrentTilemapId = 0;
             Doors.Clear();
             ChangingTilemap = false;
             EnemyManagers.Clear();
@@ -44,25 +45,25 @@ namespace TheDungeonGame
             return res;
         }
 
-        public static void AddTilemap(Tilemaps newTilemap)
+        public static void AddTilemap(int newTilemapId, Tilemaps newTilemap)
         {
-            Tilemap tilemap = new Tilemap();
             string loc  = AssetManager.GetTilemapFileLocation(newTilemap);
-            tilemap.Load(loc);
-            ActiveTilemaps.Add(newTilemap, tilemap);
-            EnemyManagers.Add(newTilemap, new EnemyManager());
+            Tilemap tilemap = new Tilemap(loc, newTilemapId);
+            ActiveTilemaps.Add(newTilemapId, tilemap);
+            EnemyManagers.Add(newTilemapId, new EnemyManager());
         }
 
-        public static void UseDoor(Tilemaps tilemap, string loc)
+        public static void UseDoor(int tilemapId, string loc)
         {
-            if (!Doors.ContainsKey((tilemap, loc)))
+            Debug.WriteLine($"Trying door {(tilemapId, loc)}");
+            if (!Doors.ContainsKey((tilemapId, loc)))
             {
                 Debug.WriteLine("Couldn't find door");
                 return;
             }
             ChangingTilemap = true;
-            (newTilemap, newLoc) = Doors[(tilemap, loc)];
-            newLoc = ActiveTilemaps[newTilemap].GetDoorLoc(newLoc); 
+            (newTilemapId, newLoc) = Doors[(tilemapId, loc)];
+            newLoc = ActiveTilemaps[newTilemapId].GetDoorLoc(newLoc); 
         }
 
         public static void Update()
@@ -99,26 +100,27 @@ namespace TheDungeonGame
         {
             if (ChangingTilemap)
             {
-                CurrentTilemapName = newTilemap;
+                CurrentTilemapId = newTilemapId;
                 Point newPos = CurrentTilemap.GetPos(newLoc);
                 player.SetPos(new Vector2(newPos.X + CurrentTilemap.TileSize/2, newPos.Y + CurrentTilemap.TileSize/2));
                 
                 ChangingTilemap = false;
-                newTilemap = Tilemaps.None;
+                newTilemapId = 0;
                 newLoc = "";
             }
         }
 
 
-        public static void ConnectDoors(Tilemaps tilemap1, string loc1, Tilemaps tilemap2, string loc2)
+        public static void ConnectDoors(int tilemap1, string loc1, int tilemap2, string loc2)
         {
             Doors[(tilemap1, loc1)] = (tilemap2, loc2);
             Doors[(tilemap2, loc2)] = (tilemap1, loc1);
+            Debug.WriteLine($"{(tilemap1, loc1)} <=> {(tilemap2, loc2)}");
         }
         
-        public static void ChangeTilemap(Tilemaps tilemap)
+        public static void ChangeTilemap(int tilemapId)
         {
-            CurrentTilemapName = tilemap;
+            CurrentTilemapId = tilemapId;
         }
 
         public static void GenerateMap(int size, int seed) // size must be an odd integer
@@ -134,8 +136,6 @@ namespace TheDungeonGame
                 size,
             };
 
-            int start;
-
             // getters
             (int, int) GetArrayPos(int pos) => ((pos / size), (pos % size));
             int GetOverallPos(int row, int col) => (row * size + col);
@@ -148,9 +148,10 @@ namespace TheDungeonGame
             int nextNum = n;
             int row, col;
             // create list of choices for special rooms locations
-            List<int> order = Enumerable.Range(0, n * n).ToList<int>();
+            List<int> order = Enumerable.Range(1, n * n).ToList<int>();
 
             // apply fisher-yates algorithm to shuffle elements for as many special rooms
+            // remove 0 so no special rooms can appear there -> makes linking doors avoid special case where a special room already is connected
             int temp;
             int i = 0;
             for (; i < Tilemap.SpecialRooms.Count; i++)
@@ -168,7 +169,11 @@ namespace TheDungeonGame
                 col = 2 * (order[i] / (n + 1));
                 grid[row, col] = (int)tilemap;
                 if (tilemap == Tilemaps.Spawn)
-                    start = GetOverallPos(row, col);
+                {
+                    AddTilemap(GetOverallPos(row, col), tilemap);
+                    CurrentTilemapId = GetOverallPos(row, col);
+                    Debug.WriteLine($"Current tilemap: {CurrentTilemapId}");
+                }
                 visited.Add(GetOverallPos(row, col));
                 i++;
             }
@@ -182,7 +187,11 @@ namespace TheDungeonGame
             while (visited.Count < size*size)
             {
                 choices.Clear();
-                visited.Add(current);
+                if(!visited.Contains(current))
+                {
+                    visited.Add(current);
+                    AddTilemap(current, Tilemaps.BasicRoom);
+                }
                 (row, col) = GetArrayPos(current);
                 grid[row, col] = -1;
                 // get choices
@@ -226,12 +235,44 @@ namespace TheDungeonGame
                 current = next;
             }
 
+            // put in the rooms from the maze and link the doors 
+            int index;
+            for(row = 0; row < size; row++)
+            {
+                for(col = 0; col < size; col++)
+                {
+                    index = GetOverallPos(row, col);
+                    if (path.ContainsKey(index))
+                    {
+                        // all rooms here are basic rooms so door positions are known
+                        // link the doors from the path to this door
+                        if(index - path[index] == -1) // right 
+                        {
+                            ConnectDoors(index, "10;0", path[index], "-10;0");
+                        }
+                        else if (index - path[index] == 1) // left 
+                        {
+                            ConnectDoors(index, "-10;0", path[index], "10;0");
 
+                        }
+                        else if (index - path[index] == size) // top 
+                        {
+                            ConnectDoors(index, "0;-10", path[index], "0;10");
+                        }
+                        else if (index - path[index] == -size) // bottom
+                        {
+                            ConnectDoors(index, "0;10", path[index], "0;-10");
+                        }
+                    }
+                    else
+                    {
+                        // not found so must be a special room
+                        // link door from room to a random adjacent room 
+                        
+                    }
+                }
+            }
 
-
-            // go through the maze paths and place rooms where you can
-
-            // any left alone spots will be 1 x 1 rooms
 
             // Prints the maze
             Debug.WriteLine("#########");
@@ -270,9 +311,10 @@ namespace TheDungeonGame
             EnemyManager.AddEnemy(enemy);
         }
         
-        public static void AddEnemy(Tilemaps tilemap, Enemy enemy)
+        public static void AddEnemy(int tilemapId, Enemy enemy)
         {
-            if (EnemyManagers.ContainsKey(tilemap)) EnemyManagers[tilemap].AddEnemy(enemy);
+            if (EnemyManagers.ContainsKey(tilemapId)) 
+                EnemyManagers[tilemapId].AddEnemy(enemy);
         }
 
         #endregion

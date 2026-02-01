@@ -53,6 +53,7 @@ namespace TheDungeonGame
         None,
         Lobby,
         Hallway1,
+        BasicRoom,
         Spawn,
         MazePuzzle,
         TowerOfHanoiPuzzle,
@@ -74,6 +75,9 @@ namespace TheDungeonGame
             Tilemaps.Boss
         };
 
+        
+      
+
         [JsonInclude]
         public Tilemaps Name { get; private set; }
         [JsonInclude]
@@ -87,6 +91,7 @@ namespace TheDungeonGame
         private Dictionary<string, int[]> Doors { get; set; } // second stores the offset on entry
         [JsonInclude]
         public Dictionary<string, NPCId> NPCs { get; set; }
+        private int Id { get; set; }
 
         public Tilemap()
         {
@@ -98,9 +103,15 @@ namespace TheDungeonGame
             NPCs = new Dictionary<string, NPCId>();
         }
 
-        public Tilemap(string path)
+        public Tilemap(string path, int id)
         {
             Load(path);
+            Id = id;
+        }
+
+        public void SetId(int id)
+        {
+            Id = id;
         }
 
         public void Load(string path)
@@ -109,8 +120,8 @@ namespace TheDungeonGame
             string text = FileManager.ReadData(path);
             Tilemap newTilemap = (Tilemap)JsonSerializer.Deserialize<Tilemap>(text, options);
             Debug.WriteLine(newTilemap.Name);
-            Name = newTilemap.Name;
             Map = newTilemap.Map;
+            Name = newTilemap.Name;
             TileSize = newTilemap.TileSize;
             CameraBounds = newTilemap.savedBounds.getRect();
             DoorsCount = newTilemap.DoorsCount;
@@ -195,16 +206,16 @@ namespace TheDungeonGame
 
             // top left
             if (!TraversableTiles.Contains(this[topLeft])) return false;
-            if (Doors.ContainsKey(GetLoc(topLeft))) Dungeon.UseDoor(Name, GetLoc(topLeft));
+            if (Doors.ContainsKey(GetLoc(topLeft))) Dungeon.UseDoor(Id, GetLoc(topLeft));
             // top right
             if (!TraversableTiles.Contains(this[topRight])) return false;
-            if (Doors.ContainsKey(GetLoc(topRight))) Dungeon.UseDoor(Name, GetLoc(topRight));
+            if (Doors.ContainsKey(GetLoc(topRight))) Dungeon.UseDoor(Id, GetLoc(topRight));
             // bottom left
             if (!TraversableTiles.Contains(this[bottomLeft])) return false;
-            if (Doors.ContainsKey(GetLoc(bottomLeft))) Dungeon.UseDoor(Name, GetLoc(bottomLeft));
+            if (Doors.ContainsKey(GetLoc(bottomLeft))) Dungeon.UseDoor(Id, GetLoc(bottomLeft));
             // bottom right
             if (!TraversableTiles.Contains(this[bottomRight])) return false;
-            if (Doors.ContainsKey(GetLoc(bottomRight))) Dungeon.UseDoor(Name, GetLoc(bottomRight));
+            if (Doors.ContainsKey(GetLoc(bottomRight))) Dungeon.UseDoor(Id, GetLoc(bottomRight));
             return true;
         }
 

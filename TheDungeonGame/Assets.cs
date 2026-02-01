@@ -28,8 +28,8 @@ namespace TheDungeonGame
     {
         private static readonly Dictionary<FileTypes, string> Prefixes = new Dictionary<FileTypes, string>()
         {
-            {FileTypes.Tilemap, @"Maps/" },
-            {FileTypes.Dialogues, @"Dialogue/" }
+            {FileTypes.Tilemap, @"Maps\" },
+            {FileTypes.Dialogues, @"Dialogue\" }
         };
 
         private static string AddPrefix(FileTypes fileType, string loc) => $"{Prefixes[fileType]}{loc}";
@@ -45,7 +45,14 @@ namespace TheDungeonGame
         {
             {Tilemaps.None, AddPrefix(FileTypes.Tilemap, "") },
             {Tilemaps.Lobby, AddPrefix(FileTypes.Tilemap, "Lobby.json") },
-            {Tilemaps.Hallway1, AddPrefix(FileTypes.Tilemap, "Hallway1.json") }  
+            {Tilemaps.Hallway1, AddPrefix(FileTypes.Tilemap, "Hallway1.json") },
+            {Tilemaps.BasicRoom, AddPrefix(FileTypes.Tilemap, "BasicRoom.json") },
+            {Tilemaps.Spawn, AddPrefix(FileTypes.Tilemap, "Spawn.json") }, 
+            {Tilemaps.TowerOfHanoiPuzzle, AddPrefix(FileTypes.Tilemap, "PlaceHolderPuzzle.json") }, 
+            {Tilemaps.MazePuzzle, AddPrefix(FileTypes.Tilemap, "PlaceHolderPuzzle.json") }, 
+            {Tilemaps.Boss, AddPrefix(FileTypes.Tilemap, "Boss.json") }, 
+
+            
         };
 
         public static void LoadUnimplementedTexture(ContentManager Content, string path)
