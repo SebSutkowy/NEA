@@ -283,6 +283,7 @@ namespace TheDungeonGame
         public void Reset()
         {
             Text = string.Empty;
+            Entered = false;
         }
 
         public void OnClick(Point mpos)

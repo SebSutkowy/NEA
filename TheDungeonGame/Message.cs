@@ -160,7 +160,7 @@ static class Message
 
             case MessageType.LoginSuccess:
                 // server --> client: client can join
-                SceneManager.SwitchScene(SceneName.Game);
+                SceneManager.SwitchScene(SceneName.Lobby);
                 username = splitMessage[1];
                 Network.AddClient(Network.LocalId, username);
                 break;

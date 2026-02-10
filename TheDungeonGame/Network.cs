@@ -62,6 +62,7 @@ namespace TheDungeonGame
             {
                 Messages.Dequeue();
             }
+            Debug.WriteLine(message);
         }
 
         public static Queue<string> GetMessages() => Messages;

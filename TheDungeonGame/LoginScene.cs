@@ -50,6 +50,7 @@ namespace TheDungeonGame
                 if (UsernameBox.Text != string.Empty && PasswordBox.Text.Length >= 8)
                 {
                     string message = Message.CreateRequestLoginMessage(Network.LocalId, UsernameBox.Text, PasswordBox.Text);
+                    Debug.WriteLine(message);
                     if (Network.GetMode() == ConnectionType.Host)
                     {
                         Message.Decode(message);

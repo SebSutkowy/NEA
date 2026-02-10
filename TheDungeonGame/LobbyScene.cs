@@ -12,6 +12,7 @@ namespace TheDungeonGame
         private TextBox ChatTextBox;
         private List<UIRect> PlayerList;
         private UIRect StartButton;
+        string receivedMessages;
 
         public LobbyScene(ContentManager Content)
         {
@@ -29,7 +30,7 @@ namespace TheDungeonGame
         public void SendMessage()
         {
             string message = Message.CreateSendMessage(Network.LocalId, ChatTextBox.Text);
-            Network.AddMessage($"[{Network.LocalId}] {ChatTextBox.Text}");
+            Network.AddMessage($"[{Network.GetConnections[Network.LocalId]}] {ChatTextBox.Text}");
             Network.SendMessage(message);
             ChatTextBox.Reset();
         }
@@ -39,10 +40,19 @@ namespace TheDungeonGame
             Point mpos = InputManager.GetMousePos();
             bool Clicked = InputManager.IsPressed(Input.LMB);
 
+            receivedMessages = "";
+            foreach(string message in Network.GetMessages())
+            {
+                receivedMessages += $"{message}\n";
+            }
+            Chat.ChangeText(receivedMessages);
+
             float height = 0f;
+            PlayerList.Clear();
             foreach(string name in Network.GetConnections.Values)
             {
                 UIRect player = new UIRect(Camera.GetScaledRect(10f, 2f + height, 6f, 1f, (1f / 16f)), new Color(0, 0, 0, 160), name);
+                PlayerList.Add(player);
                 height++;
             }
 
