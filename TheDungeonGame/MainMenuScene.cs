@@ -29,7 +29,7 @@ namespace TheDungeonGame
 
             if (InputManager.IsPressed(Input.LMB) && startServerRect.Color == Color.DarkGray)
             {
-                SceneManager.SwitchScene(SceneName.Login);
+                SceneManager.SwitchScene(SceneName.Lobby);
                 Network.ChangeNetworkMode(ConnectionType.Host);
             }
 
@@ -40,7 +40,7 @@ namespace TheDungeonGame
 
             if (InputManager.IsPressed(Input.LMB) && joinServerRect.Color == Color.DarkGray)
             {
-                SceneManager.SwitchScene(SceneName.Login);
+                SceneManager.SwitchScene(SceneName.Lobby);
                 Network.ChangeNetworkMode(ConnectionType.Client);
             }
 

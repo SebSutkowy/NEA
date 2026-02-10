@@ -10,7 +10,8 @@ namespace TheDungeonGame
         MainMenu,
         Game,
         OnlineTesting,
-        Login
+        Login,
+        Lobby
     }
 
     public static class SceneManager
@@ -30,6 +31,7 @@ namespace TheDungeonGame
             Scenes.Add(SceneName.Game, new GameScene(Content));
             Scenes.Add(SceneName.OnlineTesting, new OnlineTestingScene(Content));
             Scenes.Add(SceneName.Login, new LoginScene(Content));
+            Scenes.Add(SceneName.Lobby, new LobbyScene(Content));
         }
 
         public static void Update()

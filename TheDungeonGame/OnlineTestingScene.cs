@@ -31,7 +31,6 @@ namespace TheDungeonGame
             MessageTextBox = new TextBox(Camera.GetWindow(), Camera.GetScaledRect(6f, 5f, 8f, 2f, div), Color.Gray);
             ReceivedMessages = new UIRect(Camera.GetScaledRect(7f, 8f, 7f, 7f, div), Color.Gray, Color.Black);
             ConnectedClientsList = new List<UIRect>();
-            //ConnectedClientsList = new UIRect(Camera.GetScaledRect(2f, 8f, 4f, 7f, div), Color.Gray);
             LocalIdButton = new UIRect(Camera.GetScaledRect(8f, 1f, 2f, 1f, div), Color.Gray, Color.Black);
         }
 
@@ -90,7 +89,9 @@ namespace TheDungeonGame
 
             if (InputManager.IsPressed(Input.LMB) && ExitNetworkButton.Contains(mpos))
             {
-                // exit network
+                Network.Stop();
+                SceneManager.SwitchScene(SceneName.MainMenu);
+                return;
             }
             if (MessageTextBox.Entered && MessageTextBox.Text != string.Empty)
             {
@@ -135,8 +136,6 @@ namespace TheDungeonGame
                     current.ChangeText(current.Text + " (muted)");
                 }
                 ConnectedClientsList.Add(current);
-                
-
                 i++;
             }
 
