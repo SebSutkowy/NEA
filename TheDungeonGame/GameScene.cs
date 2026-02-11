@@ -37,9 +37,6 @@ namespace TheDungeonGame
 
         public override void OnSwitch()
         {
-            Dungeon.Clear();
-            Dungeon.GenerateMap(7, 1067);
-
             TrackedPlayerId = -1;
             TargetPlayer = -1;
             ShowingTabList = false;

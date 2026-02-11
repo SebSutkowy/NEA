@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using System;
+using System.Diagnostics;
 
 
 namespace TheDungeonGame
@@ -14,6 +16,8 @@ namespace TheDungeonGame
         private UIRect StartButton;
         string receivedMessages;
 
+        private Random seedRandomiser;
+
         public LobbyScene(ContentManager Content)
         {
             float div = (1f / 16f);
@@ -21,11 +25,28 @@ namespace TheDungeonGame
             Chat = new UIRect(Camera.GetScaledRect(0f, 2f, 6f, 7f, div), new Color(0, 0, 0, 160));
             ChatTextBox = new TextBox(Camera.GetWindow(), Camera.GetScaledRect(0, 9f, 6f, 1f, div), new Color(20, 20, 20, 160), "Click here to Chat");
             PlayerList = new List<UIRect>();
-            StartButton = new UIRect(Camera.GetScaledRect(6f, 10f, 4f, 1f, div), Color.Green, "Click here to Start");
+
+
         }
 
         public override void OnSwitch()
         {
+            string startButtonText = "";
+            Color startButtonColor = Color.Black;
+            switch(Network.GetMode())
+            {
+                case ConnectionType.Host:
+                    startButtonText = "Start Game";
+                    startButtonColor = Color.Green;
+                    break;
+                case ConnectionType.Client:
+                    startButtonText = "Only host can start";
+                    startButtonColor = Color.LightGreen;
+                    break;
+                default:
+                    break;
+            }
+            StartButton = new UIRect(Camera.GetScaledRect(6f, 10f, 4f, 1f, (1f/16f)), startButtonColor, startButtonText);
         }
         public void SendMessage()
         {
@@ -56,6 +77,22 @@ namespace TheDungeonGame
                 height++;
             }
 
+            if(StartButton.Contains(mpos) && Clicked)
+            {
+                if(Network.GetMode() == ConnectionType.Host)
+                {
+                    seedRandomiser = new Random();
+                    int seed = seedRandomiser.Next();
+                    Dungeon.GenerateMap(7, seed);
+                    string message = Message.CreateGenerateWorldMessage(7, seed);
+                    Network.SendMessage(message);
+                    SceneManager.SwitchScene(SceneName.Game);
+                }
+                else
+                {
+                    Debug.WriteLine("YOU CANNOT START AS A CLIENT");
+                }
+            }
 
             if(BackButton.Contains(mpos) && Clicked)
             {

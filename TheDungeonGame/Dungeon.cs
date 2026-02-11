@@ -121,6 +121,7 @@ namespace TheDungeonGame
 
         public static void GenerateMap(int size, int seed) // size must be an odd integer
         {
+            Clear();
             Random rng = new Random(seed);
             HashSet<int> visited = new HashSet<int>();
             Dictionary<int, int> path = new Dictionary<int, int>();

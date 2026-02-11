@@ -25,6 +25,7 @@ enum MessageType : ushort
     AccountRegister = 14,
     AccountCreationSuccess = 15,
     AccountCreationFail = 16,
+    GenerateWorld = 17,
 }
 
 static class Message
@@ -188,6 +189,13 @@ static class Message
                 // server --> client: username already taken
                 Debug.WriteLine("Account failed to be created");
                 break;
+
+            case MessageType.GenerateWorld:
+                int size = int.Parse(splitMessage[1]);
+                int seed = int.Parse(splitMessage[2]);
+                Dungeon.GenerateMap(size, seed);
+                SceneManager.SwitchScene(SceneName.Game);
+                break;
                 
 
                 //    case MessageType.SpawnPlayer:
@@ -350,6 +358,8 @@ static class Message
     public static string CreateAccountCreationSuccess() => $"{(ushort)MessageType.AccountCreationSuccess}";
 
     public static string CreateAccountCreationFail() => $"{(ushort)MessageType.AccountCreationFail}";
+
+    public static string CreateGenerateWorldMessage(int size, int seed) => $"{(ushort)MessageType.GenerateWorld} {size} {seed}";
 
     //public static string CreateInteractionMessage(int id, int tick, TilemapName tilemap, Point tilemapPos) => $"{(ushort)MessageType.Interaction} {id} {tick} {(int)tilemap} {tilemapPos.X} {tilemapPos.Y}";
     //public static string CreateInteractionConfirmationMessage(int tick, TilemapName tilemap, Point tilemapPos, int seed) => $"{(ushort)MessageType.InteractionConfirmation} {tick} {(int)tilemap} {tilemapPos.X} {tilemapPos.Y} {seed}";
