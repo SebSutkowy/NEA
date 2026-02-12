@@ -275,6 +275,7 @@ namespace TheDungeonGame
                     UnRegisterTextInput(OnTextInput);
                     break;
                 default:
+                    if (!Camera.FontContains(c)) break;
                     Text += c;
                     break;
             }

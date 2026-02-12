@@ -62,6 +62,7 @@ namespace TheDungeonGame
             startServerRect.Draw();
             joinServerRect.Draw();
             quitGameRect.Draw();
+            Dungeon.DrawMinimap();
         }
     }
 }

@@ -51,8 +51,6 @@ namespace TheDungeonGame
             {Tilemaps.TowerOfHanoiPuzzle, AddPrefix(FileTypes.Tilemap, "PlaceHolderPuzzle.json") }, 
             {Tilemaps.MazePuzzle, AddPrefix(FileTypes.Tilemap, "PlaceHolderPuzzle.json") }, 
             {Tilemaps.Boss, AddPrefix(FileTypes.Tilemap, "Boss.json") }, 
-
-            
         };
 
         public static void LoadUnimplementedTexture(ContentManager Content, string path)

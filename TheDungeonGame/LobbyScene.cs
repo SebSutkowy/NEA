@@ -83,8 +83,8 @@ namespace TheDungeonGame
                 {
                     seedRandomiser = new Random();
                     int seed = seedRandomiser.Next();
-                    Dungeon.GenerateMap(7, seed);
-                    string message = Message.CreateGenerateWorldMessage(7, seed);
+                    Dungeon.GenerateMap(5, seed);
+                    string message = Message.CreateGenerateWorldMessage(5, seed);
                     Network.SendMessage(message);
                     SceneManager.SwitchScene(SceneName.Game);
                 }

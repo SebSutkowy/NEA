@@ -11,11 +11,13 @@
     <File>C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/FloorTile.png</File>
     <File>C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/PointedCircle.png</File>
     <File>C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/projectile.png</File>
+    <File>C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/PuzzleTile.png</File>
     <File>C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/sword.png</File>
     <File>C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/WallTile.png</File>
     <File>C:/Users/GGBes/source/repos/TheDungeonGame/TheDungeonGame/Content/WeaponSpriteSheet.png</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

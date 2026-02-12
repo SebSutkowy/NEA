@@ -93,6 +93,8 @@ namespace TheDungeonGame
 
         #endregion
 
+        public static bool FontContains(char c) => Font.Characters.Contains(c);
+
         public static Vector2 MeasureString(string text) => Font.MeasureString(text);
 
         public static void ResetCamera()

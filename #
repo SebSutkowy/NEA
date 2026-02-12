@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -132,45 +132,20 @@ namespace TheDungeonGame
 
         }
 
-        public void StartMaze()
-        {
-            PlayingMaze = true;
-            GenerateMaze(size: 10);
-        }
-
         public void UpdateMaze()
         {
-            // handle exit
-            if (InputManager.IsPressed(Input.Escape))
+            if (!PlayingMaze)
             {
-                PlayingMaze = false;
-                return;
+                PlayingMaze = true;
+                GenerateMaze(10);
             }
-            // handle inputs to traverse the maze
-        }
 
-        public void DrawMaze()
-        {
-            // dark gray background
-            UI.DrawRect(Camera.GetScaledRect(1f, 1f, 18f, 18f, (1f / 20f)), Color.DarkGray);
-            // light gray maze with a red ending
-            // dark gray walls
         }
         // create func for updating the two different puzzles
         // if a maze is opened generate a new one fixed size random seed 
         // add basic movement for solving the maze
 
-        public void StartTower()
-        {
-            PlayingTower = true;
-        }
-        
         public void UpdateTower()
-        {
-
-        }
-
-        public void DrawTower()
         {
 
         }
@@ -274,26 +249,6 @@ namespace TheDungeonGame
             }
         }
 
-        private void DrawTabList()
-        {
-            // other players
-            foreach (UIRect rect in TabList)
-            {
-                rect.Draw();
-            }
-            foreach (UIRect rect in MuteButtons.Values)
-            {
-                rect.Draw();
-            }
-            foreach (UIRect rect in PMButtons.Values)
-            {
-                rect.Draw();
-            }
-            // minimap
-            Dungeon.DrawMinimap();
-
-        }
-
         private void ClearTabList()
         {
             TabList.Clear();
@@ -304,7 +259,6 @@ namespace TheDungeonGame
 
         public void UpdateGame()
         {
-            #region tablist
             //tablist
             if (!Network.GetConnections.ContainsKey(TargetPlayer))
                 TargetPlayer = -1;
@@ -323,9 +277,9 @@ namespace TheDungeonGame
                 ShowingTabList = false;
                 ClearTabList();
             }
-            #endregion
 
-            #region chat
+
+
             // chat
             if (InputManager.IsPressed(Input.LMB))
                 Chat.OnClick(InputManager.GetMousePos());
@@ -358,15 +312,14 @@ namespace TheDungeonGame
             }
 
             Messages = new Queue<string>(Network.GetMessages());
-            #endregion
 
-            #region camera
+
             // move camera to player
             if (PlayerManager.Contains(Network.LocalId))
             {
                 TrackedPlayerId = Network.LocalId;
             }
-            else if (InputManager.IsPressed(Input.Space)) // get rid of this
+            else if (InputManager.IsPressed(Input.Space))
             {
                 string message = Message.CreateSpawnPlayerMessage(Network.LocalId);
                 Network.SendMessage(message);
@@ -379,24 +332,13 @@ namespace TheDungeonGame
             {
                 TrackedPlayerId = PlayerManager.GetClosestPlayer(new Vector2(0f));
             }
+            
 
             if(PlayerManager.Count > 0)
                 Camera.MoveCamera(PlayerManager.GetPlayerPosition(TrackedPlayerId));
-            #endregion
 
             // update players
-            PlayerManager.UpdatePlayers(!Chat.IsFocused && !PlayingMaze && !PlayingTower);
-
-            #region puzzles
-            if (PlayingMaze)
-            {
-                UpdateMaze();
-            }
-            else if (PlayingTower)
-            {
-                UpdateTower();
-            }
-            #endregion
+            PlayerManager.UpdatePlayers(!Chat.IsFocused);
 
             // update the dungeon
             Dungeon.Update();
@@ -405,18 +347,6 @@ namespace TheDungeonGame
             // handle changing tilemap
             Dungeon.CheckIfChangingTilemap();
             // handle interactions
-            Point tilemapPos = InputManager.GetTilemapMousePos();
-            if (Dungeon.IsPuzzle(Tilemap.GetLoc(tilemapPos)) && InputManager.IsPressed(Input.LMB))
-            {
-                if (Dungeon.CurrentTilemapName == Tilemaps.MazePuzzle)
-                {
-                    StartMaze();
-                }
-                else if (Dungeon.CurrentTilemapName == Tilemaps.TowerOfHanoiPuzzle)
-                {
-                    StartTower();
-                }
-            }
         }
 
         public override void Draw()
@@ -440,13 +370,19 @@ namespace TheDungeonGame
 
             if (ShowingTabList)
             {
-                DrawTabList();
+                foreach (UIRect rect in TabList)
+                {
+                    rect.Draw();
+                }
+                foreach (UIRect rect in MuteButtons.Values)
+                {
+                    rect.Draw();
+                }
+                foreach (UIRect rect in PMButtons.Values)
+                {
+                    rect.Draw();
+                }
             }
-
-            if (PlayingMaze)
-                DrawMaze();
-            if (PlayingTower)
-                DrawTower();
 
             string localIdText = $"Local id: {Network.LocalId}";
             UI.DrawText(localIdText, new Vector2(0f), Color.White);

@@ -11,6 +11,7 @@ namespace TheDungeonGame
         private static Dictionary<int, Tilemap> ActiveTilemaps = new Dictionary<int, Tilemap>();
         public static int CurrentTilemapId { get; private set; } = 0;
         private static Tilemap CurrentTilemap => ActiveTilemaps[CurrentTilemapId];
+        public static Tilemaps CurrentTilemapName => CurrentTilemap.Name;
         public static int TileSize => CurrentTilemap.TileSize;
         public static bool IsActive => CurrentTilemapId != 0;
         public static Rectangle? CameraBounds => CurrentTilemap.CameraBounds;
@@ -46,6 +47,7 @@ namespace TheDungeonGame
         {
             string loc  = AssetManager.GetTilemapFileLocation(newTilemap);
             Tilemap tilemap = new Tilemap(loc, newTilemapId);
+            tilemap.SetName(newTilemap);
             ActiveTilemaps.Add(newTilemapId, tilemap);
             EnemyManagers.Add(newTilemapId, new EnemyManager());
         }
@@ -78,11 +80,9 @@ namespace TheDungeonGame
             }
         }
 
-        public static bool IsInteractive(string loc)
-        {
-            if (CurrentTilemap.NPCs.ContainsKey(loc)) return true;
-            return false;
-        }
+        public static bool IsInteractive(string loc) => CurrentTilemap.NPCs.ContainsKey(loc) || IsPuzzle(loc);
+
+        public static bool IsPuzzle(string loc) => CurrentTilemap[loc] == TileType.Puzzle;
 
         public static bool IsTraversable(string loc) => CurrentTilemap.IsTraversable(loc);
         public static bool IsTraversable(Point point) => CurrentTilemap.IsTraversable(point);
@@ -109,8 +109,13 @@ namespace TheDungeonGame
 
         public static void ConnectDoors(int tilemap1, string loc1, int tilemap2, string loc2)
         {
+            // make doors visible for both
+            ActiveTilemaps[tilemap1].UnlockDoor(loc1);
+            ActiveTilemaps[tilemap2].UnlockDoor(loc2);
+
             Doors[(tilemap1, loc1)] = (tilemap2, loc2);
             Doors[(tilemap2, loc2)] = (tilemap1, loc1);
+            
             Debug.WriteLine($"{(tilemap1, loc1)} <=> {(tilemap2, loc2)}");
         }
         
@@ -141,11 +146,11 @@ namespace TheDungeonGame
             // create size x size grid
             int[,] grid = new int[size, size];
             // place in the special rooms
-            int n = (size - 1) / 2;
+            int n = (size + 1) / 2;
             int nextNum = n;
             int row, col;
             // create list of choices for special rooms locations
-            List<int> order = Enumerable.Range(1, n * n).ToList<int>();
+            List<int> order = Enumerable.Range(0, n * n).ToList<int>();
 
             // apply fisher-yates algorithm to shuffle elements for as many special rooms
             // remove 0 so no special rooms can appear there -> makes linking doors avoid special case where a special room already is connected
@@ -158,24 +163,23 @@ namespace TheDungeonGame
                 order[nextNum] = order[i];
                 order[i] = temp;
             }
+            order.Remove(0);
 
             i = 0;
             foreach (Tilemaps tilemap in Tilemap.SpecialRooms)
             {
-                row = 2 * (order[i] % (n + 1));
-                col = 2 * (order[i] / (n + 1));
+                row = 2 * (order[i] % n);
+                col = 2 * (order[i] / n);
                 grid[row, col] = (int)tilemap;
+                AddTilemap(GetOverallPos(row, col), tilemap);
                 if (tilemap == Tilemaps.Spawn)
                 {
-                    AddTilemap(GetOverallPos(row, col), tilemap);
                     CurrentTilemapId = GetOverallPos(row, col);
                     Debug.WriteLine($"Current tilemap: {CurrentTilemapId}");
                 }
                 visited.Add(GetOverallPos(row, col));
                 i++;
             }
-
-
 
             // do recursive maze gen to create paths
             int current = 0;
@@ -385,6 +389,56 @@ namespace TheDungeonGame
         }
 
         #endregion
+
+        public static void DrawMinimap()
+        {
+            // bg 
+            Rectangle bgRect = Camera.GetScaledRect(2f, 2f, 2f, 2f, (1f / 4f));
+            UI.DrawRect(bgRect, Color.DarkGray);
+            // get all the rooms
+            foreach ((int id, Tilemap tilemap) in ActiveTilemaps)
+            {
+                int row = id / 5;
+                int col = id % 5;
+                Color color = Color.White;
+                switch(tilemap.Name) // locked to 5x5 mazes :(
+                {
+                    case Tilemaps.Spawn:
+                        color = Color.Green;
+                        Debug.WriteLine("Spawn");
+                        break;
+                    case Tilemaps.Boss:
+                        color = Color.Crimson;
+                        Debug.WriteLine("Boss");
+                        break;
+                    case Tilemaps.MazePuzzle:
+                    case Tilemaps.TowerOfHanoiPuzzle:
+                        color = Color.Brown;
+                        Debug.WriteLine("Puzzle");
+                        break;
+                    default:
+                        break;
+                }
+                UI.DrawRect(Camera.GetScaledRect(2 * col + 12f, 2 * row + 12f, 1f, 1f, (1f / 22f)), color);
+            }
+            foreach((int tilemapId, string loc) in Doors.Keys)
+            {
+                if ((ActiveTilemaps[tilemapId].Name & (Tilemaps.Boss | Tilemaps.MazePuzzle | Tilemaps.TowerOfHanoiPuzzle)) != 0)
+                    continue;
+                Point point = Tilemap.GetPoint(loc);
+                int row = tilemapId / 5;
+                int col = tilemapId % 5;
+                Point delta = new Point((point.X), (point.Y));
+                if (delta.X != 0)
+                    delta.X = delta.X / Math.Abs(delta.X);
+                if (delta.Y != 0)
+                    delta.Y = delta.Y / Math.Abs(delta.Y);
+                
+                UI.DrawRect(Camera.GetScaledRect(2 * col + delta.X + 12f, 2 * row + delta.Y + 12f, 1f, 1f, 1f / 22f), Color.White);
+
+
+            }
+        }
 
         public static void Draw()
         {

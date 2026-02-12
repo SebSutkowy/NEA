@@ -46,18 +46,19 @@ namespace TheDungeonGame
         Wall,
         Floor,
         Door,
+        Puzzle
     }
 
     public enum Tilemaps
     {
-        None,
-        Lobby,
-        Hallway1,
-        BasicRoom,
-        Spawn,
-        MazePuzzle,
-        TowerOfHanoiPuzzle,
-        Boss,
+        None = 0,
+        Lobby = 1 << 0,
+        Hallway1 = 1 << 1,
+        BasicRoom = 1 << 2,
+        Spawn = 1 << 3,
+        MazePuzzle = 1 << 4,
+        TowerOfHanoiPuzzle = 1 << 5,
+        Boss = 1 << 6,
     }
 
     public class Tilemap
@@ -89,6 +90,8 @@ namespace TheDungeonGame
         public int DoorsCount { get; set; }
         [JsonInclude]
         private Dictionary<string, int[]> Doors { get; set; } // second stores the offset on entry
+        [JsonIgnore]
+        private HashSet<string> UnlockedDoors { get; set; } // to draw all the unlocked doors and not the others
         [JsonInclude]
         public Dictionary<string, NPCId> NPCs { get; set; }
         private int Id { get; set; }
@@ -101,10 +104,12 @@ namespace TheDungeonGame
             DoorsCount = 0;
             Doors = new Dictionary<string, int[]>();
             NPCs = new Dictionary<string, NPCId>();
+            UnlockedDoors = new HashSet<string>();
         }
 
         public Tilemap(string path, int id)
         {
+            UnlockedDoors = new HashSet<string>();
             Load(path);
             Id = id;
         }
@@ -114,11 +119,16 @@ namespace TheDungeonGame
             Id = id;
         }
 
+        public void SetName(Tilemaps name)
+        {
+            Name = name;
+        }
+
         public void Load(string path)
         {
             JsonSerializerOptions options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
             string text = FileManager.ReadData(path);
-            Tilemap newTilemap = (Tilemap)JsonSerializer.Deserialize<Tilemap>(text, options);
+            Tilemap newTilemap = JsonSerializer.Deserialize<Tilemap>(text, options);
             Debug.WriteLine(newTilemap.Name);
             Map = newTilemap.Map;
             Name = newTilemap.Name;
@@ -177,6 +187,11 @@ namespace TheDungeonGame
             return GetLoc(newPos);
         }
 
+        public void UnlockDoor(string loc)
+        {
+            UnlockedDoors.Add(loc);
+        }
+
         public void Interact(string loc)
         {
             if (NPCs.ContainsKey(loc))
@@ -228,7 +243,7 @@ namespace TheDungeonGame
                 Camera.Draw(texture, rect, Color.White);
             }
 
-            foreach (string loc in Doors.Keys)
+            foreach (string loc in UnlockedDoors)
             {
                 Texture2D texture = AssetManager.GetTileTexture(TileType.Door);
                 Rectangle rect = new Rectangle(GetPos(loc), texture.Bounds.Size);

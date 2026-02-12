@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System;
 
 namespace TheDungeonGame
 {
@@ -21,13 +22,13 @@ namespace TheDungeonGame
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-
-            base.Initialize();
             _graphics.PreferredBackBufferWidth = Camera.ScreenWidth;
             _graphics.PreferredBackBufferHeight = Camera.ScreenHeight;
             _graphics.IsFullScreen = false;
             _graphics.ApplyChanges();
 
+
+            base.Initialize();
         }
 
         public bool IsFocused() => this.IsActive;
@@ -78,7 +79,7 @@ namespace TheDungeonGame
             UI.AddGUI(GUINames.Shop, shopGUI);
             UI.AddGUI(GUINames.Dialogue, dialogueGUI);
 
-            Dungeon.GenerateMap(7, 1067);
+            Dungeon.GenerateMap(5, (int)DateTime.Now.Ticks);
         }
 
         protected override void Update(GameTime gameTime)
