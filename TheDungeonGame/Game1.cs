@@ -78,8 +78,6 @@ namespace TheDungeonGame
             UI.AddGUI(GUINames.Game, gameGUI);
             UI.AddGUI(GUINames.Shop, shopGUI);
             UI.AddGUI(GUINames.Dialogue, dialogueGUI);
-
-            Dungeon.GenerateMap(5, (int)DateTime.Now.Ticks);
         }
 
         protected override void Update(GameTime gameTime)

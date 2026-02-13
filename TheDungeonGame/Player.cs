@@ -120,7 +120,7 @@ namespace TheDungeonGame
             
             if ((oldPosition != Position || oldRotation != Rotation) && Network.GetMode() != ConnectionType.None)
             {
-                string message = Message.CreateUpdatePlayerPosMessage(Network.LocalId, Position.X, Position.Y, Rotation);
+                string message = Message.CreateUpdatePlayerPosMessage(Network.LocalId, Position.X, Position.Y, Rotation, TilemapId);
                 Network.SendMessage(message);
             }
         }

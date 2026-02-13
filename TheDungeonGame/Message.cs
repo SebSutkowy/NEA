@@ -26,6 +26,7 @@ enum MessageType : ushort
     AccountCreationSuccess = 15,
     AccountCreationFail = 16,
     GenerateWorld = 17,
+    CompletedPuzzle = 18
 }
 
 static class Message
@@ -42,7 +43,7 @@ static class Message
         MessageType type = (MessageType)typeValue;
 
 
-        int tick, id, targetId;
+        int tick, id, targetId, tilemapId;
         string passedMessage, username, password, salt; 
         float x, y, rotation;
         //Point tilemapPos = new Point();
@@ -113,7 +114,8 @@ static class Message
 
             case MessageType.SpawnPlayer:
                 id = int.Parse(splitMessage[1]);
-                PlayerManager.AddPlayer(id);
+                tilemapId = int.Parse(splitMessage[2]);
+                PlayerManager.AddPlayer(id, tilemapId);
                 if (Network.GetMode() == ConnectionType.Host)
                 {
                     Network.SendMessage(message);
@@ -126,13 +128,14 @@ static class Message
                 x = float.Parse(splitMessage[2]);
                 y = float.Parse(splitMessage[3]);
                 rotation = float.Parse(splitMessage[4]);
-                PlayerManager.UpdatePos(id, new Vector2(x, y), rotation);
+                tilemapId = int.Parse(splitMessage[5]);
+                PlayerManager.UpdatePos(id, new Vector2(x, y), rotation, tilemapId);
                 if (Network.GetMode() == ConnectionType.Host)
                 {
                     HashSet<int> excluded = new HashSet<int>() { id };
                     Network.SendExclusiveMessage(message, excluded);
                 }
-                Network.SetTranslatedMessage($"updating {id} to {x}, {y}, {rotation}");
+                Network.SetTranslatedMessage($"updating {id} to {x}, {y}, {rotation} in {tilemapId}");
                 break;
 
             case MessageType.PlayerDeath:
@@ -196,132 +199,16 @@ static class Message
                 Dungeon.GenerateMap(size, seed);
                 SceneManager.SwitchScene(SceneName.Game);
                 break;
-                
 
-                //    case MessageType.SpawnPlayer:
-                //    case MessageType.PlayerState:
-                //        id = int.Parse(splitMessage[1]);
-                //        tick = int.Parse(splitMessage[2]);
-                //        X = float.Parse(splitMessage[3]);
-                //        Y = float.Parse(splitMessage[4]);
-                //        StatePayload state = new StatePayload
-                //        {
-                //            Tick = tick,
-                //            Position = new Vector2(X, Y)
-                //        };
-                //        playerManager.SetPlayerState(id, state);
-                //        Client.Write($"Received player state: {{Tick: {tick} X: {X} Y: {Y}}}");
-                //        break;
-
-                //    case MessageType.PlayerSpawnRequest:
-                //        id = int.Parse(splitMessage[1]);
-                //        playerManager.CreatePlayer(id);
-                //        Server.Write($"Received player spawn request for client {id}");
-                //        break;
-
-                //    case MessageType.PlayerInput:
-                //        id = int.Parse(splitMessage[1]);
-                //        tick = int.Parse(splitMessage[2]);
-                //        X = float.Parse(splitMessage[3]);
-                //        Y = float.Parse(splitMessage[4]);
-                //        InputPayload input = new InputPayload
-                //        {
-                //            Tick = tick,
-                //            Input = new Vector2(X, Y)
-                //        };
-                //        Server.Write($"Received an input of {tick} {X} {Y} from client {id}");
-                //        playerManager.AddInput(id, input);
-                //        break;
-
-                //    case MessageType.Interaction:
-                //        id = int.Parse(splitMessage[1]);
-                //        tick = int.Parse(splitMessage[2]);
-                //        tilemap = (TilemapName)int.Parse(splitMessage[3]);
-                //        tilemapPos.X = int.Parse(splitMessage[4]);
-                //        tilemapPos.Y = int.Parse(splitMessage[5]);
-                //        Change = new TilemapChange()
-                //        {
-                //            Tick = tick,
-                //            Position = tilemapPos
-                //        };
-                //        Dungeon.AddChanges(tilemap, Change, Mode.Server);
-                //        Server.Write($"Received Interaction message position: {tilemapPos} in {tilemap}");
-                //        break;
-
-                //    case MessageType.InteractionConfirmation:
-                //        tick = int.Parse(splitMessage[1]);
-                //        tilemap = (TilemapName)int.Parse(splitMessage[2]);
-                //        tilemapPos.X = int.Parse(splitMessage[3]);
-                //        tilemapPos.Y = int.Parse(splitMessage[4]);
-                //        seed = splitMessage[5];
-                //        Change = new TilemapChange()
-                //        {
-                //            Tick = tick,
-                //            Position = tilemapPos
-                //        };
-                //        Dungeon.AddChanges(tilemap, Change, Mode.Client);
-                //        Client.Write($"Received Interaction confirmation position: {tilemapPos}");
-                //        break;
-
-                //    case MessageType.PlayerHealthChange:
-                //        id = int.Parse(splitMessage[1]);
-                //        int newHealth = int.Parse(splitMessage[2]);
-                //        Client.PlayerManager.SetPlayerHealth(id, newHealth);
-                //        Client.Write($"Received new health message: {newHealth}");
-                //        break;
-
-                //    case MessageType.TrapActivation:
-                //        tilemap = (TilemapName)int.Parse(splitMessage[1]);
-                //        tilemapPos.X = int.Parse(splitMessage[2]);
-                //        tilemapPos.Y = int.Parse(splitMessage[3]);
-                //        TrapActivationStatus status = (TrapActivationStatus) ushort.Parse(splitMessage[4]);
-                //        if (status == TrapActivationStatus.Inactive)
-                //            Dungeon.AddTile(tilemap, tilemapPos, TileType.Trap);
-                //        else
-                //            Dungeon.AddTile(tilemap, tilemapPos, TileType.ActiveTrap);
-                //        Client.Write($"Received new Trap toggle message: {tilemapPos}");
-                //        break;
-
-                //    case MessageType.EnteredBossRoom:
-                //        break;
-
-                //    case MessageType.ChangeTilemap:
-                //        tilemap = (TilemapName)int.Parse(splitMessage[1]);
-                //        Client.PlayerManager.ResetPositions();
-                //        Client.Write($"Received tilemap change: {Dungeon.ActiveTilemapName} -> {tilemap}");
-                //        Dungeon.ChangeTilemap(tilemap);
-                //        break;
-
-                //    case MessageType.UpdateEnemy:
-                //        id = int.Parse(splitMessage[1]);
-                //        entityType = (EntityType)int.Parse(splitMessage[2]);
-                //        X = float.Parse(splitMessage[3]);
-                //        Y = float.Parse(splitMessage[4]);
-                //        health = int.Parse(splitMessage[5]);
-                //        int maxHealth = int.Parse(splitMessage[6]);
-                //        Client.Write($"Received {entityType.ToString()} Update message");
-
-                //        if (Dungeon.Enemies.ContainsKey(id))
-                //        {
-                //            Dungeon.Enemies[id].Position = new Vector2(X, Y);
-                //            Dungeon.Enemies[id].SetHealth(health);
-                //            break;
-                //        }
-                //        Dungeon.Enemies[id] = entityType switch
-                //        {
-                //            EntityType.Boss => new Boss1(Camera.EntityAssets[entityType], X, Y, Camera.EntityAssets[entityType].Width, Camera.EntityAssets[entityType].Height, 0, maxHealth),
-                //            EntityType.Totem => new Totem(Camera.EntityAssets[entityType], X, Y, Camera.EntityAssets[entityType].Width, Camera.EntityAssets[entityType].Height, maxHealth)
-                //        };
-                //        break;
-
-                //    case MessageType.PlayerAttacking:
-                //        int damage = int.Parse(splitMessage[1]);
-                //        int enemyId = int.Parse(splitMessage[2]);
-                //        if (Dungeon.Enemies.ContainsKey(enemyId))
-                //            Dungeon.Enemies[enemyId].TakeDamage(damage);
-                //        Server.Write($"Received Player Attack: -{damage}HP -> {Dungeon.Enemies[enemyId].Type}");
-                //        break;
-
+            case MessageType.CompletedPuzzle:
+                string name = splitMessage[1];
+                tilemapId = int.Parse(splitMessage[2]);
+                Dungeon.CompletedPuzzle(name, tilemapId, false);
+                if(Network.GetMode() == ConnectionType.Host)
+                {
+                    Network.SendMessage(message);
+                }
+                break;
         }
     }
 
@@ -339,9 +226,9 @@ static class Message
 
     public static string CreateListClientsMessage(int id, string username) => $"{(ushort)MessageType.ListClients} {id} {username}";
 
-    public static string CreateSpawnPlayerMessage(int id) => $"{(ushort)MessageType.SpawnPlayer} {id}";
+    public static string CreateSpawnPlayerMessage(int id, int tilemapId) => $"{(ushort)MessageType.SpawnPlayer} {id} {tilemapId}";
 
-    public static string CreateUpdatePlayerPosMessage(int id, float x, float y, float rotation) => $"{(ushort)MessageType.UpdatePlayerPos} {id} {x} {y} {rotation}";
+    public static string CreateUpdatePlayerPosMessage(int id, float x, float y, float rotation, int tilemap) => $"{(ushort)MessageType.UpdatePlayerPos} {id} {x} {y} {rotation} {tilemap}";
 
     public static string CreatePlayerDeathMessage(int id) => $"{(ushort)MessageType.PlayerDeath} {id}";
 
@@ -360,6 +247,8 @@ static class Message
     public static string CreateAccountCreationFail() => $"{(ushort)MessageType.AccountCreationFail}";
 
     public static string CreateGenerateWorldMessage(int size, int seed) => $"{(ushort)MessageType.GenerateWorld} {size} {seed}";
+
+    public static string CreatePuzzleCompletionMessage(string playerName, int tilemapId) => $"{(ushort)MessageType.CompletedPuzzle} {playerName} {tilemapId}";
 
     //public static string CreateInteractionMessage(int id, int tick, TilemapName tilemap, Point tilemapPos) => $"{(ushort)MessageType.Interaction} {id} {tick} {(int)tilemap} {tilemapPos.X} {tilemapPos.Y}";
     //public static string CreateInteractionConfirmationMessage(int tick, TilemapName tilemap, Point tilemapPos, int seed) => $"{(ushort)MessageType.InteractionConfirmation} {tick} {(int)tilemap} {tilemapPos.X} {tilemapPos.Y} {seed}";

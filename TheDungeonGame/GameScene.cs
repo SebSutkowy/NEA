@@ -29,6 +29,9 @@ namespace TheDungeonGame
         private bool PlayingMaze;
         private bool PlayingTower;
 
+        private Dictionary<int, int?> Maze;
+        private int MazeCurrentLoc;
+
         public GameScene(ContentManager Content)
         {
             // 03 25
@@ -53,7 +56,7 @@ namespace TheDungeonGame
 
         public override void Update()
         {
-            Debug.WriteLine($"Tilemap Id in Update: {Dungeon.CurrentTilemapId}");
+            Debug.WriteLine($"Tilemap Id in Update: {Dungeon.CurrentTilemapName}");
             switch (UI.CurrentGUIName)
             {
                 case GUINames.Game:
@@ -124,18 +127,24 @@ namespace TheDungeonGame
                     currentTile = nextTile;
             }
 
+            Maze = Paths;
+
             Debug.WriteLine("Generated Maze: ");
             foreach ((int tile, int? prev) in Paths)
             {
                 Debug.WriteLine($"({tile}) <== ({prev.ToString()})");
             }
-
         }
 
         public void StartMaze()
         {
             PlayingMaze = true;
             GenerateMaze(size: 10);
+            MazeCurrentLoc = 0;
+        }
+        public bool IsConnected(int a, int b)
+        {
+            return (Maze.ContainsKey(a) && Maze[a] == b) || (Maze.ContainsKey(b) && Maze[b] == a);
         }
 
         public void UpdateMaze()
@@ -147,14 +156,58 @@ namespace TheDungeonGame
                 return;
             }
             // handle inputs to traverse the maze
+            if(InputManager.IsPressed(Input.MoveLeft) && IsConnected(MazeCurrentLoc, MazeCurrentLoc - 1))
+            {
+                    MazeCurrentLoc -= 1; 
+            }
+            if(InputManager.IsPressed(Input.MoveRight) && IsConnected(MazeCurrentLoc, MazeCurrentLoc + 1))
+            {
+                MazeCurrentLoc += 1;
+            }
+            if(InputManager.IsPressed(Input.MoveUp) && IsConnected(MazeCurrentLoc, MazeCurrentLoc - 10))
+            {
+                MazeCurrentLoc -= 10;
+            }
+            if(InputManager.IsPressed(Input.MoveDown) && IsConnected(MazeCurrentLoc, MazeCurrentLoc + 10)) // magic numbers :(
+            {
+                MazeCurrentLoc += 10;
+            }
+
+            if(MazeCurrentLoc == 99) // win condition
+            {
+                PlayingMaze = false;
+                Dungeon.CompletedPuzzle(Network.GetConnections[Network.LocalId], Dungeon.CurrentTilemapId);
+            }
+            
         }
 
         public void DrawMaze()
         {
             // dark gray background
-            UI.DrawRect(Camera.GetScaledRect(1f, 1f, 18f, 18f, (1f / 20f)), Color.DarkGray);
-            // light gray maze with a red ending
-            // dark gray walls
+            UI.DrawRect(Camera.GetScaledRect(1f, 1f, 22f, 22f, (1f / 23f)), Color.DarkGray);
+            for(int i = 0; i < 10*10; i++)
+            {
+                int row = i / 10;
+                int col = i % 10;
+                Color color = Color.White;
+                if (i == 0)
+                    color = Color.LightGreen;
+                if (i == 99)
+                    color = Color.Crimson;
+
+                UI.DrawRect(Camera.GetScaledRect(2 * col + 2f, 2 * row + 2f, 1f, 1f, 1f / 23f), color);
+                if(Maze.ContainsKey(i) && Maze[i] != null)
+                {
+                    int dx, dy;
+                    dx = (i % 10) - (Maze[i].Value % 10);
+                    dy = (i / 10) - (Maze[i].Value / 10);
+                    UI.DrawRect(Camera.GetScaledRect(2 * col + 2f - dx, 2 * row + 2f - dy, 1f, 1f, 1f / 23f), Color.White);
+                }
+                if(i == MazeCurrentLoc)
+                {
+                    UI.DrawRect(Camera.GetScaledRect(2 * col + 2f + 1 / 3f, 2 * row + 2f + 1 / 3f, 1 / 3f, 1 / 3f, 1 / 23f), Color.LightBlue);
+                }
+            }
         }
         // create func for updating the two different puzzles
         // if a maze is opened generate a new one fixed size random seed 
@@ -167,6 +220,11 @@ namespace TheDungeonGame
         
         public void UpdateTower()
         {
+            if (InputManager.IsPressed(Input.Escape))
+            {
+                PlayingTower = false;
+                return;
+            }
 
         }
 
@@ -366,15 +424,6 @@ namespace TheDungeonGame
             {
                 TrackedPlayerId = Network.LocalId;
             }
-            else if (InputManager.IsPressed(Input.Space)) // get rid of this
-            {
-                string message = Message.CreateSpawnPlayerMessage(Network.LocalId);
-                Network.SendMessage(message);
-                if (Network.GetMode() == ConnectionType.Host)
-                {
-                    PlayerManager.AddPlayer(Network.LocalId);
-                }
-            }
             else 
             {
                 TrackedPlayerId = PlayerManager.GetClosestPlayer(new Vector2(0f));
@@ -387,23 +436,30 @@ namespace TheDungeonGame
             // update players
             PlayerManager.UpdatePlayers(!Chat.IsFocused && !PlayingMaze && !PlayingTower);
 
-            #region puzzles
-            if (PlayingMaze)
-            {
-                UpdateMaze();
-            }
-            else if (PlayingTower)
-            {
-                UpdateTower();
-            }
-            #endregion
 
             // update the dungeon
             Dungeon.Update();
 
             // handle pausing 
             // handle changing tilemap
-            Dungeon.CheckIfChangingTilemap();
+            int id = -1;
+            if (PlayerManager.Contains(Network.LocalId))
+                id = Network.LocalId;
+            Dungeon.CheckIfChangingTilemap(id);
+
+            #region puzzles
+            if (PlayingMaze)
+            {
+                UpdateMaze();
+                return;
+            }
+            else if (PlayingTower)
+            {
+                UpdateTower();
+                return;
+            } // wont handle interactions when doing puzzles (can click accidentally on puzzle tile)
+            #endregion
+
             // handle interactions
             Point tilemapPos = InputManager.GetTilemapMousePos();
             if (Dungeon.IsPuzzle(Tilemap.GetLoc(tilemapPos)) && InputManager.IsPressed(Input.LMB))

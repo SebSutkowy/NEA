@@ -23,6 +23,10 @@ namespace TheDungeonGame
         private static Stack<(Rectangle, float)> Attacks = new Stack<(Rectangle, float)>();
         private static EnemyManager EnemyManager => EnemyManagers[CurrentTilemapId];
 
+        private static HashSet<int> PuzzleRoomsCompleted = new HashSet<int>();
+        public static int PuzzlesCompleted => PuzzleRoomsCompleted.Count;
+
+
         public static bool IsValid(Rectangle Bounds) => CurrentTilemap.IsValid(Bounds);
         
         public static void Clear()
@@ -33,6 +37,7 @@ namespace TheDungeonGame
             ChangingTilemap = false;
             EnemyManagers.Clear();
             Attacks.Clear();
+            PuzzleRoomsCompleted.Clear();
         }
 
         public static Point GetTilemapPos(Point pos)
@@ -65,6 +70,19 @@ namespace TheDungeonGame
             newLoc = ActiveTilemaps[newTilemapId].GetDoorLoc(newLoc); 
         }
 
+        public static void CompletedPuzzle(string playerName, int tilemapId, bool send=true)
+        {
+            if (PuzzleRoomsCompleted.Contains(tilemapId))
+                return;
+            Network.AddMessage($"[PUZZLE] {playerName} just completed a Puzzle!");
+            PuzzleRoomsCompleted.Add(tilemapId);
+            ActiveTilemaps[tilemapId].Remove("0;0"); // remove the puzzle tile
+            ActiveTilemaps[tilemapId].Add("0;0", TileType.Floor); // replace with floor
+            // cant do puzzle more than once after completing
+            if (send)
+                Network.SendMessage(Message.CreatePuzzleCompletionMessage(playerName, tilemapId));
+        }
+
         public static void Update()
         {
             EnemyManager.Update();
@@ -93,17 +111,17 @@ namespace TheDungeonGame
         }
 
 
-        public static void CheckIfChangingTilemap()
+        public static void CheckIfChangingTilemap(int playerId=-1)
         {
-            if (ChangingTilemap)
-            {
-                CurrentTilemapId = newTilemapId;
-                Point newPos = CurrentTilemap.GetPos(newLoc);
-                PlayerManager.SetAllPos(new Vector2(newPos.X + CurrentTilemap.TileSize / 2, newPos.Y + CurrentTilemap.TileSize / 2));
-                ChangingTilemap = false;
-                newTilemapId = 0;
-                newLoc = "";
-            }
+            if (!ChangingTilemap)
+                return;
+            CurrentTilemapId = newTilemapId;
+            Point newPos = CurrentTilemap.GetPos(newLoc);
+            if(playerId != -1)
+                PlayerManager.SetPos(playerId, new Vector2(newPos.X + CurrentTilemap.TileSize / 2, newPos.Y + CurrentTilemap.TileSize / 2), newTilemapId);
+            ChangingTilemap = false;
+            newTilemapId = 0;
+            newLoc = "";
         }
 
 
@@ -344,6 +362,17 @@ namespace TheDungeonGame
                 }
             }
 
+            // generate all the players in the dungeon
+
+            if (Network.GetMode() == ConnectionType.Client)
+                return;
+            foreach(int id in Network.GetConnections.Keys)
+            {
+                PlayerManager.AddPlayer(id, CurrentTilemapId);
+                string message = Message.CreateSpawnPlayerMessage(id, CurrentTilemapId);
+                Network.SendMessage(message);
+            }
+
 
             // Prints the maze
             Debug.WriteLine("#########");
@@ -398,10 +427,11 @@ namespace TheDungeonGame
             // get all the rooms
             foreach ((int id, Tilemap tilemap) in ActiveTilemaps)
             {
+                // locked to 5x5 mazes :(
                 int row = id / 5;
                 int col = id % 5;
                 Color color = Color.White;
-                switch(tilemap.Name) // locked to 5x5 mazes :(
+                switch(tilemap.Name) 
                 {
                     case Tilemaps.Spawn:
                         color = Color.Green;
@@ -420,6 +450,10 @@ namespace TheDungeonGame
                         break;
                 }
                 UI.DrawRect(Camera.GetScaledRect(2 * col + 12f, 2 * row + 12f, 1f, 1f, (1f / 22f)), color);
+                if(CurrentTilemapId == id)
+                {
+                    UI.DrawRect(Camera.GetScaledRect(2 * col + 12f + 1f / 3f, 2 * row + 12f + 1f / 3f, 1 / 3f, 1 / 3f, (1f / 22f)), Color.LightBlue);
+                }
             }
             foreach((int tilemapId, string loc) in Doors.Keys)
             {
@@ -435,8 +469,6 @@ namespace TheDungeonGame
                     delta.Y = delta.Y / Math.Abs(delta.Y);
                 
                 UI.DrawRect(Camera.GetScaledRect(2 * col + delta.X + 12f, 2 * row + delta.Y + 12f, 1f, 1f, 1f / 22f), Color.White);
-
-
             }
         }
 

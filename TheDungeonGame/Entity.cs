@@ -10,6 +10,7 @@ namespace TheDungeonGame
         public int Health { get; private set; }
         public float Damage { get; private set; }
         public float Speed { get; private set; } = 5.0f;
+        public int TilemapId { get; set; }
         protected int FramesSinceDamage { get; set; }
 
         public bool IsAlive => Health > 0;

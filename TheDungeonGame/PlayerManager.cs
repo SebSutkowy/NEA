@@ -32,7 +32,7 @@ namespace TheDungeonGame
             return data;
         }
 
-        public static void AddPlayer(int playerId)
+        public static void AddPlayer(int playerId, int tilemapId)
         {
             AnimationManager animationManager = new AnimationManager(AssetManager.GetSpriteSheet(SpriteSheets.Player));
             Animation idleAnimation = new Animation(new Vector2(100f), 0, 1, 0);
@@ -41,6 +41,7 @@ namespace TheDungeonGame
             animationManager.ChangeAnimation(AnimationNames.Idle);
             // all class berserker for now
             Player player = new Player(animationManager, new Vector2(0f), 0f, MaxHealth, MaxHealth, PlayerDamage, PlayerSpeed, Classes.Berserker);
+            player.TilemapId = tilemapId;
             Players.Add(playerId, player);
         }
 
@@ -49,27 +50,26 @@ namespace TheDungeonGame
             List<string> messages = new List<string>();
             foreach ((int id, Player player) in Players)
             {
-                messages.Add(Message.CreateSpawnPlayerMessage(id));
-                messages.Add(Message.CreateUpdatePlayerPosMessage(id, player.Position.X, player.Position.Y, player.Rotation));
+                messages.Add(Message.CreateSpawnPlayerMessage(id, player.TilemapId));
+                messages.Add(Message.CreateUpdatePlayerPosMessage(id, player.Position.X, player.Position.Y, player.Rotation, player.TilemapId));
             }
             return messages;
         }
 
-        public static void UpdatePos(int playerId, Vector2 newPos, float rotation)
+        public static void UpdatePos(int playerId, Vector2 newPos, float rotation, int tilemapId)
         {
             if (Players.ContainsKey(playerId))
             {
                 Players[playerId].Position = newPos;
                 Players[playerId].Rotation = rotation;
+                Players[playerId].TilemapId = tilemapId;
             }
         }
 
-        public static void SetAllPos(Vector2 newPos)
+        public static void SetPos(int playerId, Vector2 newPos, int tilemapId)
         {
-            foreach(Player player in Players.Values)
-            {
-                player.SetPos(newPos);
-            }
+            Players[playerId].Position = newPos;
+            Players[playerId].TilemapId = tilemapId;
         }
 
         public static void RemovePlayer(int playerId)
@@ -134,7 +134,6 @@ namespace TheDungeonGame
                 {
                     player.TakeDamage((int)damage);
                 }
-
             }
         }
 
@@ -147,7 +146,8 @@ namespace TheDungeonGame
         {
             foreach (Player player in Players.Values)
             {
-                player.Draw();
+                if(Dungeon.CurrentTilemapId == player.TilemapId)
+                    player.Draw();
             }
         }
     }
