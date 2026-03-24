@@ -166,8 +166,6 @@ namespace TheDungeonGame
                 Message.Decode(message);
             else
                 SendMessage(id, message);
-
-
         }
 
 
@@ -196,6 +194,11 @@ namespace TheDungeonGame
                     {
                         string msg = Message.CreateClientJoinMessage(Id, Name);
                         SendGlobalMessage(msg);
+                        if(Id != 0)
+                        {
+                            msg = Message.CreateClientJoinMessage(id, username);
+                            SendMessage(Id, msg);
+                        }
                     }
                     foreach (string msg in PlayerManager.OnClientJoin())
                     {

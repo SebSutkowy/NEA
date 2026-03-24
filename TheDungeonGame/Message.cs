@@ -26,7 +26,8 @@ enum MessageType : ushort
     AccountCreationSuccess = 15,
     AccountCreationFail = 16,
     GenerateWorld = 17,
-    CompletedPuzzle = 18
+    CompletedPuzzle = 18,
+    CompleteDungeon = 19
 }
 
 static class Message
@@ -209,6 +210,9 @@ static class Message
                     Network.SendMessage(message);
                 }
                 break;
+            case MessageType.CompleteDungeon:
+                Dungeon.CompleteDungeon();
+                break;
         }
     }
 
@@ -250,6 +254,7 @@ static class Message
 
     public static string CreatePuzzleCompletionMessage(string playerName, int tilemapId) => $"{(ushort)MessageType.CompletedPuzzle} {playerName} {tilemapId}";
 
+    public static string CreateDungeonCompletionMessage() => $"{(ushort)MessageType.CompleteDungeon}";
     //public static string CreateInteractionMessage(int id, int tick, TilemapName tilemap, Point tilemapPos) => $"{(ushort)MessageType.Interaction} {id} {tick} {(int)tilemap} {tilemapPos.X} {tilemapPos.Y}";
     //public static string CreateInteractionConfirmationMessage(int tick, TilemapName tilemap, Point tilemapPos, int seed) => $"{(ushort)MessageType.InteractionConfirmation} {tick} {(int)tilemap} {tilemapPos.X} {tilemapPos.Y} {seed}";
 
@@ -264,4 +269,4 @@ static class Message
     //public static string CreateUpdateEnemyMessage(Enemy enemy) => $"{(ushort)MessageType.UpdateEnemy} {enemy.Id} {(int)enemy.Type} {enemy.X} {enemy.Y} {enemy.Health} {enemy.MaxHealth}";
 
     //public static string CreatePlayerAttackMessage(int damage, int enemyId) => $"{(ushort)MessageType.PlayerAttacking} {damage} {enemyId}";
-}
+} 

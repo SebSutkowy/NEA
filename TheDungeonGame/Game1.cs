@@ -100,6 +100,10 @@ namespace TheDungeonGame
             SceneManager.Draw();
             UI.Draw();
 
+            float fps = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            fps = 1 / fps;
+            Camera.DrawString($"{fps}FPS", new Vector2(0, 50), Color.White);
+
             _spriteBatch.End();
 
             base.Draw(gameTime);

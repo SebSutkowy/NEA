@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Transactions;
 
 namespace TheDungeonGame
 {
@@ -25,12 +26,15 @@ namespace TheDungeonGame
 
         private static HashSet<int> PuzzleRoomsCompleted = new HashSet<int>();
         public static int PuzzlesCompleted => PuzzleRoomsCompleted.Count;
+        private static int FrameTimer = 0;
+
 
 
         public static bool IsValid(Rectangle Bounds) => CurrentTilemap.IsValid(Bounds);
         
         public static void Clear()
         {
+            PlayerManager.Clear();
             ActiveTilemaps.Clear();
             CurrentTilemapId = 0;
             Doors.Clear();
@@ -38,6 +42,7 @@ namespace TheDungeonGame
             EnemyManagers.Clear();
             Attacks.Clear();
             PuzzleRoomsCompleted.Clear();
+            FrameTimer = 0;
         }
 
         public static Point GetTilemapPos(Point pos)
@@ -83,8 +88,11 @@ namespace TheDungeonGame
                 Network.SendMessage(Message.CreatePuzzleCompletionMessage(playerName, tilemapId));
         }
 
+        public static float GetTimeTaken() => (float)FrameTimer * Network.GetDelta();
+
         public static void Update()
         {
+            FrameTimer++;
             EnemyManager.Update();
             while (Attacks.Count > 0)
             {
@@ -96,6 +104,23 @@ namespace TheDungeonGame
             {
                 AssetManager.GetNPC(id).Update();
             }
+
+            // check if reached the end
+            if (CurrentTilemapName == Tilemaps.Boss)
+            {
+                string message = Message.CreateDungeonCompletionMessage();
+                Network.SendMessage(message);
+                if(Network.GetMode() == ConnectionType.Host)
+                {
+                    Message.Decode(message);
+                }
+            }
+        }
+
+        public static void CompleteDungeon()
+        {
+            Network.AddMessage("The dungeon has been completed");
+            SceneManager.SwitchScene(SceneName.DungeonFinish);
         }
 
         public static bool IsInteractive(string loc) => CurrentTilemap.NPCs.ContainsKey(loc) || IsPuzzle(loc);
@@ -481,4 +506,4 @@ namespace TheDungeonGame
 
         
     }
-}
+} 

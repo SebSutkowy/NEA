@@ -15,6 +15,11 @@ namespace TheDungeonGame
         private static float PlayerSpeed = 5f;
         private static float PlayerDamage = 5f;
 
+        public static void Clear()
+        {
+            Players.Clear();
+        }
+
         public static int GetPlayerHealth(int id)
         {
             if (Contains(id)) return Players[id].Health;
@@ -34,6 +39,8 @@ namespace TheDungeonGame
 
         public static void AddPlayer(int playerId, int tilemapId)
         {
+            if (Players.ContainsKey(playerId))
+                return;
             AnimationManager animationManager = new AnimationManager(AssetManager.GetSpriteSheet(SpriteSheets.Player));
             Animation idleAnimation = new Animation(new Vector2(100f), 0, 1, 0);
             idleAnimation.Pause();

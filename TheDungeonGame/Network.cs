@@ -110,6 +110,8 @@ namespace TheDungeonGame
         {
             if (NetworkMode == ConnectionType.Client && _localId == -1)
                 _localId = id;
+            if (ConnectedClients.ContainsKey(id))
+                return;
             ConnectedClients.Add(id, username);
             AddMessage($"[NETWORK] {username} Joined.");
         }
