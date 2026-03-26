@@ -31,6 +31,10 @@ namespace TheDungeonGame
             IsStopped = false;
         }
 
+        public bool IsOnline() => Server.ConnectionState == ConnectionState.Connected;
+        public bool IsConnecting() => Server.ConnectionState == ConnectionState.Outgoing;
+        public bool DidConnectionFail() => Server.ConnectionState == ConnectionState.Disconnected;
+
         public void StartClient(string ip, int port, string key)
         {
             IsRunning = true;

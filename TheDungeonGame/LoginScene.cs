@@ -89,7 +89,7 @@ namespace TheDungeonGame
                     {
                         Network.SendMessage(message);
                     }
-                        UsernameBox.Reset();
+                    UsernameBox.Reset();
                     PasswordBox.Reset();
                 }
                 else if (PasswordBox.Text.Length < 8)

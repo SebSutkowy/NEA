@@ -96,6 +96,37 @@ namespace TheDungeonGame
 
         }
 
+        public static void RestartClient()
+        {
+            Client.Stop();
+            Client.StartClient(serverIp, serverPort, serverKey);
+        }
+
+        public static bool IsOnline()
+        {
+            switch(NetworkMode)
+            {
+                case ConnectionType.Host:
+                    return Server.IsOnline();
+                case ConnectionType.Client:
+                    return Client.IsOnline();
+                default:
+                    return false;
+            }
+        }
+
+        public static bool IsConnecting()
+        {
+            if (NetworkMode != ConnectionType.Client) return false;
+            else return Client.IsConnecting();
+        }
+
+        public static bool DidConnectionFail()
+        {
+            if (NetworkMode != ConnectionType.Client) return false;
+            else return Client.DidConnectionFail();
+        }
+
         public static void SetTick(int tick)
         {
             Client.SetTick(tick);

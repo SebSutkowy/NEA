@@ -17,6 +17,7 @@ namespace TheDungeonGame
 
         public override void OnSwitch()
         {
+            Network.Stop();
             Camera.ResetCamera();
         }
 
@@ -29,7 +30,7 @@ namespace TheDungeonGame
 
             if (InputManager.IsPressed(Input.LMB) && startServerRect.Color == Color.DarkGray)
             {
-                SceneManager.SwitchScene(SceneName.Login);
+                SceneManager.SwitchScene(SceneName.Connecting);
                 Network.ChangeNetworkMode(ConnectionType.Host);
             }
 
@@ -40,7 +41,7 @@ namespace TheDungeonGame
 
             if (InputManager.IsPressed(Input.LMB) && joinServerRect.Color == Color.DarkGray)
             {
-                SceneManager.SwitchScene(SceneName.Login);
+                SceneManager.SwitchScene(SceneName.Connecting);
                 Network.ChangeNetworkMode(ConnectionType.Client);
             }
 

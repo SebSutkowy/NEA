@@ -35,6 +35,8 @@ namespace TheDungeonGame
             ConnectedClients = new Dictionary<int, NetPeer>();
         }
 
+        public bool IsOnline() => _Server.IsRunning;
+
         public void StartServer(int port)
         {
             Network.SetLocalId(0);
